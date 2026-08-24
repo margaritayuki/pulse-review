@@ -14,7 +14,7 @@ fail() {
   exit 1
 }
 
-command -v ruby >/dev/null 2>&1 || fail "Ruby не найден. Установите Ruby 3.1 или новее."
+command -v ruby >/dev/null 2>&1 || fail "Ruby не найден. Установите Ruby 2.6 или новее (рекомендуется 3.1+)."
 
 RUBY_OK="$(ruby -e 'major, minor = RUBY_VERSION.split(".").map(&:to_i); puts((major > 2 || (major == 2 && minor >= 6)) ? "yes" : "no")')"
 if [[ "$RUBY_OK" != "yes" ]]; then

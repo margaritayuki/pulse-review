@@ -6,7 +6,10 @@ on:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
       - uses: ruby/setup-ruby@v1
@@ -17,3 +20,12 @@ jobs:
         run: ruby -c local_server.rb
       - name: Check repository for secrets
         run: ruby scripts/security_check.rb
+      - name: Check Bash scripts
+        if: runner.os != 'Windows'
+        run: bash -n bin/setup bin/start
+      - name: Check PowerShell scripts
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          [void][scriptblock]::Create((Get-Content -Raw windows/setup.ps1))
+          [void][scriptblock]::Create((Get-Content -Raw windows/start.ps1))
