@@ -188,6 +188,7 @@ bundle exec ruby local_server.rb
 - `data/` — локальные настройки, исключённые из Git.
 
 Предложения и pull requests приветствуются. См. [CONTRIBUTING.md](CONTRIBUTING.md).
+История версий опубликована в [CHANGELOG.md](CHANGELOG.md).
 
 ## В планах
 
