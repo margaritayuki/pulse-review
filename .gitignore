@@ -8,3 +8,4 @@ data/*.json
 !data/.gitkeep
 coverage/
 *.log
+.local/

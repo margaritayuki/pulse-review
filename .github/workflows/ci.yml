@@ -5,10 +5,10 @@ on:
   pull_request:
 
 jobs:
-  check:
+  ruby-oracle:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
@@ -29,3 +29,32 @@ jobs:
         run: |
           [void][scriptblock]::Create((Get-Content -Raw windows/setup.ps1))
           [void][scriptblock]::Create((Get-Content -Raw windows/start.ps1))
+          [void][scriptblock]::Create((Get-Content -Raw windows/setup-go.ps1))
+          [void][scriptblock]::Create((Get-Content -Raw windows/start-go.ps1))
+
+  go:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.27.x"
+          cache: true
+      - name: Format
+        shell: bash
+        run: test -z "$(gofmt -l .)"
+      - name: Test
+        run: go test ./...
+      - name: Test with race detector
+        if: runner.os != 'Windows'
+        run: go test -race ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Build
+        run: go build -trimpath ./...
+      - name: Check Bash Go scripts
+        if: runner.os != 'Windows'
+        run: bash -n bin/setup-go bin/start-go

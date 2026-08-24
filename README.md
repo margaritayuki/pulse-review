@@ -184,8 +184,23 @@ bundle exec ruby local_server.rb
 Основные файлы:
 
 - `local_server.rb` — API, GitLab-интеграция и локальное хранение настроек;
+- `main.go` — совместимая Go-реализация backend для версии 0.2.0;
 - `public/index.html` — интерфейс dashboard;
 - `data/` — локальные настройки, исключённые из Git.
+
+### Предварительная Go-версия 0.2.0
+
+Во время миграции Ruby остаётся эталоном и стандартным способом запуска. Для
+проверки Go-версии нужен Go 1.27 или новее:
+
+```bash
+bin/setup-go
+bin/start-go
+```
+
+На Windows используйте `setup-go.cmd` и `start-go.cmd`. Обе реализации читают
+один формат `.env.local` и `data/*.json`. Подробные условия совместимости
+описаны в [MIGRATION.md](MIGRATION.md).
 
 Предложения и pull requests приветствуются. См. [CONTRIBUTING.md](CONTRIBUTING.md).
 История версий опубликована в [CHANGELOG.md](CHANGELOG.md).

@@ -22,7 +22,14 @@ bundle exec ruby local_server.rb
 ```bash
 ruby -c local_server.rb
 ruby scripts/security_check.rb
+go test ./...
+go test -race ./...
+go vet ./...
 ```
+
+Для миграции v0.2.0 Ruby остаётся oracle: изменение правил метрик должно сначала
+получить fixture, демонстрирующий прежнее и ожидаемое поведение. Не удаляйте
+Ruby-запуск до прохождения CI на Windows, macOS и Ubuntu.
 
 ## Pull request
 
