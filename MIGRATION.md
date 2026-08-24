@@ -1,7 +1,7 @@
 # Миграция backend на Go — v0.2.0
 
 Ruby-реализация `local_server.rb` остаётся эталоном поведения до прохождения
-матрицы CI на Windows, macOS и Ubuntu. Пользовательские JSON-файлы и frontend не
+матрицы CI на Windows и macOS. Пользовательские JSON-файлы и frontend не
 требуют миграции.
 
 ## Контракт совместимости
@@ -20,8 +20,10 @@ Go-версия сохраняет:
 
 ## Переходный запуск
 
-- Ruby: `bin/start` или `start.cmd`;
-- Go: `bin/setup-go` + `bin/start-go` или `setup-go.cmd` + `start-go.cmd`.
+- Go: `bin/setup` + `bin/start` или `setup.cmd` + `start.cmd`;
+- явные Go-команды `bin/setup-go`, `bin/start-go`, `setup-go.cmd` и
+  `start-go.cmd` оставлены как алиасы;
+- Ruby временно доступен напрямую через `bundle exec ruby local_server.rb`.
 
 Основной запуск будет переключён на Go только после зелёного CI и проверки
 результатов обеих реализаций на одинаковых GitLab fixtures. До этого Ruby-файлы,
@@ -30,7 +32,7 @@ Gemfile и старые установщики не удаляются.
 ## Критерии завершения
 
 1. `go test ./...`, `go test -race ./...` и `go vet ./...` проходят.
-2. Go-бинарник собирается и запускается на трёх целевых ОС.
+2. Go-бинарник собирается и запускается на Windows и macOS.
 3. Контракты API и результаты метрик совпадают с Ruby oracle.
 4. Существующие `data/*.json` читаются обеими реализациями.
 5. Frontend работает без изменений HTTP-контракта.

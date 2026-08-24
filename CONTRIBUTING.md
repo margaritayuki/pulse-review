@@ -29,7 +29,7 @@ go vet ./...
 
 Для миграции v0.2.0 Ruby остаётся oracle: изменение правил метрик должно сначала
 получить fixture, демонстрирующий прежнее и ожидаемое поведение. Не удаляйте
-Ruby-запуск до прохождения CI на Windows, macOS и Ubuntu.
+Ruby oracle до прохождения CI на Windows и macOS.
 
 ## Pull request
 

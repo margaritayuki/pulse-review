@@ -28,11 +28,10 @@ Pulse Review показывает, сколько ревью провёл каж
 ## Требования
 
 - GitLab с доступным REST API v4;
-- Ruby 2.6 или новее (рекомендуется 3.1+);
-- Bundler;
+- Go 1.27 или новее при сборке из исходников;
 - GitLab access token со scope `read_api`.
 
-## Быстрый запуск на macOS и Linux
+## Быстрый запуск на macOS
 
 ```bash
 git clone https://github.com/margaritayuki/pulse-review.git
@@ -40,9 +39,9 @@ cd pulse-review
 bin/setup
 ```
 
-Установщик проверит окружение, запросит адрес GitLab и токен, установит
-зависимости и предложит сразу запустить приложение. Токен при вводе не
-отображается и сохраняется только в локальном `.env.local`.
+Установщик проверит Go, запросит адрес GitLab и токен и соберёт локальный
+бинарник. Токен при вводе не отображается и сохраняется только в локальном
+`.env.local`.
 
 Для последующих запусков используйте:
 
@@ -52,7 +51,7 @@ bin/start
 
 ## Быстрый запуск на Windows
 
-1. Установите [Ruby+Devkit](https://rubyinstaller.org/) версии 3.1 или новее.
+1. Установите [Go](https://go.dev/dl/) версии 1.27 или новее.
 2. Скачайте исходный код Pulse Review или клонируйте репозиторий.
 3. Откройте папку проекта в PowerShell или Проводнике.
 4. Запустите установщик:
@@ -61,8 +60,8 @@ bin/start
 .\setup.cmd
 ```
 
-Он проверит Ruby и Bundler, безопасно запросит GitLab token, создаст локальный
-`.env.local` и установит зависимости. Для последующих запусков используйте:
+Он проверит Go, безопасно запросит GitLab token, создаст локальный `.env.local`
+и соберёт приложение. Для последующих запусков используйте:
 
 ```powershell
 .\start.cmd
@@ -75,10 +74,10 @@ bin/start
 Если предпочитаете ручную настройку:
 
 ```bash
-bundle install
 cp .env.example .env.local
 # заполните GITLAB_URL и GITLAB_TOKEN в .env.local
-bundle exec ruby local_server.rb
+go build -trimpath -o pulse-review .
+./pulse-review
 ```
 
 Откройте [http://127.0.0.1:4567](http://127.0.0.1:4567).
@@ -176,31 +175,30 @@ reactions для восстановления истории ревью. Пер�
 ## Разработка
 
 ```bash
-bundle install
-ruby -c local_server.rb
-bundle exec ruby local_server.rb
+go test -race ./...
+go vet ./...
+go run .
 ```
 
 Основные файлы:
 
-- `local_server.rb` — API, GitLab-интеграция и локальное хранение настроек;
-- `main.go` — совместимая Go-реализация backend для версии 0.2.0;
+- `main.go` — API, GitLab-интеграция и локальное хранение настроек;
+- `local_server.rb` — временный oracle поведения версии 0.1.0;
 - `public/index.html` — интерфейс dashboard;
 - `data/` — локальные настройки, исключённые из Git.
 
-### Предварительная Go-версия 0.2.0
+### Миграция v0.2.0
 
-Во время миграции Ruby остаётся эталоном и стандартным способом запуска. Для
-проверки Go-версии нужен Go 1.27 или новее:
+Стандартные команды уже запускают Go-версию:
 
 ```bash
-bin/setup-go
-bin/start-go
+bin/setup
+bin/start
 ```
 
-На Windows используйте `setup-go.cmd` и `start-go.cmd`. Обе реализации читают
-один формат `.env.local` и `data/*.json`. Подробные условия совместимости
-описаны в [MIGRATION.md](MIGRATION.md).
+На Windows используйте `setup.cmd` и `start.cmd`. Ruby временно сохранён только
+для проверки совместимости и будет удалён после зелёного CI на Windows и macOS.
+Подробности описаны в [MIGRATION.md](MIGRATION.md).
 
 Предложения и pull requests приветствуются. См. [CONTRIBUTING.md](CONTRIBUTING.md).
 История версий опубликована в [CHANGELOG.md](CHANGELOG.md).
