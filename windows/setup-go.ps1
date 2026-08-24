@@ -50,4 +50,4 @@ try {
     & go build -trimpath -o $Binary .
     if ($LASTEXITCODE -ne 0) { Stop-WithError "Go build failed." }
 } finally { Pop-Location }
-Write-Host "`nSetup complete. Run start-go.cmd." -ForegroundColor Green
+Write-Host "`nSetup complete. Run start.cmd." -ForegroundColor Green

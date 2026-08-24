@@ -45,4 +45,4 @@ say "Собираю Go-приложение..."
 mkdir -p "$(dirname "$BINARY")"
 cd "$ROOT_DIR"
 go build -trimpath -o "$BINARY" .
-say "Готово. Запуск: bin/start-go"
+say "Готово. Запуск: bin/start"

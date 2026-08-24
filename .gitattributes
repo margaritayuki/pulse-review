@@ -1,6 +1,5 @@
 * text=auto
 *.go text eol=lf
-*.rb text eol=lf
 *.yml text eol=lf
 bin/* text eol=lf
 *.cmd text eol=crlf

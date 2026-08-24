@@ -48,7 +48,7 @@ func scan(root string) ([]string, error) {
 		relative = filepath.ToSlash(relative)
 		if entry.IsDir() {
 			base := entry.Name()
-			if relative != "." && (base == ".git" || base == ".bundle" || base == ".local" || base == "vendor" || base == "data") {
+			if relative != "." && (base == ".git" || base == ".local" || base == "vendor" || base == "data") {
 				return filepath.SkipDir
 			}
 			return nil

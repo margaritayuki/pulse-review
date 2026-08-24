@@ -12,24 +12,21 @@
 ## Локальная разработка
 
 ```bash
-bundle install
 cp .env.example .env.local
-bundle exec ruby local_server.rb
+go run .
 ```
 
 Перед pull request:
 
 ```bash
-ruby -c local_server.rb
-ruby scripts/security_check.rb
 go test ./...
 go test -race ./...
 go vet ./...
+go run ./cmd/security-check
 ```
 
-Для миграции v0.2.0 Ruby остаётся oracle: изменение правил метрик должно сначала
-получить fixture, демонстрирующий прежнее и ожидаемое поведение. Не удаляйте
-Ruby oracle до прохождения CI на Windows и macOS.
+Изменение правил метрик должно сопровождаться fixture, демонстрирующим прежнее и
+ожидаемое поведение.
 
 ## Pull request
 

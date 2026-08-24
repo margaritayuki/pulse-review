@@ -88,7 +88,7 @@ func fixtureGitLab(t *testing.T) http.Handler {
 	})
 }
 
-func TestBuildReportMatchesRubyRules(t *testing.T) {
+func TestBuildReportRules(t *testing.T) {
 	app := newTestApplication(t, fixtureGitLab(t))
 	writeFixture(t, app.root, "groups.json", []string{"acme"})
 	writeFixture(t, app.root, "projects.json", []string{})
@@ -176,7 +176,7 @@ func TestInRangeIsInclusiveAndUTC(t *testing.T) {
 	}
 }
 
-func TestLoadEnvFileMatchesRubyPrecedence(t *testing.T) {
+func TestLoadEnvFilePrecedence(t *testing.T) {
 	t.Setenv("PULSE_TEST_VALUE", "process")
 	path := filepath.Join(t.TempDir(), ".env.local")
 	if err := os.WriteFile(path, []byte("PULSE_TEST_VALUE=file\r\nEMPTY=\r\n# comment\r\n"), 0o600); err != nil {
@@ -197,7 +197,7 @@ func TestDirectHTTPClientIgnoresProxyEnvironment(t *testing.T) {
 		t.Fatal("direct client must use an explicit HTTP transport")
 	}
 	if transport.Proxy != nil {
-		t.Fatal("direct client must match Ruby and ignore proxy environment variables")
+		t.Fatal("direct client must ignore proxy environment variables")
 	}
 }
 

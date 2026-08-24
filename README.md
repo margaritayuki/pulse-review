@@ -144,7 +144,8 @@ reactions для восстановления истории ревью. Пер�
 ### `Failed to fetch`
 
 Страница должна открываться через `http://127.0.0.1:4567`, а не через
-`file:///.../public/index.html`. Убедитесь, что `local_server.rb` запущен.
+`file:///.../public/index.html`. Убедитесь, что Pulse Review запущен через
+`bin/start` или `start.cmd`.
 
 ### `GitLab API: 401`
 
@@ -183,7 +184,6 @@ go run .
 Основные файлы:
 
 - `main.go` — API, GitLab-интеграция и локальное хранение настроек;
-- `local_server.rb` — временный oracle поведения версии 0.1.0;
 - `public/index.html` — интерфейс dashboard;
 - `data/` — локальные настройки, исключённые из Git.
 
@@ -196,9 +196,8 @@ bin/setup
 bin/start
 ```
 
-На Windows используйте `setup.cmd` и `start.cmd`. Ruby временно сохранён только
-для проверки совместимости и будет удалён после зелёного CI на Windows и macOS.
-Подробности описаны в [MIGRATION.md](MIGRATION.md).
+На Windows используйте `setup.cmd` и `start.cmd`. Миграция backend на Go
+завершена; Ruby и Bundler больше не требуются.
 
 Предложения и pull requests приветствуются. См. [CONTRIBUTING.md](CONTRIBUTING.md).
 История версий опубликована в [CHANGELOG.md](CHANGELOG.md).
