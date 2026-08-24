@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+.bundle/
+vendor/bundle/
+data/*.json
+!data/.gitkeep
+coverage/
+*.log

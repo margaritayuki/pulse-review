@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Pulse Review">
+  <rect width="32" height="32" rx="9" fill="#17233f"/>
+  <path d="M11.5 8.5 5.5 16l6 7.5" fill="none" stroke="#6673ee" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m20.5 8.5 6 7.5-6 7.5" fill="none" stroke="#6673ee" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M9.5 16h3.2l1.55-3.35 2.15 7.1 1.65-3.75h4.45" fill="none" stroke="#fff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

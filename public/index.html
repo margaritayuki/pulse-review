@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pulse Review</title>
+</head>
+<body>
+<div id="review-dashboard-concept">
+  <style>
+    #review-dashboard-concept { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: light-dark(#172033,#eef3ff); }
+    #review-dashboard-concept * { box-sizing: border-box; }
+    #review-dashboard-concept .rd-window { width: 100%; min-height: 690px; background: light-dark(#f5f7fb,#111722); border: 1px solid light-dark(#dfe4ee,#303a49); border-radius: 18px; overflow: hidden; }
+    #review-dashboard-concept .rd-top { height: 66px; padding: 0 24px; display:flex; align-items:center; justify-content:space-between; background: light-dark(#ffffff,#18202c); border-bottom:1px solid light-dark(#e5e9f1,#303a49); }
+    #review-dashboard-concept .rd-head-left { display:flex; align-items:center; gap:28px; height:100%; }
+    #review-dashboard-concept .rd-brand { display:flex; align-items:center; gap:12px; font-weight:750; letter-spacing:-.02em; }
+    #review-dashboard-concept .rd-logo { width:32px; height:32px; display:block; flex:none; }
+    #review-dashboard-concept .rd-tabs { display:flex; align-items:stretch; height:100%; gap:20px; }
+    #review-dashboard-concept .rd-tab { position:relative; border:0; padding:0 2px; background:transparent; color:light-dark(#667085,#aab4c4); cursor:pointer; font-weight:650; }
+    #review-dashboard-concept .rd-tab.active { color:light-dark(#172033,#eef3ff); }
+    #review-dashboard-concept .rd-tab.active::after { content:""; position:absolute; left:0; right:0; bottom:0; height:2px; background:#5965d8; }
+    #review-dashboard-concept .rd-main { padding:26px; }
+    #review-dashboard-concept .rd-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:18px; }
+    #review-dashboard-concept h1 { font-size:26px; margin:0 0 5px; letter-spacing:-.035em; }
+    #review-dashboard-concept .rd-sub { font-size:13px; color:light-dark(#667085,#aab4c4); }
+    #review-dashboard-concept button, #review-dashboard-concept select, #review-dashboard-concept input { font:inherit; }
+    #review-dashboard-concept .rd-action { border:0; background:#5965d8; color:white; border-radius:9px; padding:10px 15px; font-weight:650; cursor:pointer; }
+    #review-dashboard-concept .rd-action.secondary { color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); border:1px solid light-dark(#d7dde8,#3a4657); }
+    #review-dashboard-concept .rd-controls { display:grid; grid-template-columns:minmax(150px,1fr) minmax(150px,1fr) minmax(300px,2fr); align-items:end; gap:12px; padding:16px; border:1px solid light-dark(#dfe4ee,#303a49); background:light-dark(#fff,#18202c); border-radius:13px; margin-bottom:20px; }
+    #review-dashboard-concept .rd-period-row { min-width:0; }
+    #review-dashboard-concept .rd-date-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; align-items:end; gap:12px; }
+    #review-dashboard-concept .rd-date-row > div { min-width:0; }
+    #review-dashboard-concept label { display:block; color:light-dark(#667085,#aab4c4); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    #review-dashboard-concept select, #review-dashboard-concept input { width:100%; color:inherit; background:light-dark(#f8fafc,#111722); border:1px solid light-dark(#d7dde8,#3a4657); border-radius:8px; padding:9px 10px; }
+    #review-dashboard-concept .rd-run { width:40px; height:40px; align-self:end; justify-self:start; display:grid; place-items:center; padding:0; font-size:21px; line-height:1; }
+    #review-dashboard-concept .rd-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:18px; }
+    #review-dashboard-concept .rd-kpi { padding:13px 16px 19px; background:light-dark(#fff,#18202c); border:1px solid light-dark(#dfe4ee,#303a49); border-radius:13px; }
+    #review-dashboard-concept .rd-kpi span { color:light-dark(#667085,#aab4c4); font-size:12px; }
+    #review-dashboard-concept .rd-kpi strong { display:block; font-size:28px; margin-top:5px; letter-spacing:-.04em; }
+    #review-dashboard-concept .rd-engagement { margin-bottom:20px; overflow:visible; }
+    #review-dashboard-concept .rd-engagement-head { padding:15px 17px 12px; display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
+    #review-dashboard-concept .rd-engagement-title strong { display:block; font-size:15px; }
+    #review-dashboard-concept .rd-engagement-title span { display:block; margin-top:4px; color:light-dark(#667085,#aab4c4); font-size:11px; }
+    #review-dashboard-concept .rd-engagement-legend { display:flex; align-items:center; flex-wrap:wrap; gap:14px; color:light-dark(#667085,#aab4c4); font-size:11px; }
+    #review-dashboard-concept .rd-engagement-legend span { display:flex; align-items:center; gap:6px; }
+    #review-dashboard-concept .rd-engagement-legend i { width:10px; height:10px; border-radius:3px; }
+    #review-dashboard-concept .rd-engagement-body { padding:2px 17px 17px; display:grid; gap:11px; }
+    #review-dashboard-concept .rd-engagement-row { display:grid; grid-template-columns:minmax(150px,220px) minmax(160px,1fr) 44px; align-items:center; gap:14px; }
+    #review-dashboard-concept .rd-engagement-person { min-width:0; display:flex; align-items:center; gap:8px; font-size:12px; font-weight:650; }
+    #review-dashboard-concept .rd-engagement-person span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    #review-dashboard-concept .rd-engagement-bar { position:relative; height:14px; display:flex; border-radius:7px; background:light-dark(#edf0f5,#293342); }
+    #review-dashboard-concept .rd-engagement-segment { position:relative; height:100%; min-width:0; cursor:default; }
+    #review-dashboard-concept .rd-engagement-segment:first-child { border-radius:7px 0 0 7px; }
+    #review-dashboard-concept .rd-engagement-segment:last-of-type { border-radius:0 7px 7px 0; }
+    #review-dashboard-concept .rd-engagement-segment:hover { filter:brightness(.94); z-index:3; }
+    #review-dashboard-concept .rd-engagement-segment:hover::after { content:attr(data-tooltip); position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%); padding:6px 8px; border-radius:6px; color:#fff; background:#172033; font-size:11px; font-weight:650; white-space:nowrap; box-shadow:0 5px 16px rgba(23,32,51,.2); }
+    #review-dashboard-concept .rd-engagement-segment:hover::before { content:""; position:absolute; left:50%; bottom:100%; transform:translateX(-50%); border:4px solid transparent; border-top-color:#172033; }
+    #review-dashboard-concept .rd-engagement-approvals { background:#36a86f; }
+    #review-dashboard-concept .rd-engagement-comments { background:#6f63d9; }
+    #review-dashboard-concept .rd-engagement-mrs { background:#f5aa2b; }
+    #review-dashboard-concept .rd-engagement-total { text-align:right; font-size:12px; font-weight:750; }
+    #review-dashboard-concept .rd-engagement-empty { padding:8px 0; color:light-dark(#98a2b3,#778397); font-size:12px; }
+    #review-dashboard-concept .rd-content { display:grid; gap:20px; }
+    #review-dashboard-concept .rd-panel { background:light-dark(#fff,#18202c); border:1px solid light-dark(#dfe4ee,#303a49); border-radius:13px; overflow:hidden; }
+    #review-dashboard-concept .rd-panel-title { min-height:58px; padding:10px 17px; display:flex; align-items:center; justify-content:space-between; gap:16px; font-weight:700; border-bottom:1px solid light-dark(#e7eaf0,#303a49); }
+    #review-dashboard-concept table { width:100%; border-collapse:collapse; font-size:13px; }
+    #review-dashboard-concept th { padding:11px 15px; text-align:left; color:light-dark(#667085,#aab4c4); background:light-dark(#f8fafc,#111722); font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+    #review-dashboard-concept td { padding:14px 15px; border-top:1px solid light-dark(#edf0f5,#293342); }
+    #review-dashboard-concept tfoot td { background:light-dark(#f6f7fa,#202a38); color:light-dark(#667085,#aab4c4); font-weight:700; }
+    #review-dashboard-concept th:nth-child(n+2), #review-dashboard-concept td:nth-child(n+2) { text-align:right; }
+    #review-dashboard-concept .rd-person { display:flex; align-items:center; gap:9px; font-weight:650; }
+    #review-dashboard-concept .rd-person a, #review-dashboard-concept .rd-number-link { color:inherit; text-decoration:none; border-bottom:1px solid light-dark(#c8cfdd,#596579); }
+    #review-dashboard-concept .rd-person a:hover, #review-dashboard-concept .rd-number-link:hover { color:#5965d8; border-bottom-color:#5965d8; }
+    #review-dashboard-concept .rd-export-team { position:relative; width:34px; height:34px; padding:0; border:0; background:transparent; color:light-dark(#667085,#aab4c4); cursor:pointer; }
+    #review-dashboard-concept .rd-export-team::before { content:"↓"; position:absolute; inset:0 0 7px; font-size:25px; line-height:24px; text-align:center; }
+    #review-dashboard-concept .rd-export-team::after { content:""; position:absolute; left:9px; right:9px; bottom:5px; height:6px; border:2px solid currentColor; border-top:0; border-radius:0 0 3px 3px; }
+    #review-dashboard-concept .rd-export-team:hover { color:light-dark(#344054,#e4eaf4); }
+    #review-dashboard-concept .rd-avatar { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; color:white; font-size:11px; background:#7280df; }
+    #review-dashboard-concept .rd-zero { color:light-dark(#98a2b3,#778397); }
+    #review-dashboard-concept .rd-settings { padding:16px; }
+    #review-dashboard-concept .rd-switch-row { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:16px; }
+    #review-dashboard-concept .rd-switch-copy strong { font-size:13px; display:block; }
+    #review-dashboard-concept .rd-switch-copy small { color:light-dark(#667085,#aab4c4); }
+    #review-dashboard-concept .rd-switch { width:40px; height:23px; border:0; border-radius:14px; padding:3px; background:#5965d8; cursor:pointer; }
+    #review-dashboard-concept .rd-switch i { display:block; width:17px; height:17px; border-radius:50%; background:white; margin-left:17px; transition:.15s; }
+    #review-dashboard-concept .rd-switch.off { background:light-dark(#cbd2dd,#465263); }
+    #review-dashboard-concept .rd-switch.off i { margin-left:0; }
+    #review-dashboard-concept .rd-field { margin-bottom:13px; }
+    #review-dashboard-concept .rd-note { padding:11px; border-radius:8px; background:light-dark(#f0f2ff,#222a4b); color:light-dark(#505aa7,#c5cbff); font-size:12px; line-height:1.45; margin:14px 0; }
+    #review-dashboard-concept .rd-full { width:100%; }
+    #review-dashboard-concept .rd-toast { margin-top:12px; text-align:center; font-size:12px; color:#3f9d70; min-height:18px; }
+    #review-dashboard-concept .rd-view[hidden] { display:none; }
+    #review-dashboard-concept .rd-settings-page { max-width:900px; }
+    #review-dashboard-concept .rd-settings-heading { margin-bottom:18px; }
+    #review-dashboard-concept .rd-settings-heading h1 { margin-bottom:5px; }
+    #review-dashboard-concept .rd-routes { display:grid; gap:14px; }
+    #review-dashboard-concept .rd-route { padding:16px; border:1px solid light-dark(#dfe4ee,#303a49); border-radius:11px; background:light-dark(#f8fafc,#151c27); }
+    #review-dashboard-concept .rd-route-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+    #review-dashboard-concept .rd-route-head strong { font-size:14px; }
+    #review-dashboard-concept .rd-route-head small { display:block; margin-top:3px; color:light-dark(#667085,#aab4c4); font-size:11px; }
+    #review-dashboard-concept .rd-route-grid { display:grid; grid-template-columns:1.25fr .7fr .6fr .9fr; gap:12px; }
+    #review-dashboard-concept .rd-team-review-row { grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,1fr) 230px; gap:12px; }
+    #review-dashboard-concept .rd-channel-control { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:12px; }
+    #review-dashboard-concept .rd-notify-toggle { display:flex; align-items:center; gap:8px; color:light-dark(#667085,#aab4c4); font-size:11px; white-space:nowrap; }
+    #review-dashboard-concept .rd-project-picker { margin-top:13px; }
+    #review-dashboard-concept .rd-global-sources-picker { margin-top:0; }
+    #review-dashboard-concept .rd-project-box { min-height:43px; padding:6px; display:flex; flex-wrap:wrap; align-items:center; gap:6px; background:light-dark(#fff,#111722); border:1px solid light-dark(#d7dde8,#3a4657); border-radius:8px; }
+    #review-dashboard-concept .rd-chip { display:inline-flex; align-items:center; gap:5px; padding:5px 8px; color:light-dark(#3f4979,#dfe3ff); background:light-dark(#eef0ff,#272f55); border-radius:6px; font-size:11px; }
+    #review-dashboard-concept .rd-chip button { padding:0; border:0; color:inherit; background:transparent; cursor:pointer; }
+    #review-dashboard-concept .rd-add-project, #review-dashboard-concept .rd-add-group, #review-dashboard-concept .rd-add-member, #review-dashboard-concept .rd-add-source { padding:5px 7px; border:0; color:#5965d8; background:transparent; cursor:pointer; font-size:11px; }
+    #review-dashboard-concept .rd-inline-add { display:flex; align-items:center; gap:6px; flex:1; min-width:220px; }
+    #review-dashboard-concept .rd-inline-add input { min-width:130px; padding:5px 7px; border:0; background:transparent; }
+    #review-dashboard-concept .rd-inline-add button { padding:5px 8px; border:0; border-radius:6px; color:white; background:#5965d8; cursor:pointer; font-size:11px; }
+    #review-dashboard-concept .rd-route-actions { display:flex; align-items:center; gap:9px; }
+    #review-dashboard-concept .rd-icon-action { width:30px; height:30px; padding:0; display:grid; place-items:center; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; }
+    #review-dashboard-concept .rd-settings-footer { margin-top:15px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    #review-dashboard-concept .rd-add-route { border-style:dashed !important; }
+    @media (max-width: 760px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row { grid-template-columns:1fr; } }
+    @media (max-width: 520px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr; } #review-dashboard-concept .rd-date-row { grid-column:auto; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-run { grid-column:1 / -1; } #review-dashboard-concept .rd-summary { grid-template-columns:1fr; } #review-dashboard-concept .rd-engagement-head { flex-direction:column; } #review-dashboard-concept .rd-engagement-row { grid-template-columns:120px minmax(100px,1fr) 34px; gap:8px; } }
+  </style>
+  <section class="rd-window">
+    <header class="rd-top">
+      <div class="rd-head-left">
+        <div class="rd-brand"><img class="rd-logo" src="/pulse-review-mark.svg" alt=""><span>Pulse Review</span></div>
+        <nav class="rd-tabs" aria-label="Разделы">
+          <button class="rd-tab active" data-view="dashboard" aria-selected="true">Статистика</button>
+          <button class="rd-tab" data-view="settings" aria-selected="false">Настройки</button>
+        </nav>
+      </div>
+    </header>
+    <main class="rd-main">
+      <section class="rd-view" data-page="dashboard">
+      <div class="rd-controls">
+        <div class="rd-period-row"><label for="rd-period">Период</label><select id="rd-period"><option value="yesterday">Вчера</option><option value="week" selected>Последние 7 дней</option><option value="month">Предыдущий месяц</option><option value="current_quarter">Текущий квартал</option><option value="previous_quarter">Предыдущий квартал</option><option value="custom">Свои даты</option></select></div>
+        <div class="rd-date-row">
+          <div><label for="rd-from">С</label><input id="rd-from" type="date"></div>
+          <div><label for="rd-to">По</label><input id="rd-to" type="date"></div>
+          <button class="rd-action rd-run" id="rd-refresh" aria-label="Обновить данные" title="Обновить данные">↻</button>
+        </div>
+      </div>
+      <div class="rd-heading">
+        <div><h1>Ревью команды</h1><div class="rd-sub" id="rd-caption">Статистика за последние 7 дней</div></div>
+      </div>
+      <div class="rd-summary">
+        <div class="rd-kpi"><span>Успешно проведённых ревью</span><strong>12</strong></div>
+        <div class="rd-kpi"><span>Комментариев</span><strong>38</strong></div>
+        <div class="rd-kpi"><span>Открыто MR</span><strong>0</strong></div>
+        <div class="rd-kpi"><span>Активных ревьюеров</span><strong>5 из 7</strong></div>
+      </div>
+      <section class="rd-panel rd-engagement" aria-labelledby="rd-engagement-title">
+        <div class="rd-engagement-head">
+          <div class="rd-engagement-title"><strong id="rd-engagement-title">Вовлечённость</strong><span>Approvals / 👍 + комментарии + созданные MR</span></div>
+          <div class="rd-engagement-legend" aria-label="Обозначения графика"><span><i class="rd-engagement-approvals"></i>Approvals / 👍</span><span><i class="rd-engagement-comments"></i>Комментарии</span><span><i class="rd-engagement-mrs"></i>Создано MR</span></div>
+        </div>
+        <div class="rd-engagement-body"><div class="rd-engagement-empty">График появится после загрузки данных</div></div>
+      </section>
+      <div class="rd-content">
+        <section class="rd-panel">
+          <div class="rd-panel-title"><span>Участие разработчиков</span><button class="rd-action secondary" id="rd-export">Скачать CSV</button></div>
+          <table><thead><tr><th>Сотрудник</th><th>Approvals</th><th>Комментарии</th><th>Создано MR</th></tr></thead><tbody>
+            <tr><td><div class="rd-person"><span class="rd-avatar">АС</span>Анна Смирнова</div></td><td>4</td><td>11</td><td>5</td></tr>
+            <tr><td><div class="rd-person"><span class="rd-avatar">ИП</span>Иван Петров</div></td><td>3</td><td>9</td><td>4</td></tr>
+            <tr><td><div class="rd-person"><span class="rd-avatar">МК</span>Мария Ким</div></td><td>2</td><td>8</td><td>3</td></tr>
+            <tr><td><div class="rd-person"><span class="rd-avatar">АД</span>Алексей Денисов</div></td><td>2</td><td>6</td><td>3</td></tr>
+            <tr><td><div class="rd-person"><span class="rd-avatar">ОБ</span>Олег Белов</div></td><td>1</td><td>4</td><td>2</td></tr>
+            <tr><td><div class="rd-person"><span class="rd-avatar">ЕН</span>Елена Новикова</div></td><td class="rd-zero">0</td><td class="rd-zero">0</td><td class="rd-zero">0</td></tr>
+          </tbody></table>
+        </section>
+      </div>
+      <div class="rd-toast" id="rd-toast"></div>
+      </section>
+      <section class="rd-view" data-page="settings" hidden>
+        <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
+          <div class="rd-panel-title"><span>Источники GitLab</span><span class="rd-sub">Общие для всех команд</span></div>
+          <div class="rd-settings">
+            <div class="rd-project-picker rd-global-sources-picker"><div class="rd-project-box rd-global-sources"><button class="rd-add-source">+ Добавить группу или проект</button></div></div>
+          </div>
+        </section>
+        <section class="rd-panel rd-settings-page">
+          <div class="rd-panel-title"><span>Команды</span><span class="rd-sub" id="rd-route-count">2 команды</span></div>
+          <div class="rd-settings">
+            <div class="rd-routes" id="rd-routes">
+              <article class="rd-route">
+                <div class="rd-route-head"><div><strong>Backend-команда</strong><small>Отчёт за предыдущий день</small></div><div class="rd-route-actions"><button class="rd-icon-action" aria-label="Удалить маршрут">×</button></div></div>
+                <div class="rd-route-grid">
+                  <div class="rd-team-review-row"><div class="rd-channel-field rd-team-field"><label>Команда</label><input placeholder="Название команды..." value="Backend-команда"></div><div class="rd-review-signal"><label>Подтверждение ревью</label><select><option value="approval">Approve</option><option value="like">👍 Лайк</option><option value="either">Approve или 👍</option></select></div></div>
+                  <div class="rd-channel-field"><label>Канал Mattermost</label><div class="rd-channel-control"><input value="~team-backend"><div class="rd-notify-toggle"><span>Оповещения</span><button class="rd-switch" aria-pressed="true"><i></i></button></div></div></div>
+                  <div><label>Частота</label><select><option>По будням</option><option>Каждый день</option><option>Раз в неделю</option><option>Раз в месяц</option></select></div>
+                  <div><label>Время (Москва)</label><input type="time" value="10:00"></div>
+                </div>
+                <div class="rd-project-picker"><label>Проекты GitLab</label><div class="rd-project-box"><span class="rd-chip">example/backend-api <button aria-label="Убрать проект">×</button></span><span class="rd-chip">example/shared-library <button aria-label="Убрать проект">×</button></span><button class="rd-add-project">+ Добавить проект</button></div></div>
+                <div class="rd-project-picker"><label>Участники команды (GitLab username)</label><div class="rd-project-box rd-members-box"><button class="rd-add-member">+ Добавить участника</button></div></div>
+              </article>
+              <article class="rd-route">
+                <div class="rd-route-head"><div><strong>Mobile-команда</strong><small>Еженедельная сводка</small></div><div class="rd-route-actions"><button class="rd-icon-action" aria-label="Удалить маршрут">×</button></div></div>
+                <div class="rd-route-grid">
+                  <div class="rd-team-review-row"><div class="rd-channel-field rd-team-field"><label>Команда</label><input placeholder="Название команды..." value="Mobile-команда"></div><div class="rd-review-signal"><label>Подтверждение ревью</label><select><option value="approval">Approve</option><option value="like">👍 Лайк</option><option value="either">Approve или 👍</option></select></div></div>
+                  <div class="rd-channel-field"><label>Канал Mattermost</label><div class="rd-channel-control"><input value="~team-mobile"><div class="rd-notify-toggle"><span>Оповещения</span><button class="rd-switch" aria-pressed="true"><i></i></button></div></div></div>
+                  <div><label>Частота</label><select><option>Раз в неделю</option><option>По будням</option><option>Каждый день</option><option>Раз в месяц</option></select></div>
+                  <div><label>Время (Москва)</label><input type="time" value="10:00"></div>
+                </div>
+                <div class="rd-project-picker"><label>Проекты GitLab</label><div class="rd-project-box"><span class="rd-chip">mobile/android-app <button aria-label="Убрать проект">×</button></span><span class="rd-chip">mobile/ios-app <button aria-label="Убрать проект">×</button></span><button class="rd-add-project">+ Добавить проект</button></div></div>
+                <div class="rd-project-picker"><label>Участники команды (GitLab username)</label><div class="rd-project-box rd-members-box"><button class="rd-add-member">+ Добавить участника</button></div></div>
+              </article>
+            </div>
+            <div class="rd-settings-footer"><button class="rd-action secondary rd-add-route" id="rd-add-route">+ Добавить команду</button><button class="rd-action" id="rd-save-routes">Сохранить настройки</button></div>
+            <div class="rd-toast" id="rd-settings-toast"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </section>
+  <script>
+    (() => {
+      const root = document.getElementById('review-dashboard-concept');
+      const period = root.querySelector('#rd-period');
+      const caption = root.querySelector('#rd-caption');
+      const toast = root.querySelector('#rd-toast');
+      const settingsToast = root.querySelector('#rd-settings-toast');
+      const tabs = [...root.querySelectorAll('.rd-tab')];
+      const pages = [...root.querySelectorAll('.rd-view')];
+      tabs.forEach(tab => tab.addEventListener('click', () => {
+        tabs.forEach(item => { const active = item === tab; item.classList.toggle('active', active); item.setAttribute('aria-selected', String(active)); });
+        pages.forEach(page => { page.hidden = page.dataset.page !== tab.dataset.view; });
+      }));
+      period.addEventListener('change', () => {
+        const labels = { yesterday:'Статистика за вчера, 13 августа 2026', week:'Статистика за последние 7 дней', month:'Статистика за июль 2026', custom:'Статистика за выбранный период' };
+        caption.textContent = labels[period.value];
+      });
+      root.querySelector('#rd-refresh').addEventListener('click', () => { toast.textContent = 'Данные обновлены'; setTimeout(() => toast.textContent = '', 1800); });
+      root.querySelector('#rd-save-routes').addEventListener('click', () => { settingsToast.textContent = 'Настройки сохранены'; });
+      root.querySelector('#rd-add-route').addEventListener('click', () => { settingsToast.textContent = 'Добавлен новый маршрут'; });
+      root.querySelector('#rd-export').addEventListener('click', () => { toast.textContent = 'CSV подготовлен'; });
+      root.querySelectorAll('.rd-switch').forEach(switchButton => switchButton.addEventListener('click', () => { const on = switchButton.getAttribute('aria-pressed') === 'true'; switchButton.setAttribute('aria-pressed', String(!on)); switchButton.classList.toggle('off', on); }));
+    })();
+  </script>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('review-dashboard-concept');
+  const controls = root.querySelector('.rd-controls');
+  const teamRow = document.createElement('div');
+  teamRow.className = 'rd-period-row';
+  teamRow.innerHTML = '<label for="live-team">Команда</label><select id="live-team"><option value="all">Все команды</option></select>';
+  controls.prepend(teamRow);
+  const teamSelect = teamRow.querySelector('select');
+  const kpis = root.querySelectorAll('.rd-kpi strong');
+  const tbody = root.querySelector('tbody');
+  const reportContent = root.querySelector('.rd-content');
+  const engagementBody = root.querySelector('.rd-engagement-body');
+  const refreshButton = root.querySelector('#rd-refresh');
+  const status = root.querySelector('#rd-toast');
+  const routesContainer = root.querySelector('#rd-routes');
+  const routeTemplate = routesContainer.querySelector('.rd-route').cloneNode(true);
+  const routeCount = root.querySelector('#rd-route-count');
+  const settingsStatus = root.querySelector('#rd-settings-toast');
+  const periodSelect = root.querySelector('#rd-period');
+  const fromInput = root.querySelector('#rd-from');
+  const toInput = root.querySelector('#rd-to');
+  const captionLive = root.querySelector('#rd-caption');
+  let lastReport = null;
+  tbody.innerHTML = '<tr><td colspan="4" class="rd-zero">Выберите команду и период, затем нажмите «Обновить»</td></tr>';
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
+  function fillTeams(routes) {
+    teamSelect.innerHTML = '<option value="all">Все команды</option>' + routes.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name || 'Без названия')}</option>`).join('');
+  }
+  function updateRouteCount() {
+    const count = routesContainer.querySelectorAll('.rd-route').length;
+    routeCount.textContent = `${count} команд${count === 1 ? 'а' : count < 5 ? 'ы' : ''}`;
+  }
+  function createRoute(data = {}) {
+    const card = routeTemplate.cloneNode(true);
+    card.dataset.routeId = data.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const teamHeading = card.querySelector('.rd-route-head strong');
+    teamHeading.textContent = data.name || 'Новая команда';
+    card.querySelector('.rd-route-head small').textContent = data.frequency === 'weekly' ? 'Еженедельная сводка' : 'Отчёт по расписанию';
+    const teamInput = card.querySelector('.rd-team-field input');
+    teamInput.value = data.name || '';
+    teamInput.addEventListener('input', () => { teamHeading.textContent = teamInput.value.trim() || 'Новая команда'; });
+    card.querySelector('.rd-channel-field:not(.rd-team-field) input').value = data.channel || '';
+    const selects = card.querySelectorAll('.rd-route-grid select');
+    if (selects[0]) selects[0].value = data.frequency || 'weekdays';
+    const reviewSignal = card.querySelector('.rd-review-signal select');
+    if (reviewSignal) reviewSignal.value = data.reviewSignal || 'approval';
+    const time = card.querySelector('input[type="time"]'); if (time) time.value = data.time || '10:00';
+    const switchButton = card.querySelector('.rd-switch');
+    const notificationsEnabled = data.enabled === true;
+    switchButton.setAttribute('aria-pressed', String(notificationsEnabled));
+    switchButton.classList.toggle('off', !notificationsEnabled);
+    switchButton.onclick = () => { const on = switchButton.getAttribute('aria-pressed') === 'true'; switchButton.setAttribute('aria-pressed', String(!on)); switchButton.classList.toggle('off', on); };
+    card.querySelector('.rd-icon-action').onclick = () => { card.remove(); updateRouteCount(); };
+    const projectPicker = [...card.querySelectorAll('.rd-project-picker')].find(picker => !picker.querySelector('.rd-members-box'));
+    if (projectPicker) projectPicker.remove();
+    const membersBox = card.querySelector('.rd-members-box'); membersBox.querySelectorAll('.rd-chip').forEach(chip => chip.remove());
+    (data.members || []).forEach(member => addChip(membersBox, member, 'rd-add-member'));
+    return card;
+  }
+  function renderRoutes(routes) {
+    routesContainer.innerHTML = '';
+    (routes.length ? routes : [{}]).forEach(route => routesContainer.appendChild(createRoute(route)));
+    updateRouteCount();
+  }
+  async function loadConfig() {
+    const response = await fetch('/api/config');
+    const config = await response.json();
+    fillTeams(config.routes || []);
+    renderRoutes(config.routes || []);
+    const sourcesBox = root.querySelector('.rd-global-sources');
+    sourcesBox.querySelectorAll('.rd-chip').forEach(chip => chip.remove());
+    [...(config.groups || []), ...(config.projects || [])].forEach(source => addChip(sourcesBox, source, 'rd-add-source'));
+  }
+  function addChip(box, project, beforeClass = 'rd-add-project') {
+    const chip = document.createElement('span'); chip.className = 'rd-chip'; chip.dataset.project = project;
+    chip.innerHTML = `${escapeHtml(project)} <button aria-label="Убрать проект">×</button>`;
+    chip.querySelector('button').onclick = () => { chip.remove(); settingsStatus.textContent = 'Есть несохранённые изменения'; }; box.insertBefore(chip, box.querySelector(`.${beforeClass}`));
+  }
+  root.addEventListener('click', event => {
+    const button = event.target.closest('.rd-add-source');
+    if (!button) return;
+    const box = button.parentElement;
+    if (box.querySelector('.rd-inline-add')) return;
+    const editor = document.createElement('span'); editor.className = 'rd-inline-add';
+    editor.innerHTML = '<input aria-label="Адрес GitLab" placeholder="Ссылка на группу или проект..."><button type="button">Добавить</button>';
+    box.insertBefore(editor, button); button.hidden = true; const input = editor.querySelector('input');
+    const confirm = () => { let source = input.value.trim(); if (/^https?:\/\//i.test(source)) { try { source = new URL(source).pathname.replace(/^\/+|\/+$/g, '').replace(/\.git$/, ''); } catch {} } if (!source) return; addChip(box, source, 'rd-add-source'); editor.remove(); button.hidden = false; settingsStatus.textContent = 'Источник добавлен — сохраните настройки'; };
+    editor.querySelector('button').onclick = confirm;
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); confirm(); } if (e.key === 'Escape') { editor.remove(); button.hidden = false; } });
+    input.focus();
+  });
+  root.addEventListener('click', event => {
+    const button = event.target.closest('.rd-add-group');
+    if (!button) return;
+    const box = button.parentElement;
+    if (box.querySelector('.rd-inline-add')) return;
+    const editor = document.createElement('span'); editor.className = 'rd-inline-add';
+    editor.innerHTML = '<input aria-label="Путь группы GitLab" placeholder="alco или ссылка на группу..."><button type="button">Добавить</button>';
+    box.insertBefore(editor, button); button.hidden = true; const input = editor.querySelector('input');
+    const confirm = () => { let group = input.value.trim(); if (/^https?:\/\//i.test(group)) { try { group = new URL(group).pathname.replace(/^\/+|\/+$/g, ''); } catch {} } if (!group) return; addChip(box, group, 'rd-add-group'); editor.remove(); button.hidden = false; settingsStatus.textContent = 'Группа добавлена — сохраните настройки'; };
+    editor.querySelector('button').onclick = confirm; input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); confirm(); } if (e.key === 'Escape') { editor.remove(); button.hidden = false; } }); input.focus();
+  });
+  root.addEventListener('click', event => {
+    const button = event.target.closest('.rd-add-project');
+    if (!button) return;
+    const box = button.parentElement;
+    if (box.querySelector('.rd-inline-add')) return;
+    const editor = document.createElement('span'); editor.className = 'rd-inline-add';
+    editor.innerHTML = '<input aria-label="Путь проекта GitLab" placeholder="group/project..."><button type="button">Добавить</button>';
+    box.insertBefore(editor, button); button.hidden = true;
+    const input = editor.querySelector('input');
+    const confirm = () => {
+      let project = input.value.trim();
+      if (/^https?:\/\//i.test(project)) { try { project = new URL(project).pathname.replace(/^\/+|\/+$/g, '').replace(/\.git$/, ''); } catch {} }
+      if (!project || !project.includes('/')) { input.setCustomValidity('Укажите ссылку или путь в формате group/project'); input.reportValidity(); return; }
+      addChip(box, project); editor.remove(); button.hidden = false; settingsStatus.textContent = 'Проект добавлен — сохраните настройки';
+    };
+    editor.querySelector('button').onclick = confirm;
+    input.addEventListener('input', () => input.setCustomValidity(''));
+    input.addEventListener('keydown', keyEvent => { if (keyEvent.key === 'Enter') { keyEvent.preventDefault(); confirm(); } if (keyEvent.key === 'Escape') { editor.remove(); button.hidden = false; } });
+    input.focus();
+  });
+  root.addEventListener('click', event => {
+    const button = event.target.closest('.rd-add-member');
+    if (!button) return;
+    const box = button.parentElement;
+    if (box.querySelector('.rd-inline-add')) return;
+    const editor = document.createElement('span'); editor.className = 'rd-inline-add';
+    editor.innerHTML = '<input aria-label="GitLab usernames" placeholder="username1, username2, username3..."><button type="button">Добавить</button>';
+    box.insertBefore(editor, button); button.hidden = true;
+    const input = editor.querySelector('input');
+    const confirm = () => {
+      const existing = new Set([...box.querySelectorAll('.rd-chip')].map(chip => chip.dataset.project.toLowerCase()));
+      const usernames = input.value.split(/[,;\n]+/).map(value => value.trim().replace(/^@/, '')).filter(Boolean).filter(username => !existing.has(username.toLowerCase()));
+      if (!usernames.length) return;
+      usernames.forEach(username => { addChip(box, username, 'rd-add-member'); existing.add(username.toLowerCase()); });
+      editor.remove(); button.hidden = false;
+      settingsStatus.textContent = usernames.length === 1 ? 'Участник добавлен — сохраните настройки' : `Добавлено участников: ${usernames.length} — сохраните настройки`;
+    };
+    editor.querySelector('button').onclick = confirm;
+    input.addEventListener('keydown', keyEvent => { if (keyEvent.key === 'Enter') { keyEvent.preventDefault(); confirm(); } if (keyEvent.key === 'Escape') { editor.remove(); button.hidden = false; } });
+    input.focus();
+  });
+  async function saveProjects() {
+    const routes = [...routesContainer.querySelectorAll('.rd-route')].map((routeElement, index) => ({
+      id: routeElement.dataset.routeId,
+      name: routeElement.querySelector('.rd-team-field input').value || 'Без названия',
+      channel: routeElement.querySelector('.rd-channel-field:not(.rd-team-field) input').value,
+      members: [...routeElement.querySelectorAll('.rd-members-box .rd-chip')].map(chip => chip.dataset.project),
+      frequency: routeElement.querySelector('.rd-route-grid select').value,
+      reviewSignal: routeElement.querySelector('.rd-review-signal select').value,
+      time: routeElement.querySelector('input[type="time"]').value,
+      enabled: routeElement.querySelector('.rd-switch').getAttribute('aria-pressed') === 'true'
+    }));
+    const sources = [...root.querySelectorAll('.rd-global-sources .rd-chip')].map(chip => chip.dataset.project);
+    const response = await fetch('/api/config', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({routes, sources}) });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Не удалось сохранить');
+    fillTeams(result.routes || routes);
+    teamSelect.value = 'all';
+    if (lastReport) {
+      const allPeople = lastReport.reviewers || [];
+      const teams = routes.map(route => ({ id: route.id, name: route.name, reviewers: allPeople.filter(person => route.members.map(value => value.toLowerCase()).includes(person.username.toLowerCase())) }));
+      lastReport = { ...lastReport, teams };
+      renderSelectedTeam();
+    }
+    settingsStatus.textContent = 'Настройки сохранены';
+  }
+  root.querySelector('#rd-add-route').addEventListener('click', event => { event.stopImmediatePropagation(); routesContainer.appendChild(createRoute({ enabled:false })); updateRouteCount(); });
+  root.querySelector('#rd-save-routes').addEventListener('click', event => { event.stopImmediatePropagation(); saveProjects().catch(error => status.textContent = error.message); });
+  function renderEngagement(people) {
+    const ranked = people.map(person => ({ ...person, engagement: (person.approvals || 0) + (person.comments || 0) + (person.createdMergeRequests || 0) }))
+      .sort((a, b) => b.engagement - a.engagement || a.name.localeCompare(b.name, 'ru'));
+    if (!ranked.length) { engagementBody.innerHTML = '<div class="rd-engagement-empty">Нет данных за выбранный период</div>'; return; }
+    const max = Math.max(1, ...ranked.map(person => person.engagement));
+    engagementBody.innerHTML = ranked.map(person => {
+      const initials = person.name.split(' ').map(part => part[0]).join('').slice(0, 2);
+      const approvalsWidth = (person.approvals || 0) / max * 100;
+      const commentsWidth = (person.comments || 0) / max * 100;
+      const mrsWidth = (person.createdMergeRequests || 0) / max * 100;
+      return `<div class="rd-engagement-row"><div class="rd-engagement-person"><span class="rd-avatar">${escapeHtml(initials)}</span><span title="${escapeHtml(person.name)}">${escapeHtml(person.name)}</span></div><div class="rd-engagement-bar" aria-label="Вовлечённость ${escapeHtml(person.name)}: ${person.engagement}"><span class="rd-engagement-segment rd-engagement-approvals" style="width:${approvalsWidth}%" data-tooltip="Approvals / 👍: ${person.approvals || 0}"></span><span class="rd-engagement-segment rd-engagement-comments" style="width:${commentsWidth}%" data-tooltip="Комментарии: ${person.comments || 0}"></span><span class="rd-engagement-segment rd-engagement-mrs" style="width:${mrsWidth}%" data-tooltip="Создано MR: ${person.createdMergeRequests || 0}"></span></div><div class="rd-engagement-total" title="Суммарная вовлечённость">${person.engagement}</div></div>`;
+    }).join('');
+  }
+  function renderReport(report) {
+    const sections = report.teams || [{ name: report.project, reviewers: report.reviewers }];
+    const people = sections.flatMap(section => section.reviewers);
+    const approvals = people.reduce((sum, person) => sum + person.approvals, 0);
+    const comments = people.reduce((sum, person) => sum + person.comments, 0);
+    const active = people.filter(person => person.approvals > 0 || person.comments > 0).length;
+    const openedMrs = people.reduce((sum, person) => sum + (person.openedMergeRequests || 0), 0);
+    kpis[0].textContent = approvals; kpis[1].textContent = comments; kpis[2].textContent = openedMrs; kpis[3].textContent = `${active} из ${people.length}`;
+    renderEngagement(people);
+    reportContent.innerHTML = sections.map((section, sectionIndex) => {
+      const rows = section.reviewers.length ? section.reviewers.map(person => `<tr><td><div class="rd-person"><span class="rd-avatar">${escapeHtml(person.name.split(' ').map(x=>x[0]).join('').slice(0,2))}</span><a href="${escapeHtml(person.profileUrl)}" target="_blank" rel="noopener">${escapeHtml(person.name)}</a></div></td><td>${person.approvals}</td><td>${person.comments}</td><td>${person.createdMergeRequests}</td><td>${person.receivedComments || 0}</td><td><a class="rd-number-link" href="${escapeHtml(person.openMergeRequestsUrl)}" target="_blank" rel="noopener">${person.openedMergeRequests || 0}</a></td></tr>`).join('') : '<tr><td colspan="6" class="rd-zero">У команды пока нет участников</td></tr>';
+      const sumApprovals = section.reviewers.reduce((sum, person) => sum + person.approvals, 0);
+      const sumComments = section.reviewers.reduce((sum, person) => sum + person.comments, 0);
+      const sumMrs = section.reviewers.reduce((sum, person) => sum + person.createdMergeRequests, 0);
+      const sumReceivedComments = section.reviewers.reduce((sum, person) => sum + (person.receivedComments || 0), 0);
+      const sumOpenedMrs = section.reviewers.reduce((sum, person) => sum + (person.openedMergeRequests || 0), 0);
+      return `<section class="rd-panel"><div class="rd-panel-title"><span>${escapeHtml(section.name || 'Без названия')}</span><button class="rd-export-team" data-section="${sectionIndex}" aria-label="Скачать CSV команды ${escapeHtml(section.name || 'Без названия')}" title="Скачать CSV"></button></div><table><thead><tr><th>Сотрудник</th><th>Approvals</th><th>Комментарии</th><th>Создано MR</th><th>Комментариев к MR</th><th>Открыто MR</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Итого</td><td>${sumApprovals}</td><td>${sumComments}</td><td>${sumMrs}</td><td>${sumReceivedComments}</td><td>${sumOpenedMrs}</td></tr></tfoot></table></section>`;
+    }).join('');
+    reportContent._visibleSections = sections;
+  }
+  function renderSelectedTeam() {
+    if (!lastReport) return;
+    if (teamSelect.value === 'all' || !lastReport.teams) { renderReport(lastReport); return; }
+    const team = lastReport.teams.find(item => String(item.id) === teamSelect.value);
+    renderReport({ ...lastReport, teams: team ? [team] : [] });
+  }
+  const toIsoDate = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  periodSelect.addEventListener('change', () => {
+    const today = new Date();
+    const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+    if (periodSelect.value === 'yesterday') { fromInput.value = toIsoDate(yesterday); toInput.value = toIsoDate(yesterday); captionLive.textContent = 'Статистика за вчера'; }
+    if (periodSelect.value === 'week') { fromInput.value = toIsoDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7)); toInput.value = toIsoDate(today); captionLive.textContent = 'Статистика за последние 7 дней, включая сегодня'; }
+    if (periodSelect.value === 'month') { fromInput.value = toIsoDate(new Date(today.getFullYear(), today.getMonth() - 1, 1)); toInput.value = toIsoDate(new Date(today.getFullYear(), today.getMonth(), 0)); captionLive.textContent = 'Статистика за предыдущий месяц'; }
+    if (periodSelect.value === 'current_quarter') { const startMonth = Math.floor(today.getMonth() / 3) * 3; fromInput.value = toIsoDate(new Date(today.getFullYear(), startMonth, 1)); toInput.value = toIsoDate(today); captionLive.textContent = 'Статистика за текущий квартал'; }
+    if (periodSelect.value === 'previous_quarter') { const startMonth = Math.floor(today.getMonth() / 3) * 3; fromInput.value = toIsoDate(new Date(today.getFullYear(), startMonth - 3, 1)); toInput.value = toIsoDate(new Date(today.getFullYear(), startMonth, 0)); captionLive.textContent = 'Статистика за предыдущий квартал'; }
+    if (periodSelect.value === 'custom') captionLive.textContent = 'Статистика за выбранный период';
+    status.textContent = 'Период изменён — нажмите обновить';
+  });
+  [fromInput, toInput].forEach(input => input.addEventListener('change', () => { periodSelect.value = 'custom'; captionLive.textContent = 'Статистика за выбранный период'; status.textContent = 'Период изменён — нажмите обновить'; }));
+  teamSelect.addEventListener('change', renderSelectedTeam);
+  root.addEventListener('click', event => {
+    const button = event.target.closest('.rd-export-team');
+    if (!button) return;
+    const section = (reportContent._visibleSections || [])[Number(button.dataset.section)];
+    if (!section) return;
+    const quote = value => `"${String(value).replace(/"/g, '""')}"`;
+    const lines = [['Сотрудник','GitLab username','Approvals','Комментарии','Создано MR','Комментариев к MR','Открыто MR'], ...section.reviewers.map(person => [person.name,person.username,person.approvals,person.comments,person.createdMergeRequests,person.receivedComments || 0,person.openedMergeRequests || 0])];
+    const csv = '\uFEFF' + lines.map(row => row.map(quote).join(';')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+    const link = document.createElement('a'); link.href = url; link.download = `${(section.name || 'team').replace(/[^a-zа-яё0-9_-]+/gi,'-')}-${fromInput.value}-${toInput.value}.csv`; link.click(); URL.revokeObjectURL(url);
+  });
+  async function loadReport() {
+    let progressKnown = false;
+    const setLoadingMessage = message => {
+      status.textContent = message;
+      const cell = reportContent.querySelector('.rd-loading-message');
+      if (cell) cell.textContent = message;
+    };
+    refreshButton.disabled = true;
+    reportContent.innerHTML = '<section class="rd-panel"><div class="rd-panel-title"><span>Загрузка статистики</span></div><table><tbody><tr><td class="rd-zero rd-loading-message">Посылаю запросы в космос…</td></tr></tbody></table></section>';
+    setLoadingMessage('Посылаю запросы в космос…');
+    const from = root.querySelector('#rd-from').value, to = root.querySelector('#rd-to').value;
+    const job = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const timers = [
+      setTimeout(() => { if (!progressKnown) setLoadingMessage('Запросы в космос не помогли — посылаю запрос во Вселенную…'); }, 5000),
+      setTimeout(() => { if (!progressKnown) setLoadingMessage('Запрос улетел в стратосферу…'); }, 10000)
+    ];
+    const progressTimer = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/progress?id=${encodeURIComponent(job)}`);
+        const progress = await response.json();
+        if (Number.isInteger(progress.total)) {
+          progressKnown = true;
+          const shown = progress.processed >= progress.total ? progress.total : Math.floor(progress.processed / 10) * 10;
+          setLoadingMessage(`Обработано ${shown} из ${progress.total} MR…`);
+        }
+      } catch {}
+    }, 1000);
+    try {
+      const response = await fetch(`/api/report?from=${from}&to=${to}&team=all&job=${encodeURIComponent(job)}`);
+      const report = await response.json();
+      if (!response.ok) throw new Error(report.error || 'Ошибка загрузки');
+      lastReport = report;
+      renderSelectedTeam();
+      status.textContent = 'Данные обновлены';
+    } finally {
+      timers.forEach(clearTimeout);
+      clearInterval(progressTimer);
+      refreshButton.disabled = false;
+    }
+  }
+  root.querySelector('#rd-refresh').addEventListener('click', event => { event.stopImmediatePropagation(); loadReport().catch(error => status.textContent = error.message); });
+  periodSelect.dispatchEvent(new Event('change'));
+  loadConfig().then(loadReport).catch(error => status.textContent = error.message);
+})();
+</script>
+</body>
+</html>
