@@ -157,7 +157,7 @@ func main() {
 	legacy := envOr("GITLAB_PROJECTS", envOr("GITLAB_PROJECT_ID", ""))
 	app := &application{
 		root: root, gitlabURL: strings.TrimSuffix(gitlabURL, "/"), gitlabToken: gitlabToken, port: port,
-		legacyProjects: splitList(legacy), httpClient: &http.Client{}, cache: map[string]cachedReport{}, progress: map[string]progress{},
+		legacyProjects: splitList(legacy), httpClient: directHTTPClient(), cache: map[string]cachedReport{}, progress: map[string]progress{},
 	}
 	server := &http.Server{Addr: net.JoinHostPort("127.0.0.1", strconv.Itoa(port)), Handler: app.handler()}
 	stopped := make(chan os.Signal, 1)
@@ -172,6 +172,12 @@ func main() {
 	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
+}
+
+func directHTTPClient() *http.Client {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.Proxy = nil
+	return &http.Client{Transport: transport}
 }
 
 func (a *application) handler() http.Handler {

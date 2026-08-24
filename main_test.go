@@ -190,6 +190,17 @@ func TestLoadEnvFileMatchesRubyPrecedence(t *testing.T) {
 	}
 }
 
+func TestDirectHTTPClientIgnoresProxyEnvironment(t *testing.T) {
+	t.Setenv("HTTPS_PROXY", "http://proxy.invalid:3128")
+	transport, ok := directHTTPClient().Transport.(*http.Transport)
+	if !ok {
+		t.Fatal("direct client must use an explicit HTTP transport")
+	}
+	if transport.Proxy != nil {
+		t.Fatal("direct client must match Ruby and ignore proxy environment variables")
+	}
+}
+
 func TestCacheExpiryShape(t *testing.T) {
 	app := newTestApplication(t, fixtureGitLab(t))
 	app.cache["expired"] = cachedReport{CreatedAt: time.Now().Add(-reportCacheTTL - time.Second)}
