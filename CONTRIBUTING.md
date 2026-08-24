@@ -12,17 +12,21 @@
 ## Локальная разработка
 
 ```bash
-bundle install
 cp .env.example .env.local
-bundle exec ruby local_server.rb
+go run .
 ```
 
 Перед pull request:
 
 ```bash
-ruby -c local_server.rb
-ruby scripts/security_check.rb
+go test ./...
+go test -race ./...
+go vet ./...
+go run ./cmd/security-check
 ```
+
+Изменение правил метрик должно сопровождаться fixture, демонстрирующим прежнее и
+ожидаемое поведение.
 
 ## Pull request
 

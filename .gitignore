@@ -2,9 +2,11 @@
 .env
 .env.*
 !.env.example
+# Legacy local artifacts from pre-0.2 Ruby installations.
 .bundle/
-vendor/bundle/
+vendor/
 data/*.json
 !data/.gitkeep
 coverage/
 *.log
+.local/

@@ -3,11 +3,4 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT_DIR"
-
-if [[ ! -f .env.local ]]; then
-  printf 'Настройки не найдены. Сначала запустите: bin/setup\n' >&2
-  exit 1
-fi
-
-exec bundle exec ruby local_server.rb
+exec "$ROOT_DIR/bin/start-go" "$@"

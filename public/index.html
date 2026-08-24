@@ -90,18 +90,20 @@
     #review-dashboard-concept .rd-full { width:100%; }
     #review-dashboard-concept .rd-toast { margin-top:12px; text-align:center; font-size:12px; color:#3f9d70; min-height:18px; }
     #review-dashboard-concept .rd-view[hidden] { display:none; }
-    #review-dashboard-concept .rd-settings-page { max-width:900px; }
+    #review-dashboard-concept .rd-settings-page { width:100%; max-width:1200px; }
     #review-dashboard-concept .rd-settings-heading { margin-bottom:18px; }
     #review-dashboard-concept .rd-settings-heading h1 { margin-bottom:5px; }
     #review-dashboard-concept .rd-routes { display:grid; gap:14px; }
     #review-dashboard-concept .rd-route { padding:16px; border:1px solid light-dark(#dfe4ee,#303a49); border-radius:11px; background:light-dark(#f8fafc,#151c27); }
     #review-dashboard-concept .rd-route-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
     #review-dashboard-concept .rd-route-head strong { font-size:14px; }
-    #review-dashboard-concept .rd-route-head small { display:block; margin-top:3px; color:light-dark(#667085,#aab4c4); font-size:11px; }
+    #review-dashboard-concept .rd-team-field input, #review-dashboard-concept .rd-review-signal select { background:light-dark(#fff,#18202c); box-shadow:0 1px 2px rgba(23,32,51,.04); }
     #review-dashboard-concept .rd-route-grid { display:grid; grid-template-columns:1.25fr .7fr .6fr .9fr; gap:12px; }
     #review-dashboard-concept .rd-team-review-row { grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,1fr) 230px; gap:12px; }
     #review-dashboard-concept .rd-channel-control { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:12px; }
     #review-dashboard-concept .rd-notify-toggle { display:flex; align-items:center; gap:8px; color:light-dark(#667085,#aab4c4); font-size:11px; white-space:nowrap; }
+    #review-dashboard-concept .rd-mm-setting { display:none; }
+    #review-dashboard-concept.rd-mattermost-enabled .rd-mm-setting { display:block; }
     #review-dashboard-concept .rd-project-picker { margin-top:13px; }
     #review-dashboard-concept .rd-global-sources-picker { margin-top:0; }
     #review-dashboard-concept .rd-project-box { min-height:43px; padding:6px; display:flex; flex-wrap:wrap; align-items:center; gap:6px; background:light-dark(#fff,#111722); border:1px solid light-dark(#d7dde8,#3a4657); border-radius:8px; }
@@ -181,23 +183,23 @@
           <div class="rd-settings">
             <div class="rd-routes" id="rd-routes">
               <article class="rd-route">
-                <div class="rd-route-head"><div><strong>Backend-команда</strong><small>Отчёт за предыдущий день</small></div><div class="rd-route-actions"><button class="rd-icon-action" aria-label="Удалить маршрут">×</button></div></div>
+                <div class="rd-route-head"><div><strong>Backend-команда</strong></div><div class="rd-route-actions"><button class="rd-icon-action" aria-label="Удалить маршрут">×</button></div></div>
                 <div class="rd-route-grid">
                   <div class="rd-team-review-row"><div class="rd-channel-field rd-team-field"><label>Команда</label><input placeholder="Название команды..." value="Backend-команда"></div><div class="rd-review-signal"><label>Подтверждение ревью</label><select><option value="approval">Approve</option><option value="like">👍 Лайк</option><option value="either">Approve или 👍</option></select></div></div>
-                  <div class="rd-channel-field"><label>Канал Mattermost</label><div class="rd-channel-control"><input value="~team-backend"><div class="rd-notify-toggle"><span>Оповещения</span><button class="rd-switch" aria-pressed="true"><i></i></button></div></div></div>
-                  <div><label>Частота</label><select><option>По будням</option><option>Каждый день</option><option>Раз в неделю</option><option>Раз в месяц</option></select></div>
-                  <div><label>Время (Москва)</label><input type="time" value="10:00"></div>
+                  <div class="rd-channel-field rd-mm-setting"><label>Канал Mattermost</label><div class="rd-channel-control"><input value="~team-backend"><div class="rd-notify-toggle"><span>Оповещения</span><button class="rd-switch" aria-pressed="true"><i></i></button></div></div></div>
+                  <div class="rd-frequency rd-mm-setting"><label>Частота</label><select><option value="weekdays">По будням</option><option value="daily">Каждый день</option><option value="weekly">Раз в неделю</option><option value="monthly">Раз в месяц</option></select></div>
+                  <div class="rd-mm-setting"><label>Время (Москва)</label><input type="time" value="10:00"></div>
                 </div>
                 <div class="rd-project-picker"><label>Проекты GitLab</label><div class="rd-project-box"><span class="rd-chip">example/backend-api <button aria-label="Убрать проект">×</button></span><span class="rd-chip">example/shared-library <button aria-label="Убрать проект">×</button></span><button class="rd-add-project">+ Добавить проект</button></div></div>
                 <div class="rd-project-picker"><label>Участники команды (GitLab username)</label><div class="rd-project-box rd-members-box"><button class="rd-add-member">+ Добавить участника</button></div></div>
               </article>
               <article class="rd-route">
-                <div class="rd-route-head"><div><strong>Mobile-команда</strong><small>Еженедельная сводка</small></div><div class="rd-route-actions"><button class="rd-icon-action" aria-label="Удалить маршрут">×</button></div></div>
+                <div class="rd-route-head"><div><strong>Mobile-команда</strong></div><div class="rd-route-actions"><button class="rd-icon-action" aria-label="Удалить маршрут">×</button></div></div>
                 <div class="rd-route-grid">
                   <div class="rd-team-review-row"><div class="rd-channel-field rd-team-field"><label>Команда</label><input placeholder="Название команды..." value="Mobile-команда"></div><div class="rd-review-signal"><label>Подтверждение ревью</label><select><option value="approval">Approve</option><option value="like">👍 Лайк</option><option value="either">Approve или 👍</option></select></div></div>
-                  <div class="rd-channel-field"><label>Канал Mattermost</label><div class="rd-channel-control"><input value="~team-mobile"><div class="rd-notify-toggle"><span>Оповещения</span><button class="rd-switch" aria-pressed="true"><i></i></button></div></div></div>
-                  <div><label>Частота</label><select><option>Раз в неделю</option><option>По будням</option><option>Каждый день</option><option>Раз в месяц</option></select></div>
-                  <div><label>Время (Москва)</label><input type="time" value="10:00"></div>
+                  <div class="rd-channel-field rd-mm-setting"><label>Канал Mattermost</label><div class="rd-channel-control"><input value="~team-mobile"><div class="rd-notify-toggle"><span>Оповещения</span><button class="rd-switch" aria-pressed="true"><i></i></button></div></div></div>
+                  <div class="rd-frequency rd-mm-setting"><label>Частота</label><select><option value="weekdays">По будням</option><option value="daily">Каждый день</option><option value="weekly">Раз в неделю</option><option value="monthly">Раз в месяц</option></select></div>
+                  <div class="rd-mm-setting"><label>Время (Москва)</label><input type="time" value="10:00"></div>
                 </div>
                 <div class="rd-project-picker"><label>Проекты GitLab</label><div class="rd-project-box"><span class="rd-chip">mobile/android-app <button aria-label="Убрать проект">×</button></span><span class="rd-chip">mobile/ios-app <button aria-label="Убрать проект">×</button></span><button class="rd-add-project">+ Добавить проект</button></div></div>
                 <div class="rd-project-picker"><label>Участники команды (GitLab username)</label><div class="rd-project-box rd-members-box"><button class="rd-add-member">+ Добавить участника</button></div></div>
@@ -274,13 +276,12 @@
     card.dataset.routeId = data.id || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const teamHeading = card.querySelector('.rd-route-head strong');
     teamHeading.textContent = data.name || 'Новая команда';
-    card.querySelector('.rd-route-head small').textContent = data.frequency === 'weekly' ? 'Еженедельная сводка' : 'Отчёт по расписанию';
     const teamInput = card.querySelector('.rd-team-field input');
     teamInput.value = data.name || '';
     teamInput.addEventListener('input', () => { teamHeading.textContent = teamInput.value.trim() || 'Новая команда'; });
     card.querySelector('.rd-channel-field:not(.rd-team-field) input').value = data.channel || '';
-    const selects = card.querySelectorAll('.rd-route-grid select');
-    if (selects[0]) selects[0].value = data.frequency || 'weekdays';
+    const frequency = card.querySelector('.rd-frequency select');
+    if (frequency) frequency.value = data.frequency || 'weekdays';
     const reviewSignal = card.querySelector('.rd-review-signal select');
     if (reviewSignal) reviewSignal.value = data.reviewSignal || 'approval';
     const time = card.querySelector('input[type="time"]'); if (time) time.value = data.time || '10:00';
@@ -304,6 +305,7 @@
   async function loadConfig() {
     const response = await fetch('/api/config');
     const config = await response.json();
+    root.classList.toggle('rd-mattermost-enabled', config.mattermostConfigured === true);
     fillTeams(config.routes || []);
     renderRoutes(config.routes || []);
     const sourcesBox = root.querySelector('.rd-global-sources');
@@ -386,7 +388,7 @@
       name: routeElement.querySelector('.rd-team-field input').value || 'Без названия',
       channel: routeElement.querySelector('.rd-channel-field:not(.rd-team-field) input').value,
       members: [...routeElement.querySelectorAll('.rd-members-box .rd-chip')].map(chip => chip.dataset.project),
-      frequency: routeElement.querySelector('.rd-route-grid select').value,
+      frequency: routeElement.querySelector('.rd-frequency select').value,
       reviewSignal: routeElement.querySelector('.rd-review-signal select').value,
       time: routeElement.querySelector('input[type="time"]').value,
       enabled: routeElement.querySelector('.rd-switch').getAttribute('aria-pressed') === 'true'

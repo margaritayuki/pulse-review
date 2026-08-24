@@ -28,11 +28,10 @@ Pulse Review показывает, сколько ревью провёл каж
 ## Требования
 
 - GitLab с доступным REST API v4;
-- Ruby 2.6 или новее (рекомендуется 3.1+);
-- Bundler;
+- Go 1.27 или новее при сборке из исходников;
 - GitLab access token со scope `read_api`.
 
-## Быстрый запуск на macOS и Linux
+## Быстрый запуск на macOS
 
 ```bash
 git clone https://github.com/margaritayuki/pulse-review.git
@@ -40,9 +39,9 @@ cd pulse-review
 bin/setup
 ```
 
-Установщик проверит окружение, запросит адрес GitLab и токен, установит
-зависимости и предложит сразу запустить приложение. Токен при вводе не
-отображается и сохраняется только в локальном `.env.local`.
+Установщик проверит Go, запросит адрес GitLab и токен и соберёт локальный
+бинарник. Токен при вводе не отображается и сохраняется только в локальном
+`.env.local`.
 
 Для последующих запусков используйте:
 
@@ -52,7 +51,7 @@ bin/start
 
 ## Быстрый запуск на Windows
 
-1. Установите [Ruby+Devkit](https://rubyinstaller.org/) версии 3.1 или новее.
+1. Установите [Go](https://go.dev/dl/) версии 1.27 или новее.
 2. Скачайте исходный код Pulse Review или клонируйте репозиторий.
 3. Откройте папку проекта в PowerShell или Проводнике.
 4. Запустите установщик:
@@ -61,8 +60,8 @@ bin/start
 .\setup.cmd
 ```
 
-Он проверит Ruby и Bundler, безопасно запросит GitLab token, создаст локальный
-`.env.local` и установит зависимости. Для последующих запусков используйте:
+Он проверит Go, безопасно запросит GitLab token, создаст локальный `.env.local`
+и соберёт приложение. Для последующих запусков используйте:
 
 ```powershell
 .\start.cmd
@@ -75,10 +74,10 @@ bin/start
 Если предпочитаете ручную настройку:
 
 ```bash
-bundle install
 cp .env.example .env.local
 # заполните GITLAB_URL и GITLAB_TOKEN в .env.local
-bundle exec ruby local_server.rb
+go build -trimpath -o pulse-review .
+./pulse-review
 ```
 
 Откройте [http://127.0.0.1:4567](http://127.0.0.1:4567).
@@ -145,7 +144,8 @@ reactions для восстановления истории ревью. Пер�
 ### `Failed to fetch`
 
 Страница должна открываться через `http://127.0.0.1:4567`, а не через
-`file:///.../public/index.html`. Убедитесь, что `local_server.rb` запущен.
+`file:///.../public/index.html`. Убедитесь, что Pulse Review запущен через
+`bin/start` или `start.cmd`.
 
 ### `GitLab API: 401`
 
@@ -176,16 +176,28 @@ reactions для восстановления истории ревью. Пер�
 ## Разработка
 
 ```bash
-bundle install
-ruby -c local_server.rb
-bundle exec ruby local_server.rb
+go test -race ./...
+go vet ./...
+go run .
 ```
 
 Основные файлы:
 
-- `local_server.rb` — API, GitLab-интеграция и локальное хранение настроек;
+- `main.go` — API, GitLab-интеграция и локальное хранение настроек;
 - `public/index.html` — интерфейс dashboard;
 - `data/` — локальные настройки, исключённые из Git.
+
+### Миграция v0.2.0
+
+Стандартные команды уже запускают Go-версию:
+
+```bash
+bin/setup
+bin/start
+```
+
+На Windows используйте `setup.cmd` и `start.cmd`. Миграция backend на Go
+завершена; Ruby и Bundler больше не требуются.
 
 Предложения и pull requests приветствуются. См. [CONTRIBUTING.md](CONTRIBUTING.md).
 История версий опубликована в [CHANGELOG.md](CHANGELOG.md).
