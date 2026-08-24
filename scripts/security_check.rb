@@ -16,6 +16,7 @@ Find.find(root) do |path|
     next
   end
   next if File.basename(path) == File.basename(__FILE__)
+  next if File.basename(path) == ".env" || (File.basename(path).start_with?(".env.") && File.basename(path) != ".env.example")
   next unless File.file?(path)
   content = File.binread(path)
   next unless content.valid_encoding?
