@@ -25,62 +25,36 @@ Pulse Review показывает, сколько ревью провёл каж
 - фильтры по команде и периоду;
 - экспорт таблицы в CSV для Excel.
 
-## Требования
+## Установка
 
-- GitLab с доступным REST API v4;
-- GitLab access token со scope `read_api`.
-- Go 1.27 или новее нужен только при сборке из исходников. Для готового
-  релизного бинарника Go устанавливать не нужно.
+Понадобится личный GitLab token с правом `read_api`. Go и Ruby устанавливать не
+нужно.
 
-## Запуск готового релиза
+### Windows
 
-1. Откройте [последний релиз](https://github.com/margaritayuki/pulse-review/releases/latest).
-2. Скачайте файл для своего компьютера:
-
-| Платформа | Файл |
-|---|---|
-| Mac с Apple Silicon (M1 и новее) | `pulse-review-macos-arm64` |
-| Mac с процессором Intel | `pulse-review-macos-amd64` |
-| Windows x64 | `pulse-review-windows-amd64.zip` |
-
-3. Запустите Pulse Review и настройте GitLab в открывшемся браузере. Файлы
-   конфигурации создавать вручную не нужно.
+1. Скачайте `pulse-review-windows-amd64.zip` из
+   [последнего релиза](https://github.com/margaritayuki/pulse-review/releases/latest).
+2. Полностью распакуйте архив.
+3. Дважды нажмите `start.cmd`.
+4. В открывшемся браузере настройте GitLab.
 
 ### macOS
 
-В Terminal перейдите в папку с загруженным файлом и выполните:
+Скачайте из [последнего релиза](https://github.com/margaritayuki/pulse-review/releases/latest)
+версию для своего Mac. В Terminal перейдите в папку с файлом и выполните:
 
 ```bash
 chmod +x pulse-review-macos-arm64
 ./pulse-review-macos-arm64
 ```
 
-Для Intel Mac используйте имя `pulse-review-macos-amd64`. Затем откройте
-[http://127.0.0.1:4567](http://127.0.0.1:4567). Если macOS заблокировала первый
-запуск, разрешите приложение в **Системные настройки → Конфиденциальность и
-безопасность**.
+Для Intel Mac замените имя файла на `pulse-review-macos-amd64`. Откройте
+[http://127.0.0.1:4567](http://127.0.0.1:4567) и настройте GitLab. Если macOS
+заблокировала первый запуск, разрешите приложение в **Системные настройки →
+Конфиденциальность и безопасность**.
 
-### Windows
-
-1. Полностью распакуйте `pulse-review-windows-amd64.zip`.
-2. Дважды нажмите `start.cmd`.
-3. Pulse Review откроется в браузере автоматически.
-
-> После перезагрузки компьютера локальный сервер нужно запустить снова.
-
-## Сборка из исходников
-
-Нужен Go 1.27 или новее.
-
-```bash
-git clone https://github.com/margaritayuki/pulse-review.git
-cd pulse-review
-go run .
-```
-
-На Windows выполните те же команды в PowerShell. Затем откройте
-[http://127.0.0.1:4567](http://127.0.0.1:4567). Для локальной сборки также
-доступны `bin/setup` на macOS и `setup.cmd` на Windows.
+После перезагрузки компьютера Pulse Review нужно запустить снова. Инструкции по
+сборке из исходников находятся в [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Как создать GitLab token
 
