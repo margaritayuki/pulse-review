@@ -27,8 +27,8 @@ Pulse Review показывает, сколько ревью провёл каж
 
 ## Установка
 
-Понадобится личный GitLab token с правом `read_api`. Go и Ruby устанавливать не
-нужно.
+Понадобится личный GitLab token с правом `read_api`. Дополнительные среды
+выполнения устанавливать не нужно.
 
 ### Windows
 
@@ -217,18 +217,6 @@ go run .
 - `main.go` — API, GitLab-интеграция и локальное хранение настроек;
 - `public/index.html` — интерфейс dashboard;
 - `data/` — локальные настройки, исключённые из Git.
-
-### Миграция v0.2.0
-
-Стандартные команды уже запускают Go-версию:
-
-```bash
-bin/setup
-bin/start
-```
-
-На Windows используйте `setup.cmd` и `start.cmd`. Миграция backend на Go
-завершена; Ruby и Bundler больше не требуются.
 
 Предложения и pull requests приветствуются. См. [CONTRIBUTING.md](CONTRIBUTING.md).
 История версий опубликована в [CHANGELOG.md](CHANGELOG.md).
