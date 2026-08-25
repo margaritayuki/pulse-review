@@ -11,6 +11,8 @@ if not exist "pulse-review.exe" (
   pause
   exit /b 1
 )
+set "PORT=4567"
+for /f "usebackq tokens=1,* delims==" %%A in (".env.local") do if /i "%%A"=="PORT" set "PORT=%%B"
 start "Pulse Review" "%~dp0pulse-review.exe"
 timeout /t 2 /nobreak >nul
-start "" "http://127.0.0.1:4567"
+start "" "http://127.0.0.1:%PORT%"
