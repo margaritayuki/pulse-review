@@ -2,12 +2,12 @@
 setlocal
 cd /d "%~dp0"
 if not exist ".env.local" (
-  echo Настройки не найдены. Сначала запустите setup.cmd.
+  echo Configuration was not found. Run setup.cmd first.
   pause
   exit /b 1
 )
 if not exist "pulse-review.exe" (
-  echo pulse-review.exe не найден. Распакуйте ZIP полностью.
+  echo pulse-review.exe was not found. Extract the complete ZIP archive first.
   pause
   exit /b 1
 )
