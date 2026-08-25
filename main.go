@@ -120,6 +120,11 @@ type cachedReport struct {
 	CreatedAt time.Time
 }
 
+type connectionSettings struct {
+	GitLabURL   string `json:"gitlabUrl"`
+	GitLabToken string `json:"gitlabToken"`
+}
+
 type application struct {
 	root           string
 	gitlabURL      string
@@ -127,6 +132,7 @@ type application struct {
 	port           int
 	legacyProjects []string
 	httpClient     *http.Client
+	connectionMu   sync.RWMutex
 
 	cacheMu    sync.Mutex
 	cache      map[string]cachedReport
@@ -142,13 +148,18 @@ func main() {
 	if err := loadEnvFile(filepath.Join(root, ".env.local")); err != nil {
 		log.Fatal(err)
 	}
-	gitlabURL, ok := os.LookupEnv("GITLAB_URL")
-	if !ok {
-		log.Fatal("GITLAB_URL is not set")
+	connection := connectionSettings{}
+	connectionPath := filepath.Join(root, "data", "connection.json")
+	connection, err = readJSONFile(connectionPath, connection)
+	if err != nil {
+		log.Fatal(err)
 	}
-	gitlabToken, ok := os.LookupEnv("GITLAB_TOKEN")
-	if !ok {
-		log.Fatal("GITLAB_TOKEN is not set")
+	// Existing .env.local installations remain supported.
+	if value := os.Getenv("GITLAB_URL"); connection.GitLabURL == "" && value != "" {
+		connection.GitLabURL = value
+	}
+	if value := os.Getenv("GITLAB_TOKEN"); connection.GitLabToken == "" && value != "" {
+		connection.GitLabToken = value
 	}
 	port, err := strconv.Atoi(envOr("PORT", "4567"))
 	if err != nil {
@@ -156,7 +167,7 @@ func main() {
 	}
 	legacy := envOr("GITLAB_PROJECTS", envOr("GITLAB_PROJECT_ID", ""))
 	app := &application{
-		root: root, gitlabURL: strings.TrimSuffix(gitlabURL, "/"), gitlabToken: gitlabToken, port: port,
+		root: root, gitlabURL: strings.TrimSuffix(connection.GitLabURL, "/"), gitlabToken: connection.GitLabToken, port: port,
 		legacyProjects: splitList(legacy), httpClient: directHTTPClient(), cache: map[string]cachedReport{}, progress: map[string]progress{},
 	}
 	server := &http.Server{Addr: net.JoinHostPort("127.0.0.1", strconv.Itoa(port)), Handler: app.handler()}
@@ -185,6 +196,7 @@ func (a *application) handler() http.Handler {
 	mux.HandleFunc("/api/report", a.handleReport)
 	mux.HandleFunc("/api/progress", a.handleProgress)
 	mux.HandleFunc("/api/config", a.handleConfig)
+	mux.HandleFunc("/api/connection", a.handleConnection)
 	mux.HandleFunc("/api/send", a.handleSend)
 	static, _ := fs.Sub(publicFiles, "public")
 	mux.Handle("/", http.FileServer(http.FS(static)))
@@ -228,6 +240,7 @@ func splitList(value string) []string {
 }
 
 func (a *application) dataPath(name string) string { return filepath.Join(a.root, "data", name) }
+
 func normalizeSource(value string) string {
 	text := strings.TrimSpace(value)
 	if parsed, err := url.Parse(text); err == nil && (strings.EqualFold(parsed.Scheme, "http") || strings.EqualFold(parsed.Scheme, "https")) {
@@ -332,11 +345,21 @@ func errorResponse(w http.ResponseWriter, err error) {
 }
 
 func (a *application) gitlabGet(ctx context.Context, path string, target any) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, a.gitlabURL+"/api/v4"+path, nil)
+	a.connectionMu.RLock()
+	gitlabURL, gitlabToken := a.gitlabURL, a.gitlabToken
+	a.connectionMu.RUnlock()
+	if gitlabURL == "" || gitlabToken == "" {
+		return errors.New("GitLab ещё не настроен — откройте раздел «Настройки»")
+	}
+	return a.gitlabGetWith(ctx, gitlabURL, gitlabToken, path, target)
+}
+
+func (a *application) gitlabGetWith(ctx context.Context, gitlabURL, gitlabToken, path string, target any) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, gitlabURL+"/api/v4"+path, nil)
 	if err != nil {
 		return err
 	}
-	req.Header.Set("PRIVATE-TOKEN", a.gitlabToken)
+	req.Header.Set("PRIVATE-TOKEN", gitlabToken)
 	res, err := a.httpClient.Do(req)
 	if err != nil {
 		return err
@@ -347,6 +370,71 @@ func (a *application) gitlabGet(ctx context.Context, path string, target any) er
 		return fmt.Errorf("GitLab API: %d", res.StatusCode)
 	}
 	return json.NewDecoder(res.Body).Decode(target)
+}
+
+func normalizeGitLabURL(value string) (string, error) {
+	value = strings.TrimSpace(value)
+	parsed, err := url.Parse(value)
+	if err != nil || (parsed.Scheme != "http" && parsed.Scheme != "https") || parsed.Host == "" {
+		return "", errors.New("Адрес GitLab должен начинаться с http:// или https://")
+	}
+	if parsed.RawQuery != "" || parsed.Fragment != "" || (parsed.Path != "" && parsed.Path != "/") {
+		return "", errors.New("Укажите адрес сервера GitLab без пути к группе или проекту")
+	}
+	return strings.TrimSuffix(value, "/"), nil
+}
+
+func (a *application) connectionSnapshot() connectionSettings {
+	a.connectionMu.RLock()
+	defer a.connectionMu.RUnlock()
+	return connectionSettings{GitLabURL: a.gitlabURL, GitLabToken: a.gitlabToken}
+}
+
+func (a *application) handleConnection(w http.ResponseWriter, r *http.Request) {
+	current := a.connectionSnapshot()
+	if r.Method == http.MethodGet {
+		jsonResponse(w, http.StatusOK, map[string]any{"gitlabUrl": current.GitLabURL, "configured": current.GitLabURL != "" && current.GitLabToken != "", "tokenConfigured": current.GitLabToken != ""})
+		return
+	}
+	if r.Method != http.MethodPost {
+		jsonResponse(w, http.StatusMethodNotAllowed, map[string]string{"error": "Метод не поддерживается"})
+		return
+	}
+	var payload connectionSettings
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		errorResponse(w, err)
+		return
+	}
+	gitlabURL, err := normalizeGitLabURL(payload.GitLabURL)
+	if err != nil {
+		jsonResponse(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+	token := strings.TrimSpace(payload.GitLabToken)
+	if token == "" {
+		token = current.GitLabToken
+	}
+	if token == "" {
+		jsonResponse(w, http.StatusBadRequest, map[string]string{"error": "Укажите GitLab token с правом read_api"})
+		return
+	}
+	var account user
+	if err := a.gitlabGetWith(r.Context(), gitlabURL, token, "/user", &account); err != nil {
+		jsonResponse(w, http.StatusBadGateway, map[string]string{"error": "Не удалось подключиться к GitLab: " + err.Error()})
+		return
+	}
+	settings := connectionSettings{GitLabURL: gitlabURL, GitLabToken: token}
+	if err := writeJSONAtomic(a.dataPath("connection.json"), settings); err != nil {
+		errorResponse(w, err)
+		return
+	}
+	a.connectionMu.Lock()
+	a.gitlabURL, a.gitlabToken = settings.GitLabURL, settings.GitLabToken
+	a.connectionMu.Unlock()
+	a.cacheMu.Lock()
+	a.cache = map[string]cachedReport{}
+	a.cacheMu.Unlock()
+	jsonResponse(w, http.StatusOK, map[string]any{"saved": true, "configured": true, "gitlabUrl": gitlabURL, "user": account})
 }
 
 func (a *application) gitlabList(ctx context.Context, path string, target func() any, appendPage func(any)) error {
@@ -775,6 +863,7 @@ func (a *application) classifySource(ctx context.Context, source string, knownGr
 }
 func (a *application) handleConfig(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		connection := a.connectionSnapshot()
 		routes, err := a.readRoutes()
 		if err != nil {
 			errorResponse(w, err)
@@ -790,7 +879,7 @@ func (a *application) handleConfig(w http.ResponseWriter, r *http.Request) {
 			errorResponse(w, err)
 			return
 		}
-		jsonResponse(w, http.StatusOK, map[string]any{"routes": routes, "groups": groups, "projects": projects, "mattermostConfigured": os.Getenv("MATTERMOST_WEBHOOK_URL") != ""})
+		jsonResponse(w, http.StatusOK, map[string]any{"routes": routes, "groups": groups, "projects": projects, "mattermostConfigured": os.Getenv("MATTERMOST_WEBHOOK_URL") != "", "gitlabConfigured": connection.GitLabURL != "" && connection.GitLabToken != "", "gitlabUrl": connection.GitLabURL, "gitlabTokenConfigured": connection.GitLabToken != ""})
 		return
 	}
 	var raw json.RawMessage

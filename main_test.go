@@ -265,3 +265,50 @@ func TestHTTPCompatibilityShapes(t *testing.T) {
 		t.Fatalf("static frontend was not served: %d", staticResponse.Code)
 	}
 }
+
+func TestConnectionAPIStoresTokenWithoutReturningIt(t *testing.T) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v4/user" || r.Header.Get("PRIVATE-TOKEN") != "new-token" {
+			http.Error(w, "unexpected request", http.StatusUnauthorized)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(user{ID: 42, Name: "Margarita", Username: "margarita"})
+	})
+	app := newTestApplication(t, handler)
+	app.gitlabURL, app.gitlabToken = "", ""
+	body := strings.NewReader(`{"gitlabUrl":"https://gitlab.example/","gitlabToken":"new-token"}`)
+	request := httptest.NewRequest(http.MethodPost, "/api/connection", body)
+	response := httptest.NewRecorder()
+	app.handler().ServeHTTP(response, request)
+	if response.Code != http.StatusOK {
+		t.Fatalf("unexpected response %d: %s", response.Code, response.Body.String())
+	}
+	if strings.Contains(response.Body.String(), "new-token") {
+		t.Fatal("connection response exposed token")
+	}
+	stored, err := readJSONFile(app.dataPath("connection.json"), connectionSettings{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if stored.GitLabURL != "https://gitlab.example" || stored.GitLabToken != "new-token" {
+		t.Fatalf("unexpected stored connection: %#v", stored)
+	}
+
+	getRequest := httptest.NewRequest(http.MethodGet, "/api/connection", nil)
+	getResponse := httptest.NewRecorder()
+	app.handler().ServeHTTP(getResponse, getRequest)
+	if strings.Contains(getResponse.Body.String(), "new-token") || !strings.Contains(getResponse.Body.String(), `"tokenConfigured":true`) {
+		t.Fatalf("unsafe connection GET response: %s", getResponse.Body.String())
+	}
+}
+
+func TestConnectionAPIRejectsProjectURL(t *testing.T) {
+	app := newTestApplication(t, fixtureGitLab(t))
+	body := strings.NewReader(`{"gitlabUrl":"https://gitlab.example/group/project","gitlabToken":"new-token"}`)
+	request := httptest.NewRequest(http.MethodPost, "/api/connection", body)
+	response := httptest.NewRecorder()
+	app.handler().ServeHTTP(response, request)
+	if response.Code != http.StatusBadRequest || !strings.Contains(response.Body.String(), "без пути") {
+		t.Fatalf("unexpected response %d: %s", response.Code, response.Body.String())
+	}
+}
