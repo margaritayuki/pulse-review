@@ -2,6 +2,7 @@
 *.go text eol=lf
 *.yml text eol=lf
 bin/* text eol=lf
+*.command text eol=lf
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
 *.png binary

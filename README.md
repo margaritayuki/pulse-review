@@ -39,18 +39,15 @@ Pulse Review показывает, сколько ревью провёл каж
 
 ### macOS
 
-Скачайте из [последнего релиза](https://github.com/margaritayuki/pulse-review/releases/latest)
-версию для своего Mac. В Terminal перейдите в папку с файлом и выполните:
+1. Скачайте из [последнего релиза](https://github.com/margaritayuki/pulse-review/releases/latest)
+   `pulse-review-macos-arm64.zip` для Mac с процессором Apple или
+   `pulse-review-macos-amd64.zip` для Intel Mac.
+2. Полностью распакуйте архив.
+3. Дважды нажмите `start.command`.
+4. В открывшемся браузере настройте GitLab.
 
-```bash
-chmod +x pulse-review-macos-arm64
-./pulse-review-macos-arm64
-```
-
-Для Intel Mac замените имя файла на `pulse-review-macos-amd64`. Откройте
-[http://127.0.0.1:4567](http://127.0.0.1:4567) и настройте GitLab. Если macOS
-заблокировала первый запуск, разрешите приложение в **Системные настройки →
-Конфиденциальность и безопасность**.
+Если macOS заблокировала первый запуск, нажмите правой кнопкой на
+`start.command`, выберите **Открыть** и подтвердите запуск.
 
 После перезагрузки компьютера Pulse Review нужно запустить снова. Инструкции по
 сборке из исходников находятся в [CONTRIBUTING.md](CONTRIBUTING.md).

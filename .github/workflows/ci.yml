@@ -33,7 +33,7 @@ jobs:
         run: go build -trimpath ./...
       - name: Check Bash Go scripts
         if: runner.os != 'Windows'
-        run: bash -n bin/setup bin/start bin/setup-go bin/start-go
+        run: bash -n bin/setup bin/start bin/setup-go bin/start-go release/macos/start.command
       - name: Check PowerShell scripts
         if: runner.os == 'Windows'
         shell: powershell
