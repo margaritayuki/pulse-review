@@ -408,7 +408,7 @@
     settingsStatus.textContent = 'Настройки сохранены';
   }
   root.querySelector('#rd-add-route').addEventListener('click', event => { event.stopImmediatePropagation(); routesContainer.appendChild(createRoute({ enabled:false })); updateRouteCount(); });
-  root.querySelector('#rd-save-routes').addEventListener('click', event => { event.stopImmediatePropagation(); saveProjects().catch(error => status.textContent = error.message); });
+  root.querySelector('#rd-save-routes').addEventListener('click', event => { event.stopImmediatePropagation(); saveProjects().catch(error => settingsStatus.textContent = error.message); });
   function renderEngagement(people) {
     const ranked = people.map(person => ({ ...person, engagement: (person.approvals || 0) + (person.comments || 0) + (person.createdMergeRequests || 0) }))
       .sort((a, b) => b.engagement - a.engagement || a.name.localeCompare(b.name, 'ru'));

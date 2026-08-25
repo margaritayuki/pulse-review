@@ -209,6 +209,23 @@ func TestCacheExpiryShape(t *testing.T) {
 	}
 }
 
+func TestWriteJSONAtomicCanOverwriteExistingSettings(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "data", "projects.json")
+	if err := writeJSONAtomic(path, []string{"first/project"}); err != nil {
+		t.Fatal(err)
+	}
+	if err := writeJSONAtomic(path, []string{"second/project"}); err != nil {
+		t.Fatal(err)
+	}
+	projects, err := readJSONFile(path, []string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(projects) != 1 || projects[0] != "second/project" {
+		t.Fatalf("settings were not overwritten: %#v", projects)
+	}
+}
+
 func TestHTTPCompatibilityShapes(t *testing.T) {
 	t.Setenv("MATTERMOST_WEBHOOK_URL", "")
 	app := newTestApplication(t, fixtureGitLab(t))

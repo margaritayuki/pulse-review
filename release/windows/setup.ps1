@@ -21,10 +21,15 @@ if (Test-Path $EnvFile) {
 }
 
 if (-not $KeepConfiguration) {
-    $GitLabUrl = Read-Host "`nGitLab URL [https://gitlab.com]"
+    $GitLabUrl = Read-Host "`nGitLab server URL only, without group/project [https://gitlab.com]"
     if ([string]::IsNullOrWhiteSpace($GitLabUrl)) { $GitLabUrl = "https://gitlab.com" }
     $GitLabUrl = $GitLabUrl.TrimEnd("/")
     if ($GitLabUrl -notmatch "^https?://") { Stop-WithError "GitLab URL must start with http:// or https://" }
+    try { $ParsedGitLabUrl = [Uri]$GitLabUrl }
+    catch { Stop-WithError "GitLab server URL is invalid." }
+    if (-not [string]::IsNullOrEmpty($ParsedGitLabUrl.AbsolutePath.Trim("/"))) {
+        Stop-WithError "Enter only the GitLab server URL (for example https://git.skbkontur.ru). Add groups and projects later in the Pulse Review interface."
+    }
 
     $SecureToken = Read-Host "GitLab access token (input is hidden)" -AsSecureString
     $TokenPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureToken)
