@@ -40,10 +40,21 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: "0"
         run: mkdir -p dist && go build -trimpath -ldflags="-s -w" -o "dist/${{ matrix.artifact }}" .
+      - name: Package Windows installer
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force package | Out-Null
+          Copy-Item dist\pulse-review-windows-amd64.exe package\pulse-review.exe
+          Copy-Item release\windows\setup.cmd package\setup.cmd
+          Copy-Item release\windows\setup.ps1 package\setup.ps1
+          Copy-Item release\windows\start.cmd package\start.cmd
+          Copy-Item .env.example package\.env.example
+          Compress-Archive -Path package\* -DestinationPath dist\pulse-review-windows-amd64.zip
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: dist/${{ matrix.artifact }}
+          path: dist/*
 
   publish:
     needs: build

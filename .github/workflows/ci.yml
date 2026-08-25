@@ -40,3 +40,4 @@ jobs:
         run: |
           [void][scriptblock]::Create((Get-Content -Raw windows/setup-go.ps1))
           [void][scriptblock]::Create((Get-Content -Raw windows/start-go.ps1))
+          [void][scriptblock]::Create((Get-Content -Raw release/windows/setup.ps1))
