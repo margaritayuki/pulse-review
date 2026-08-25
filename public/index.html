@@ -91,6 +91,9 @@
     #review-dashboard-concept .rd-toast { margin-top:12px; text-align:center; font-size:12px; color:#3f9d70; min-height:18px; }
     #review-dashboard-concept .rd-view[hidden] { display:none; }
     #review-dashboard-concept .rd-settings-page { width:100%; max-width:1200px; }
+    #review-dashboard-concept .rd-connection-grid { display:grid; grid-template-columns:minmax(260px,1.4fr) minmax(240px,1fr) auto; gap:12px; align-items:end; }
+    #review-dashboard-concept .rd-connection-note { margin:12px 0 0; color:light-dark(#667085,#aab4c4); font-size:12px; line-height:1.45; }
+    #review-dashboard-concept .rd-connection-status { margin-top:10px; min-height:18px; color:#3f9d70; font-size:12px; }
     #review-dashboard-concept .rd-settings-heading { margin-bottom:18px; }
     #review-dashboard-concept .rd-settings-heading h1 { margin-bottom:5px; }
     #review-dashboard-concept .rd-routes { display:grid; gap:14px; }
@@ -117,7 +120,7 @@
     #review-dashboard-concept .rd-icon-action { width:30px; height:30px; padding:0; display:grid; place-items:center; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; }
     #review-dashboard-concept .rd-settings-footer { margin-top:15px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
     #review-dashboard-concept .rd-add-route { border-style:dashed !important; }
-    @media (max-width: 760px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row { grid-template-columns:1fr; } }
+    @media (max-width: 760px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row, #review-dashboard-concept .rd-connection-grid { grid-template-columns:1fr; } }
     @media (max-width: 520px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr; } #review-dashboard-concept .rd-date-row { grid-column:auto; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-run { grid-column:1 / -1; } #review-dashboard-concept .rd-summary { grid-template-columns:1fr; } #review-dashboard-concept .rd-engagement-head { flex-direction:column; } #review-dashboard-concept .rd-engagement-row { grid-template-columns:120px minmax(100px,1fr) 34px; gap:8px; } }
   </style>
   <section class="rd-window">
@@ -172,6 +175,18 @@
       <div class="rd-toast" id="rd-toast"></div>
       </section>
       <section class="rd-view" data-page="settings" hidden>
+        <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
+          <div class="rd-panel-title"><span>Подключение GitLab</span><span class="rd-sub">Хранится только на этом компьютере</span></div>
+          <div class="rd-settings">
+            <div class="rd-connection-grid">
+              <div><label for="rd-gitlab-url">Адрес сервера GitLab</label><input id="rd-gitlab-url" type="url" placeholder="https://gitlab.com" autocomplete="url"></div>
+              <div><label for="rd-gitlab-token">Personal access token</label><input id="rd-gitlab-token" type="password" placeholder="Токен с правом read_api" autocomplete="new-password"></div>
+              <button class="rd-action" id="rd-save-connection">Проверить и сохранить</button>
+            </div>
+            <p class="rd-connection-note">Здесь нужен адрес самого сервера, без группы или проекта. Токен сохраняется локально и никогда не показывается в интерфейсе повторно.</p>
+            <div class="rd-connection-status" id="rd-connection-status"></div>
+          </div>
+        </section>
         <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
           <div class="rd-panel-title"><span>Источники GitLab</span><span class="rd-sub">Общие для всех команд</span></div>
           <div class="rd-settings">
@@ -256,6 +271,10 @@
   const routeTemplate = routesContainer.querySelector('.rd-route').cloneNode(true);
   const routeCount = root.querySelector('#rd-route-count');
   const settingsStatus = root.querySelector('#rd-settings-toast');
+  const connectionStatus = root.querySelector('#rd-connection-status');
+  const gitlabURLInput = root.querySelector('#rd-gitlab-url');
+  const gitlabTokenInput = root.querySelector('#rd-gitlab-token');
+  let gitlabConfigured = false;
   const periodSelect = root.querySelector('#rd-period');
   const fromInput = root.querySelector('#rd-from');
   const toInput = root.querySelector('#rd-to');
@@ -306,12 +325,37 @@
     const response = await fetch('/api/config');
     const config = await response.json();
     root.classList.toggle('rd-mattermost-enabled', config.mattermostConfigured === true);
+    gitlabConfigured = config.gitlabConfigured === true;
+    gitlabURLInput.value = config.gitlabUrl || '';
+    gitlabTokenInput.placeholder = config.gitlabTokenConfigured ? 'Сохранён — оставьте пустым, чтобы не менять' : 'Токен с правом read_api';
     fillTeams(config.routes || []);
     renderRoutes(config.routes || []);
     const sourcesBox = root.querySelector('.rd-global-sources');
     sourcesBox.querySelectorAll('.rd-chip').forEach(chip => chip.remove());
     [...(config.groups || []), ...(config.projects || [])].forEach(source => addChip(sourcesBox, source, 'rd-add-source'));
+    if (!gitlabConfigured) {
+      const settingsTab = root.querySelector('.rd-tab[data-view="settings"]');
+      settingsTab.click();
+      connectionStatus.textContent = 'Укажите адрес GitLab и токен, чтобы начать работу';
+    }
+    return config;
   }
+  async function saveConnection() {
+    connectionStatus.textContent = 'Проверяю подключение…';
+    const response = await fetch('/api/connection', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ gitlabUrl:gitlabURLInput.value.trim(), gitlabToken:gitlabTokenInput.value }) });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Не удалось сохранить подключение');
+    gitlabConfigured = true;
+    gitlabURLInput.value = result.gitlabUrl;
+    gitlabTokenInput.value = '';
+    gitlabTokenInput.placeholder = 'Сохранён — оставьте пустым, чтобы не менять';
+    connectionStatus.textContent = `Подключено: ${result.user?.name || result.user?.username || 'GitLab'}`;
+    return result;
+  }
+  root.querySelector('#rd-save-connection').addEventListener('click', event => {
+    event.preventDefault();
+    saveConnection().catch(error => connectionStatus.textContent = error.message);
+  });
   function addChip(box, project, beforeClass = 'rd-add-project') {
     const chip = document.createElement('span'); chip.className = 'rd-chip'; chip.dataset.project = project;
     chip.innerHTML = `${escapeHtml(project)} <button aria-label="Убрать проект">×</button>`;
@@ -383,6 +427,7 @@
     input.focus();
   });
   async function saveProjects() {
+    if (!gitlabConfigured) throw new Error('Сначала настройте подключение GitLab выше');
     const routes = [...routesContainer.querySelectorAll('.rd-route')].map((routeElement, index) => ({
       id: routeElement.dataset.routeId,
       name: routeElement.querySelector('.rd-team-field input').value || 'Без названия',
@@ -408,7 +453,7 @@
     settingsStatus.textContent = 'Настройки сохранены';
   }
   root.querySelector('#rd-add-route').addEventListener('click', event => { event.stopImmediatePropagation(); routesContainer.appendChild(createRoute({ enabled:false })); updateRouteCount(); });
-  root.querySelector('#rd-save-routes').addEventListener('click', event => { event.stopImmediatePropagation(); saveProjects().catch(error => status.textContent = error.message); });
+  root.querySelector('#rd-save-routes').addEventListener('click', event => { event.stopImmediatePropagation(); saveProjects().catch(error => settingsStatus.textContent = error.message); });
   function renderEngagement(people) {
     const ranked = people.map(person => ({ ...person, engagement: (person.approvals || 0) + (person.comments || 0) + (person.createdMergeRequests || 0) }))
       .sort((a, b) => b.engagement - a.engagement || a.name.localeCompare(b.name, 'ru'));
@@ -515,7 +560,7 @@
   }
   root.querySelector('#rd-refresh').addEventListener('click', event => { event.stopImmediatePropagation(); loadReport().catch(error => status.textContent = error.message); });
   periodSelect.dispatchEvent(new Event('change'));
-  loadConfig().then(loadReport).catch(error => status.textContent = error.message);
+  loadConfig().then(config => config.gitlabConfigured ? loadReport() : null).catch(error => status.textContent = error.message);
 })();
 </script>
 </body>

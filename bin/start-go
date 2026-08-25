@@ -6,6 +6,5 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BINARY="$ROOT_DIR/.local/bin/pulse-review"
 cd "$ROOT_DIR"
 
-[[ -f .env.local ]] || { printf 'Настройки не найдены. Сначала запустите: bin/setup\n' >&2; exit 1; }
 [[ -x "$BINARY" ]] || { printf 'Приложение не собрано. Сначала запустите: bin/setup\n' >&2; exit 1; }
 exec "$BINARY"
