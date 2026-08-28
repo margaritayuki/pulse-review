@@ -137,6 +137,7 @@
     #review-dashboard-concept .rd-line-chart svg { width:100%; height:100%; display:block; overflow:visible; }
     #review-dashboard-concept .rd-line-grid { stroke:light-dark(#e5e9f1,#303a49); stroke-width:1; stroke-dasharray:4 5; }
     #review-dashboard-concept .rd-line-axis { fill:light-dark(#667085,#aab4c4); font-size:10px; }
+    #review-dashboard-concept .rd-line-axis-date { dominant-baseline:middle; }
     #review-dashboard-concept .rd-line-path { fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
     #review-dashboard-concept .rd-line-area { opacity:.16; }
     #review-dashboard-concept .rd-line-point { stroke:light-dark(#fff,#18202c); stroke-width:2; }
@@ -478,10 +479,7 @@
       };
       const dates = Array.from({length:days},(_,index) => new Date(start.getFullYear(),start.getMonth(),start.getDate()+index));
       return {
-        months:dates.map((date,index) => {
-          const show = days<=7 || (days<=14 ? index%2===0||index===days-1 : index===0||index===days-1||date.getDate()===1||date.getDate()%5===0);
-          return show ? `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}` : '';
-        }),
+        months:dates.map(date => `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}`),
         tooltips:dates.map(date => `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getFullYear()).slice(-2)}`),
         mrs:distribute(data.mrs[sourceIndex]), added:distribute(data.added[sourceIndex]), deleted:distribute(data.deleted[sourceIndex]), files:distribute(changedFilesFor(data)[sourceIndex]), daily:true
       };
@@ -509,7 +507,8 @@
   function renderLineChart(container,labels,tooltipLabels,lines) {
     container.classList.toggle('compact',labels.length <= 7);
     container.classList.toggle('semi-compact',labels.length > 7 && labels.length <= 14);
-    const width = 640, height = 250, left = 48, right = 48, top = 14, bottom = 34;
+    const dailyLabels = labels.length > 0 && labels.every(label => /^\d{2}\.\d{2}$/.test(label));
+    const width = 640, height = 250, left = 48, right = 48, top = 14, bottom = dailyLabels ? 54 : 34;
     const plotWidth = width-left-right, plotHeight = height-top-bottom;
     const independentScales = lines.length > 2;
     const primaryLines = lines.filter(line => line.axis !== 'right'), secondaryLines = lines.filter(line => line.axis === 'right');
@@ -541,7 +540,10 @@
       const secondaryValue = secondaryCeiling*(4-index)/4;
       return `<line class="rd-line-grid" x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"></line>${independentScales ? '' : `<text class="rd-line-axis" x="${left-9}" y="${y+3}" text-anchor="end">${compact(value)}</text>${secondaryLines.length ? `<text class="rd-line-axis" x="${width-right+5}" y="${y+3}" text-anchor="start">${compact(secondaryValue)}</text>` : ''}`}`;
     }).join('');
-    const xLabels = labels.map((label,index) => label ? `<text class="rd-line-axis" x="${pointSets[0][index].x}" y="${height-8}" text-anchor="middle">${escapeHtml(label)}</text>` : '').join('');
+    const labelY = height-10;
+    const xLabels = labels.map((label,index) => label ? dailyLabels
+      ? `<text class="rd-line-axis rd-line-axis-date" x="${pointSets[0][index].x}" y="${labelY}" text-anchor="end" transform="rotate(-45 ${pointSets[0][index].x} ${labelY})">${escapeHtml(label)}</text>`
+      : `<text class="rd-line-axis" x="${pointSets[0][index].x}" y="${height-8}" text-anchor="middle">${escapeHtml(label)}</text>` : '').join('');
     const definitions = lines.map((line,index) => `<linearGradient id="${container.id}-area-${index}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${line.color}" stop-opacity=".7"></stop><stop offset="100%" stop-color="${line.color}" stop-opacity="0"></stop></linearGradient>`).join('');
     const renderedLines = lines.map((line,lineIndex) => {
       const points = pointSets[lineIndex], path = smoothPath(points);

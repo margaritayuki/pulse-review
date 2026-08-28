@@ -106,6 +106,12 @@ try {
   const weeklyChart=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart');return {period:document.querySelector('#rd-period').value,compact:chart.classList.contains('compact'),semiCompact:chart.classList.contains('semi-compact'),width:chart.getBoundingClientRect().width,hits:chart.querySelectorAll('.rd-line-hit').length,labels:[...chart.querySelectorAll('.rd-line-axis')].map(node=>node.textContent).filter(text=>/^\\d{2}\\.\\d{2}$/.test(text))}})()`);
   assert.equal(weeklyChart.compact,true,JSON.stringify(weeklyChart));
   assert.equal(weeklyChart.labels.length,7);
+  assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-overall-chart .rd-line-axis-date[transform^="rotate(-45"]').length`),7);
+  await cdp.evaluate(`document.querySelector('#rd-period').value='current_month';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
+  const monthlyDates=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart');return {hits:chart.querySelectorAll('.rd-line-hit').length,labels:chart.querySelectorAll('.rd-line-axis-date[transform^="rotate(-45"]').length}})()`);
+  assert.equal(monthlyDates.labels,monthlyDates.hits,JSON.stringify(monthlyDates));
+  assert.ok(monthlyDates.labels>=28,JSON.stringify(monthlyDates));
+  await cdp.evaluate(`document.querySelector('#rd-period').value='week';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
   const chartAlignment=await cdp.evaluate(`(()=>{const panel=document.querySelector('.rd-overall-panel'),overall=document.querySelector('#rd-overall-chart'),team=document.querySelector('[data-team="backend"] .rd-team-chart'),teamCard=document.querySelector('[data-team="backend"]');const points=[...overall.querySelectorAll('.rd-line-point')],periods=overall.querySelectorAll('.rd-line-hit').length;return {panelWidth:panel.getBoundingClientRect().width,teamWidth:team.getBoundingClientRect().width,panelLeft:panel.getBoundingClientRect().left,teamLeft:teamCard.getBoundingClientRect().left,firstX:Number(points[0].getAttribute('cx')),lastX:Number(points[periods-1].getAttribute('cx'))}})()`);
   assert.ok(Math.abs(chartAlignment.panelWidth-chartAlignment.teamWidth)<=2,JSON.stringify(chartAlignment));
   assert.ok(Math.abs(chartAlignment.panelLeft-chartAlignment.teamLeft)<=2,JSON.stringify(chartAlignment));

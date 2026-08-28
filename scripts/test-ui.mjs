@@ -22,6 +22,8 @@ const contracts = [
   ['work volume API integration', 'fetch(`/api/work-volume?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`)'],
   ['daily totals preserved after rounding', 'target-result.reduce((sum,value)=>sum+value,0)'],
   ['daily labels include month', "String(date.getMonth()+1).padStart(2,'0')"],
+  ['daily dates are shown in full', "months:dates.map(date =>"],
+  ['daily date labels are angled', 'transform="rotate(-45'],
   ['daily range ends at midnight', 'new Date(today.getFullYear(),today.getMonth(),today.getDate())'],
   ['line chart range padding', 'ownMin-ownRange*.14'],
   ['overall all-teams chart', 'id="rd-overall-chart"'],
