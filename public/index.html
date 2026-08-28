@@ -146,9 +146,8 @@
     #review-dashboard-concept .rd-line-chart svg { width:100%; height:100%; display:block; overflow:visible; }
     #review-dashboard-concept .rd-line-grid { stroke:light-dark(#e5e9f1,#303a49); stroke-width:1; stroke-dasharray:4 5; }
     #review-dashboard-concept .rd-line-axis { fill:light-dark(#667085,#aab4c4); font-size:10px; }
-    #review-dashboard-concept .rd-line-axis-date { dominant-baseline:middle; }
-    #review-dashboard-concept .rd-weekend-band { fill:light-dark(#f3f5ff,#222a42); }
-    #review-dashboard-concept .rd-weekend-label { fill:light-dark(#7a84b8,#9da7d9); font-size:9px; font-weight:700; text-transform:uppercase; }
+    #review-dashboard-concept .rd-line-axis-date { fill:#5965d8; dominant-baseline:middle; }
+    #review-dashboard-concept .rd-line-axis-weekend { fill:light-dark(#8a93a5,#828da0); }
     #review-dashboard-concept .rd-line-path { fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
     #review-dashboard-concept .rd-line-area { opacity:.16; }
     #review-dashboard-concept .rd-line-point { stroke:light-dark(#fff,#18202c); stroke-width:2; }
@@ -223,6 +222,10 @@
     #review-dashboard-concept .rd-team-table-scroll th:last-child, #review-dashboard-concept .rd-team-table-scroll td:last-child { padding-right:20px; }
     #review-dashboard-concept .rd-team-table-scroll td:first-child span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     #review-dashboard-concept .rd-team-table-scroll .rd-person { gap:7px; }
+    #review-dashboard-concept .rd-person-filter { min-width:0; padding:0; overflow:hidden; border:0; color:inherit; background:transparent; cursor:pointer; font:inherit; font-weight:inherit; text-align:left; text-overflow:ellipsis; white-space:nowrap; }
+    #review-dashboard-concept .rd-person-filter:hover { color:#5965d8; }
+    #review-dashboard-concept .rd-person-filter[aria-pressed="true"] { color:#5965d8; }
+    #review-dashboard-concept .rd-person-filtered { background:light-dark(#f2f3ff,#222a4b); }
     #review-dashboard-concept .rd-team-table-scroll .rd-avatar { width:25px; height:25px; font-size:9px; }
     #review-dashboard-concept .rd-chart-scale-note { color:light-dark(#98a2b3,#778397); font-size:9px; font-weight:500; }
     @media (max-width: 980px) { #review-dashboard-concept .rd-team-analytics-body { grid-template-columns:1fr; } #review-dashboard-concept .rd-overall-panel { width:100%; } }
@@ -453,6 +456,7 @@
   const volumeTo = toInput;
   const sharedDates = root.querySelector('#rd-shared-dates');
   const volumeSort = new Map(volumeTeams.map(team=>[team.key,{key:'mrs',direction:'desc'}]));
+  let selectedVolumePerson = null;
   const formatNumber = value => new Intl.NumberFormat('ru-RU').format(value);
   const formatDelta = (current, previous) => `${current >= previous ? '+' : ''}${Math.round((current - previous) / Math.max(1, previous) * 100)}% к предыдущему такому же периоду`;
   const changedFilesFor = data => data.files || data.mrs.map((count,index) => Math.max(1,Math.round(count*2.4+(index%3)*3)));
@@ -566,20 +570,14 @@
       return new Date(year,Number(russian[2])-1,Number(russian[1]));
     };
     const chartDates = dailyLabels ? tooltipLabels.map(parseDailyDate) : [];
-    const step = labels.length > 1 ? plotWidth/(labels.length-1) : plotWidth;
-    const weekends = chartDates.map((date,index) => ({date,index})).filter(item => item.date && (item.date.getDay() === 0 || item.date.getDay() === 6)).map(item => {
-      const center = pointSets[0][item.index].x, x = Math.max(left,center-step/2), bandRight = Math.min(width-right,center+step/2);
-      const shortDay = item.date.getDay() === 6 ? 'сб' : 'вс';
-      return `<rect class="rd-weekend-band" x="${x}" y="${top}" width="${Math.max(0,bandRight-x)}" height="${plotHeight}"></rect><text class="rd-weekend-label" x="${center}" y="${top+11}" text-anchor="middle">${shortDay}</text>`;
-    }).join('');
     const grid = Array.from({length:5},(_,index) => {
       const y = top+index/4*plotHeight, value = ceiling*(4-index)/4;
       const secondaryValue = secondaryCeiling*(4-index)/4;
       return `<line class="rd-line-grid" x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"></line>${independentScales ? '' : `<text class="rd-line-axis" x="${left-9}" y="${y+3}" text-anchor="end">${compact(value)}</text>${secondaryLines.length ? `<text class="rd-line-axis" x="${width-right+5}" y="${y+3}" text-anchor="start">${compact(secondaryValue)}</text>` : ''}`}`;
     }).join('');
-    const labelY = height-28;
+    const labelY = height-40;
     const xLabels = labels.map((label,index) => label ? dailyLabels
-      ? `<text class="rd-line-axis rd-line-axis-date" x="${pointSets[0][index].x}" y="${labelY}" text-anchor="end" transform="rotate(-45 ${pointSets[0][index].x} ${labelY})">${escapeHtml(label)}</text>`
+      ? (() => { const date = chartDates[index], weekend = date && (date.getDay() === 0 || date.getDay() === 6); return `<text class="rd-line-axis rd-line-axis-date${weekend ? ' rd-line-axis-weekend' : ''}" x="${pointSets[0][index].x}" y="${labelY}" text-anchor="end" transform="rotate(-45 ${pointSets[0][index].x} ${labelY})">${escapeHtml(label)}</text>`; })()
       : `<text class="rd-line-axis" x="${pointSets[0][index].x}" y="${height-8}" text-anchor="middle">${escapeHtml(label)}</text>` : '').join('');
     const definitions = lines.map((line,index) => `<linearGradient id="${container.id}-area-${index}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${line.color}" stop-opacity=".7"></stop><stop offset="100%" stop-color="${line.color}" stop-opacity="0"></stop></linearGradient>`).join('');
     const renderedLines = lines.map((line,lineIndex) => {
@@ -590,7 +588,7 @@
     }).join('');
     const hitWidth = Math.max(28,plotWidth/Math.max(1,labels.length));
     const hits = labels.map((_,index) => `<rect class="rd-line-hit" data-point-index="${index}" tabindex="0" role="button" aria-label="Показать значения за ${escapeHtml(tooltipLabels[index])}" x="${Math.max(left,pointSets[0][index].x-hitWidth/2)}" y="${top}" width="${Math.min(hitWidth,width-right-Math.max(left,pointSets[0][index].x-hitWidth/2))}" height="${plotHeight}"></rect>`).join('');
-    container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Динамика: ${escapeHtml(lines.map(line=>line.name).join(', '))}" preserveAspectRatio="none"><defs>${definitions}</defs>${weekends}${grid}<line class="rd-chart-guide" x1="0" x2="0" y1="${top}" y2="${top+plotHeight}" hidden></line>${xLabels}${renderedLines}${hits}</svg><div class="rd-chart-tooltip" role="tooltip" hidden></div>`;
+    container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Динамика: ${escapeHtml(lines.map(line=>line.name).join(', '))}" preserveAspectRatio="none"><defs>${definitions}</defs>${grid}<line class="rd-chart-guide" x1="0" x2="0" y1="${top}" y2="${top+plotHeight}" hidden></line>${xLabels}${renderedLines}${hits}</svg><div class="rd-chart-tooltip" role="tooltip" hidden></div>`;
     const tooltip = container.querySelector('.rd-chart-tooltip'), guide = container.querySelector('.rd-chart-guide');
     let pinnedIndex = null;
     const showPoint = index => {
@@ -616,11 +614,12 @@
   function renderVolumeConcept() {
     const legend = '<span><i style="background:#5965d8"></i>Влито MR</span><span><i style="background:#2f7ae5"></i>Добавлено строк</span><span><i style="background:#e58b19"></i>Удалено строк</span><span><i style="background:#2f8f5b"></i>Изменено файлов</span>';
     root.querySelector('#rd-overall-legend').innerHTML = legend;
-    const selectedTeam = teamSelect.value === 'all' ? null : volumeTeams.find(team=>team.key===teamSelect.value) || volumeTeams[teamSelect.selectedIndex-1] || null;
+    const selectedPersonEntry = selectedVolumePerson ? volumeTeams.map(team=>({team,person:team.people.find(person=>person.key===selectedVolumePerson.personKey)})).find(item=>item.team.key===selectedVolumePerson.teamKey&&item.person) : null;
+    const selectedTeam = selectedPersonEntry?.team || (teamSelect.value === 'all' ? null : volumeTeams.find(team=>team.key===teamSelect.value) || volumeTeams[teamSelect.selectedIndex-1] || null);
     const visibleTeams = selectedTeam ? [selectedTeam] : volumeTeams;
     const sourceFor = team => volumeIsLive && team.series ? team.series : sumSeries(team.people,team.name);
-    const overallData = selectedTeam ? sourceFor(selectedTeam) : (volumeIsLive && liveOverall ? liveOverall : sumSeries(volumePeople,'Все команды'));
-    root.querySelector('#rd-overall-title').textContent = selectedTeam?.name || 'Все команды';
+    const overallData = selectedPersonEntry?.person || (selectedTeam ? sourceFor(selectedTeam) : (volumeIsLive && liveOverall ? liveOverall : sumSeries(volumePeople,'Все команды')));
+    root.querySelector('#rd-overall-title').textContent = selectedPersonEntry?.person.name || selectedTeam?.name || 'Все команды';
     const overall = volumePeriodSlice(overallData);
     renderLineChart(root.querySelector('#rd-overall-chart'),overall.months,overall.tooltips||overall.months,[
       {name:'Влито MR',values:overall.mrs,color:'#5965d8'},
@@ -629,7 +628,7 @@
       {name:'Изменено файлов',values:overall.files,color:'#2f8f5b'}
     ]);
     root.querySelector('#rd-team-analytics').innerHTML = visibleTeams.map(team => {
-      const source = sourceFor(team);
+      const source = selectedPersonEntry?.team.key === team.key ? selectedPersonEntry.person : sourceFor(team);
       return `<section class="rd-panel rd-team-analytics-card" data-team="${team.key}"><div class="rd-team-card-title">${escapeHtml(team.name)}</div><div class="rd-team-analytics-body"><div class="rd-team-chart"><div class="rd-panel-title"><span>Динамика команды</span><div class="rd-metric-legend">${legend}</div></div><div class="rd-chart-body"><div class="rd-line-chart" id="rd-chart-${team.key}"></div></div></div><div class="rd-team-table"><div class="rd-team-table-head"><div><strong>Сотрудники</strong><small>${team.people.length} сотрудников</small></div></div><div class="rd-team-table-scroll"><table><thead><tr><th data-team="${team.key}" data-sort-key="name">Сотрудник ↕</th><th data-team="${team.key}" data-sort-key="mrs">MR ↕</th><th data-team="${team.key}" data-sort-key="added">Добавлено ↕</th><th data-team="${team.key}" data-sort-key="deleted">Удалено ↕</th><th data-team="${team.key}" data-sort-key="files">Файлов ↕</th></tr></thead><tbody id="rd-table-${team.key}"></tbody></table></div></div></div></section>`;
     }).join('');
     visibleTeams.forEach(team => {
@@ -648,10 +647,17 @@
         const difference = sort.key === 'name' ? a.name.localeCompare(b.name,'ru') : a[sort.key]-b[sort.key];
         return sort.direction === 'asc' ? difference : -difference;
       });
-      root.querySelector(`#rd-table-${team.key}`).innerHTML = metrics.map(item => `<tr><td><div class="rd-person"><span class="rd-avatar">${item.name.split(' ').map(part=>part[0]).join('').slice(0,2)}</span><span>${escapeHtml(item.name)}</span></div></td><td>${formatNumber(item.mrs)}</td><td>${formatNumber(item.added)}</td><td>${formatNumber(item.deleted)}</td><td>${formatNumber(item.files)}</td></tr>`).join('');
+      root.querySelector(`#rd-table-${team.key}`).innerHTML = metrics.map(item => { const active = selectedPersonEntry?.team.key===team.key&&selectedPersonEntry.person.key===item.key; return `<tr${active ? ' class="rd-person-filtered"' : ''}><td><div class="rd-person"><span class="rd-avatar">${item.name.split(' ').map(part=>part[0]).join('').slice(0,2)}</span><button type="button" class="rd-person-filter" data-team="${escapeHtml(team.key)}" data-person="${escapeHtml(item.key)}" aria-pressed="${active}">${escapeHtml(item.name)}</button></div></td><td>${formatNumber(item.mrs)}</td><td>${formatNumber(item.added)}</td><td>${formatNumber(item.deleted)}</td><td>${formatNumber(item.files)}</td></tr>`; }).join('');
     });
   }
   root.querySelector('#rd-team-analytics').addEventListener('click', event => {
+    const personButton = event.target.closest('.rd-person-filter');
+    if (personButton) {
+      const same = selectedVolumePerson?.teamKey===personButton.dataset.team&&selectedVolumePerson?.personKey===personButton.dataset.person;
+      selectedVolumePerson = same ? null : {teamKey:personButton.dataset.team,personKey:personButton.dataset.person};
+      renderVolumeConcept();
+      return;
+    }
     const header = event.target.closest('th[data-sort-key]');
     if (!header) return;
     const current = volumeSort.get(header.dataset.team);
@@ -970,7 +976,7 @@
     status.textContent = 'Период изменён — нажмите обновить';
   });
   [fromInput, toInput].forEach(input => input.addEventListener('change', () => { periodSelect.value = 'custom'; sharedDates.classList.add('visible'); captionLive.textContent = 'Статистика за выбранный период'; renderVolumeConcept(); status.textContent = 'Период изменён — нажмите обновить'; }));
-  teamSelect.addEventListener('change', () => { renderSelectedTeam(); renderVolumeConcept(); });
+  teamSelect.addEventListener('change', () => { selectedVolumePerson=null; renderSelectedTeam(); renderVolumeConcept(); });
   root.addEventListener('click', event => {
     const button = event.target.closest('.rd-export-team');
     if (!button) return;
