@@ -37,7 +37,9 @@ const contracts = [
   ['cancel update hover explanation', 'data-tooltip="Обновление данных будет отменено"'],
   ['report remains visible while loading', "updateProgress.hidden = false"],
   ['daily range ends at midnight', 'new Date(today.getFullYear(),today.getMonth(),today.getDate())'],
-  ['line chart scale headroom', 'flatMap(line => line.values)) * 1.08'],
+  ['tenfold nonlinear scale threshold', 'maximum/minimum>=10'],
+  ['classic scale below threshold', "mode:'linear'"],
+  ['nonlinear scale for large gaps', "mode:'nonlinear'"],
   ['overall all-teams chart', 'id="rd-overall-chart"'],
   ['one block per configured team', 'id="rd-team-analytics"'],
   ['scrollable employee tables', 'rd-team-table-scroll'],
@@ -50,8 +52,10 @@ const contracts = [
   ['table right edge spacing', 'td:last-child { padding-right:20px; }'],
   ['employee names are filter buttons', 'aria-pressed="${active}">${escapeHtml(item.name)}</button>'],
   ['changed files line', "name:'Изменено файлов'"],
-  ['changed-line metrics use right scale', "axis:'right'"],
-  ['chart axes are labelled', 'MR / файлы</text>'],
+  ['one shared real-value scale', 'buildChartScale(visibleLines)'],
+  ['metric legend controls', 'rd-metric-toggle'],
+  ['fullscreen chart control', 'rd-chart-expand'],
+  ['fullscreen laptop bounds', 'width:min(1902px,calc(100vw - 48px))'],
   ['team totals aggregate employees', "sumSeries(team.people,team.name)"],
 ];
 
@@ -67,5 +71,7 @@ assert.equal(page.match(/\['backend'/g)?.length, 3, 'Backend mock must contain 3
 assert.equal(page.match(/\['mobile'/g)?.length, 15, 'Mobile mock must contain 15 employees');
 assert.ok(!page.includes('id="rd-mr-bars"'), 'legacy split MR chart must be removed');
 assert.ok(!page.includes('id="rd-lines-bars"'), 'legacy split changes chart must be removed');
+assert.ok(!page.includes('Реальные значения на единой нелинейной шкале'), 'unrequested chart captions must stay absent');
+assert.ok(!page.includes('Количество, реальная нелинейная шкала'), 'unrequested axis captions must stay absent');
 
-console.log(`UI checks passed: ${contracts.length + 7}`);
+console.log(`UI checks passed: ${contracts.length + 9}`);

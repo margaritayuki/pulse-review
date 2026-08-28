@@ -141,11 +141,34 @@ try {
   assert.ok(weeklyCalendar.weekendLabels.every(label=>/^\d{2}\.\d{2}$/.test(label)),JSON.stringify(weeklyCalendar));
   assert.notEqual(weeklyCalendar.weekdayColor,weeklyCalendar.weekendColor,JSON.stringify(weeklyCalendar));
   assert.equal(weeklyCalendar.inside,true,JSON.stringify(weeklyCalendar));
-  const chartScales=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart'),titles=[...chart.querySelectorAll('.rd-line-axis-title')].map(node=>node.textContent),ticks=[...chart.querySelectorAll('.rd-line-axis')],paths=[...chart.querySelectorAll('.rd-line-path')].map(node=>node.getAttribute('d'));return {titles,leftTicks:ticks.filter(node=>node.getAttribute('x')==='39').length,rightTicks:ticks.filter(node=>node.getAttribute('x')==='597').length,distinctPaths:new Set(paths).size,totalPaths:paths.length}})()`);
-  assert.deepEqual(chartScales.titles,['MR / файлы','строки'],JSON.stringify(chartScales));
-  assert.equal(chartScales.leftTicks,5,JSON.stringify(chartScales));
-  assert.equal(chartScales.rightTicks,5,JSON.stringify(chartScales));
-  assert.ok(chartScales.distinctPaths>=3,JSON.stringify(chartScales));
+  const chartScale=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart'),svg=chart.querySelector('svg'),ticks=[...chart.querySelectorAll('.rd-y-axis-tick')].map(node=>node.textContent),paths=[...chart.querySelectorAll('.rd-line-path')].map(node=>node.getAttribute('d'));return {mode:svg.dataset.scaleMode,ticks,axisTitles:chart.querySelectorAll('.rd-line-axis-title').length,distinctPaths:new Set(paths).size,totalPaths:paths.length}})()`);
+  assert.equal(chartScale.mode,'nonlinear',JSON.stringify(chartScale));
+  assert.ok(chartScale.ticks.length>=5,JSON.stringify(chartScale));
+  assert.equal(chartScale.axisTitles,0,JSON.stringify(chartScale));
+  assert.equal(chartScale.totalPaths,4,JSON.stringify(chartScale));
+  assert.ok(chartScale.distinctPaths>=3,JSON.stringify(chartScale));
+
+  await cdp.evaluate(`(()=>{window.__pulseMetricFetches=0;window.__pulseMetricOriginalFetch=window.fetch;window.fetch=(...args)=>{window.__pulseMetricFetches++;return window.__pulseMetricOriginalFetch(...args)};for(const key of ['mrs','deleted','files'])document.querySelector('#rd-overall-legend [data-metric="'+key+'"]').click()})()`);
+  const classicScale=await cdp.evaluate(`(()=>({mode:document.querySelector('#rd-overall-chart svg').dataset.scaleMode,paths:document.querySelectorAll('#rd-overall-chart .rd-line-path').length,selected:[...document.querySelectorAll('#rd-overall-legend .rd-metric-toggle')].filter(button=>button.getAttribute('aria-pressed')==='true').map(button=>button.dataset.metric),fetches:window.__pulseMetricFetches}))()`);
+  assert.equal(classicScale.mode,'linear',JSON.stringify(classicScale));
+  assert.equal(classicScale.paths,1,JSON.stringify(classicScale));
+  assert.deepEqual(classicScale.selected,['added'],JSON.stringify(classicScale));
+  assert.equal(classicScale.fetches,0,JSON.stringify(classicScale));
+  await cdp.evaluate(`for(const key of ['mrs','deleted','files'])document.querySelector('#rd-overall-legend [data-metric="'+key+'"]').click()`);
+  assert.equal(await cdp.evaluate(`document.querySelector('#rd-overall-chart svg').dataset.scaleMode`),'nonlinear');
+  assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-overall-chart .rd-line-path').length`),4);
+
+  await cdp.evaluate(`document.querySelector('[data-chart-key="overall"] .rd-chart-expand').click()`);
+  const fullscreen=await cdp.evaluate(`(()=>{const shell=document.querySelector('[data-chart-key="overall"]'),rect=shell.getBoundingClientRect(),button=shell.querySelector('.rd-chart-expand');return {expanded:shell.classList.contains('rd-chart-expanded'),width:rect.width,height:rect.height,viewportWidth:innerWidth,viewportHeight:innerHeight,label:button.getAttribute('aria-label'),locked:document.documentElement.classList.contains('pulse-review-chart-lock')}})()`);
+  assert.equal(fullscreen.expanded,true,JSON.stringify(fullscreen));
+  assert.ok(fullscreen.width<=1902&&fullscreen.width<=fullscreen.viewportWidth-47,JSON.stringify(fullscreen));
+  assert.ok(fullscreen.height<=1080&&fullscreen.height<=fullscreen.viewportHeight-47,JSON.stringify(fullscreen));
+  assert.equal(fullscreen.label,'Свернуть график',JSON.stringify(fullscreen));
+  assert.equal(fullscreen.locked,true,JSON.stringify(fullscreen));
+  await cdp.evaluate(`document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`);
+  assert.equal(await cdp.evaluate(`document.querySelector('[data-chart-key="overall"]').classList.contains('rd-chart-expanded')`),false);
+  assert.equal(await cdp.evaluate(`document.documentElement.classList.contains('pulse-review-chart-lock')`),false);
+  await cdp.evaluate(`window.fetch=window.__pulseMetricOriginalFetch;delete window.__pulseMetricOriginalFetch;delete window.__pulseMetricFetches`);
   await cdp.evaluate(`document.querySelector('#rd-period').value='current_month';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
   const monthlyDates=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart');return {hits:chart.querySelectorAll('.rd-line-hit').length,labels:chart.querySelectorAll('.rd-line-axis-date[transform^="rotate(-45"]').length}})()`);
   assert.equal(monthlyDates.labels,monthlyDates.hits,JSON.stringify(monthlyDates));
@@ -171,7 +194,7 @@ try {
   assert.equal(await cdp.evaluate(`document.querySelector('#rd-toast').textContent`),'Обновление отменено');
   await cdp.evaluate(`window.fetch=window.__pulseOriginalFetch;delete window.__pulseOriginalFetch`);
 
-  console.log('Browser checks passed: 25');
+  console.log('Browser checks passed: 36');
 } finally {
   cdp?.close();
   browser.kill('SIGTERM');

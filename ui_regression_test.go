@@ -42,8 +42,11 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`id="rd-team-analytics"`,
 		`aria-pressed="${active}">${escapeHtml(item.name)}</button>`,
 		`name:'Изменено файлов'`,
-		`axis:'right'`,
-		`MR / файлы</text>`,
+		`maximum/minimum>=10`,
+		`buildChartScale(visibleLines)`,
+		`rd-metric-toggle`,
+		`rd-chart-expand`,
+		`width:min(1902px,calc(100vw - 48px))`,
 		`sumSeries(team.people,team.name)`,
 		`/api/work-volume?from=`,
 	}
@@ -72,6 +75,9 @@ func TestFrontendRegressionContracts(t *testing.T) {
 	}
 	if strings.Contains(page, `id="rd-mr-bars"`) || strings.Contains(page, `id="rd-lines-bars"`) {
 		t.Error("legacy split dynamics charts must be removed")
+	}
+	if strings.Contains(page, `Реальные значения на единой нелинейной шкале`) || strings.Contains(page, `Количество, реальная нелинейная шкала`) {
+		t.Error("unrequested chart captions must stay absent")
 	}
 }
 
