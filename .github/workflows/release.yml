@@ -33,6 +33,10 @@ jobs:
           cache: true
       - name: Test
         run: go test ./...
+      - name: Test interface contracts
+        run: npm run test:ui
+      - name: Test interface interactions in browser
+        run: npm run test:browser
       - name: Build
         shell: bash
         env:
