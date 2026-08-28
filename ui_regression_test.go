@@ -30,6 +30,7 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`rd-team-table-scroll`,
 		`<option value="week" selected>Последняя неделя</option>`,
 		`transform="rotate(-45`,
+		`id="rd-update-progress"`,
 		`<option value="two_weeks">Последние 2 недели</option>`,
 		`['week','two_weeks','current_month','previous_month']`,
 		`id="rd-overall-chart"`,

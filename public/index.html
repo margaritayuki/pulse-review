@@ -91,6 +91,15 @@
     #review-dashboard-concept .rd-note { padding:11px; border-radius:8px; background:light-dark(#f0f2ff,#222a4b); color:light-dark(#505aa7,#c5cbff); font-size:12px; line-height:1.45; margin:14px 0; }
     #review-dashboard-concept .rd-full { width:100%; }
     #review-dashboard-concept .rd-toast { margin-top:12px; text-align:center; font-size:12px; color:#3f9d70; min-height:18px; }
+    #review-dashboard-concept .rd-update-progress { width:100%; margin:-6px 0 18px; padding:10px 14px; border:1px solid light-dark(#cfd6f4,#3a4772); border-radius:10px; background:light-dark(#f0f2ff,#1c2445); }
+    #review-dashboard-concept .rd-update-progress[hidden] { display:none; }
+    #review-dashboard-concept .rd-update-progress-top { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+    #review-dashboard-concept .rd-update-progress-title { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; }
+    #review-dashboard-concept .rd-update-progress-count { color:light-dark(#5965d8,#9099ff); font-size:11px; font-weight:700; white-space:nowrap; }
+    #review-dashboard-concept .rd-update-spinner { width:14px; height:14px; flex:none; border:2px solid light-dark(#c8cef8,#49558e); border-top-color:#5965d8; border-radius:50%; animation:rd-update-spin .9s linear infinite; }
+    #review-dashboard-concept .rd-update-track { height:5px; margin-top:8px; overflow:hidden; border-radius:4px; background:light-dark(#dfe3f1,#303954); }
+    #review-dashboard-concept .rd-update-bar { display:block; width:0; height:100%; border-radius:inherit; background:#5965d8; transition:width .2s ease; }
+    @keyframes rd-update-spin { to { transform:rotate(360deg); } }
     #review-dashboard-concept .rd-view[hidden] { display:none; }
     #review-dashboard-concept .rd-controls[hidden] { display:none !important; }
     #review-dashboard-concept .rd-settings-page { width:100%; max-width:1200px; }
@@ -239,6 +248,13 @@
           <button class="rd-action rd-run" id="rd-refresh" aria-label="Обновить данные" title="Обновить данные">↻</button>
         </div>
       </div>
+      <section class="rd-update-progress" id="rd-update-progress" aria-live="polite" aria-label="Обновление данных" hidden>
+        <div class="rd-update-progress-top">
+          <div class="rd-update-progress-title"><span class="rd-update-spinner" aria-hidden="true"></span><span id="rd-update-progress-title">Обновление данных</span></div>
+          <div class="rd-update-progress-count" id="rd-update-progress-count">Подключаюсь к GitLab…</div>
+        </div>
+        <div class="rd-update-track" role="progressbar" aria-label="Обработано merge requests" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="rd-update-bar"></span></div>
+      </section>
       <section class="rd-view" data-page="dashboard">
       <div class="rd-heading">
         <div><h1>Ревью команды</h1><div class="rd-sub" id="rd-caption">Статистика за последние 7 дней</div></div>
@@ -360,7 +376,6 @@
         const controls = root.querySelector('#rd-analytics-controls');
         controls.hidden = tab.dataset.view === 'settings';
       }));
-      root.querySelector('#rd-refresh').addEventListener('click', () => { toast.textContent = 'Данные обновлены'; setTimeout(() => toast.textContent = '', 1800); });
       root.querySelector('#rd-save-routes').addEventListener('click', () => { settingsToast.textContent = 'Настройки сохранены'; });
       root.querySelector('#rd-add-route').addEventListener('click', () => { settingsToast.textContent = 'Добавлен новый маршрут'; });
       root.querySelector('#rd-export').addEventListener('click', () => { toast.textContent = 'CSV подготовлен'; });
@@ -378,6 +393,11 @@
   const engagementBody = root.querySelector('.rd-engagement-body');
   const refreshButton = root.querySelector('#rd-refresh');
   const status = root.querySelector('#rd-toast');
+  const updateProgress = root.querySelector('#rd-update-progress');
+  const updateProgressTitle = root.querySelector('#rd-update-progress-title');
+  const updateProgressCount = root.querySelector('#rd-update-progress-count');
+  const updateProgressTrack = updateProgress.querySelector('[role="progressbar"]');
+  const updateProgressBar = updateProgress.querySelector('.rd-update-bar');
   const routesContainer = root.querySelector('#rd-routes');
   const routeTemplate = routesContainer.querySelector('.rd-route').cloneNode(true);
   const routeCount = root.querySelector('#rd-route-count');
@@ -945,13 +965,16 @@
   });
   async function loadReport() {
     let progressKnown = false;
-    const setLoadingMessage = message => {
-      status.textContent = message;
-      const cell = reportContent.querySelector('.rd-loading-message');
-      if (cell) cell.textContent = message;
+    const setLoadingMessage = (message, processed = null, total = null) => {
+      updateProgressTitle.textContent = processed === null ? message : 'Обновление данных';
+      updateProgressCount.textContent = processed === null ? '' : `Обработано ${processed} из ${total} MR`;
+      const percent = processed === null || !total ? 0 : Math.min(100,Math.round(processed/total*100));
+      updateProgressTrack.setAttribute('aria-valuenow',String(percent));
+      updateProgressBar.style.width = `${percent}%`;
     };
     refreshButton.disabled = true;
-    reportContent.innerHTML = '<section class="rd-panel"><div class="rd-panel-title"><span>Загрузка статистики</span></div><table><tbody><tr><td class="rd-zero rd-loading-message">Посылаю запросы в космос…</td></tr></tbody></table></section>';
+    updateProgress.hidden = false;
+    status.textContent = '';
     setLoadingMessage('Посылаю запросы в космос…');
     const from = root.querySelector('#rd-from').value, to = root.querySelector('#rd-to').value;
     const job = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -966,7 +989,7 @@
         if (Number.isInteger(progress.total)) {
           progressKnown = true;
           const shown = progress.processed >= progress.total ? progress.total : Math.floor(progress.processed / 10) * 10;
-          setLoadingMessage(`Обработано ${shown} из ${progress.total} MR…`);
+          setLoadingMessage('Обновление данных',shown,progress.total);
         }
       } catch {}
     }, 1000);
@@ -986,6 +1009,7 @@
       timers.forEach(clearTimeout);
       clearInterval(progressTimer);
       refreshButton.disabled = false;
+      updateProgress.hidden = true;
     }
   }
   root.querySelector('#rd-refresh').addEventListener('click', event => { event.stopImmediatePropagation(); loadReport().catch(error => status.textContent = error.message); });

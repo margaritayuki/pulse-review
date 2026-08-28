@@ -69,6 +69,12 @@ try {
   await waitFor(()=>cdp.evaluate('document.readyState === "complete"'));
   await cdp.evaluate(`document.querySelector('[data-view="volume"]').click()`);
 
+  const updateProgressLayout=await cdp.evaluate(`(()=>{const progress=document.querySelector('#rd-update-progress'),controls=document.querySelector('#rd-analytics-controls'),dashboard=document.querySelector('[data-page="dashboard"]'),volume=document.querySelector('[data-page="volume"]');progress.hidden=false;const result={width:progress.getBoundingClientRect().width,controlsWidth:controls.getBoundingClientRect().width,beforeDashboard:(progress.compareDocumentPosition(dashboard)&Node.DOCUMENT_POSITION_FOLLOWING)!==0,beforeVolume:(progress.compareDocumentPosition(volume)&Node.DOCUMENT_POSITION_FOLLOWING)!==0};document.querySelector('[data-view="volume"]').click();result.visibleInVolume=getComputedStyle(progress).display!=='none';progress.hidden=true;return result})()`);
+  assert.ok(Math.abs(updateProgressLayout.width-updateProgressLayout.controlsWidth)<=1,JSON.stringify(updateProgressLayout));
+  assert.equal(updateProgressLayout.beforeDashboard,true,JSON.stringify(updateProgressLayout));
+  assert.equal(updateProgressLayout.beforeVolume,true,JSON.stringify(updateProgressLayout));
+  assert.equal(updateProgressLayout.visibleInVolume,true,JSON.stringify(updateProgressLayout));
+
   assert.equal(await cdp.evaluate(`document.querySelectorAll('[data-team="backend"] tbody tr').length`),3);
   assert.equal(await cdp.evaluate(`document.querySelectorAll('[data-team="mobile"] tbody tr').length`),15);
 
