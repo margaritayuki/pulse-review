@@ -95,3 +95,27 @@ func TestConfigReturnsTeamsUsedByFrontendFilters(t *testing.T) {
 		t.Fatalf("configured teams were not returned to the frontend: %#v", config.Routes)
 	}
 }
+
+func TestConfigSavesRenamedTeam(t *testing.T) {
+	app := newTestApplication(t, fixtureGitLab(t))
+	writeFixture(t, app.root, "groups.json", []string{"acme"})
+	writeFixture(t, app.root, "projects.json", []string{"acme/project"})
+	writeFixture(t, app.root, "routes.json", []route{{ID: "backend", Name: "Backend", Members: []string{"alice"}, ReviewSignal: "approval"}})
+
+	body := `{"routes":[{"id":"backend","name":"Backend Platform","members":["alice"],"reviewSignal":"approval"}],"groups":["acme"],"projects":["acme/project"]}`
+	request := httptest.NewRequest(http.MethodPost, "/api/config", strings.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+	app.handler().ServeHTTP(response, request)
+	if response.Code != http.StatusOK {
+		t.Fatalf("rename failed with %d: %s", response.Code, response.Body.String())
+	}
+
+	routes, err := app.readRoutes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(routes) != 1 || routes[0].Name != "Backend Platform" {
+		t.Fatalf("renamed team was not persisted: %#v", routes)
+	}
+}
