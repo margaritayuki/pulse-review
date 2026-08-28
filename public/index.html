@@ -26,7 +26,7 @@
     #review-dashboard-concept button, #review-dashboard-concept select, #review-dashboard-concept input { font:inherit; }
     #review-dashboard-concept .rd-action { border:0; background:#5965d8; color:white; border-radius:9px; padding:10px 15px; font-weight:650; cursor:pointer; }
     #review-dashboard-concept .rd-action.secondary { color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); border:1px solid light-dark(#d7dde8,#3a4657); }
-    #review-dashboard-concept .rd-controls { width:min(100%,780px); display:grid; grid-template-columns:minmax(220px,320px) minmax(260px,320px) 40px; align-items:end; gap:12px; padding:16px; border:1px solid light-dark(#dfe4ee,#303a49); background:light-dark(#fff,#18202c); border-radius:13px; margin-bottom:20px; transition:width .18s ease; }
+    #review-dashboard-concept .rd-controls { width:min(100%,720px); display:grid; grid-template-columns:minmax(220px,320px) minmax(260px,320px) 40px; align-items:end; gap:12px; padding:0; border:0; background:transparent; margin-bottom:20px; transition:width .18s ease; }
     #review-dashboard-concept .rd-controls.rd-custom-period { width:min(100%,1140px); grid-template-columns:minmax(220px,320px) minmax(260px,320px) minmax(420px,1fr); }
     #review-dashboard-concept .rd-period-row { min-width:0; }
     #review-dashboard-concept .rd-date-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; align-items:end; gap:12px; }
@@ -96,7 +96,11 @@
     #review-dashboard-concept .rd-update-progress[hidden] { display:none; }
     #review-dashboard-concept .rd-update-progress-top { display:flex; align-items:center; justify-content:space-between; gap:14px; }
     #review-dashboard-concept .rd-update-progress-title { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; }
-    #review-dashboard-concept .rd-update-progress-count { color:light-dark(#5965d8,#9099ff); font-size:11px; font-weight:700; white-space:nowrap; }
+    #review-dashboard-concept .rd-update-progress-count { color:light-dark(#5965d8,#9099ff); font-size:12px; font-weight:700; white-space:nowrap; }
+    #review-dashboard-concept .rd-update-cancel { position:relative; width:24px; height:24px; flex:none; display:grid; place-items:center; padding:0; border:0; border-radius:6px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; font-size:18px; line-height:1; }
+    #review-dashboard-concept .rd-update-cancel:hover { color:light-dark(#344054,#e4eaf4); background:light-dark(#e4e7fb,#2a345d); }
+    #review-dashboard-concept .rd-update-cancel::after { content:attr(data-tooltip); display:none; position:absolute; z-index:20; right:0; top:calc(100% + 7px); width:max-content; max-width:240px; padding:7px 9px; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:7px; color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); box-shadow:0 8px 24px rgba(23,32,51,.16); font-size:11px; font-weight:500; white-space:nowrap; }
+    #review-dashboard-concept .rd-update-cancel:hover::after, #review-dashboard-concept .rd-update-cancel:focus-visible::after { display:block; }
     #review-dashboard-concept .rd-update-spinner { width:14px; height:14px; flex:none; border:2px solid light-dark(#c8cef8,#49558e); border-top-color:#5965d8; border-radius:50%; animation:rd-update-spin .9s linear infinite; }
     #review-dashboard-concept .rd-update-track { height:5px; margin-top:8px; overflow:hidden; border-radius:4px; background:light-dark(#dfe3f1,#303954); }
     #review-dashboard-concept .rd-update-bar { display:block; width:0; height:100%; border-radius:inherit; background:#5965d8; transition:width .2s ease; }
@@ -256,8 +260,8 @@
       </div>
       <section class="rd-update-progress" id="rd-update-progress" aria-live="polite" aria-label="Обновление данных" hidden>
         <div class="rd-update-progress-top">
-          <div class="rd-update-progress-title"><span class="rd-update-spinner" aria-hidden="true"></span><span id="rd-update-progress-title">Обновление данных</span></div>
-          <div class="rd-update-progress-count" id="rd-update-progress-count">Подключаюсь к GitLab…</div>
+          <div class="rd-update-progress-title"><span class="rd-update-spinner" aria-hidden="true"></span><span class="rd-update-progress-count" id="rd-update-progress-count">Подключаюсь к GitLab…</span></div>
+          <button type="button" class="rd-update-cancel" id="rd-update-cancel" aria-label="Отменить обновление данных" data-tooltip="Обновление данных будет отменено">×</button>
         </div>
         <div class="rd-update-track" role="progressbar" aria-label="Обработано merge requests" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="rd-update-bar"></span></div>
       </section>
@@ -400,8 +404,8 @@
   const refreshButton = root.querySelector('#rd-refresh');
   const status = root.querySelector('#rd-toast');
   const updateProgress = root.querySelector('#rd-update-progress');
-  const updateProgressTitle = root.querySelector('#rd-update-progress-title');
   const updateProgressCount = root.querySelector('#rd-update-progress-count');
+  const updateCancel = root.querySelector('#rd-update-cancel');
   const updateProgressTrack = updateProgress.querySelector('[role="progressbar"]');
   const updateProgressBar = updateProgress.querySelector('.rd-update-bar');
   const routesContainer = root.querySelector('#rd-routes');
@@ -417,6 +421,7 @@
   const toInput = root.querySelector('#rd-to');
   const captionLive = root.querySelector('#rd-caption');
   let lastReport = null;
+  let activeReportController = null;
   tbody.innerHTML = '<tr><td colspan="4" class="rd-zero">Выберите команду и период, затем нажмите «Обновить»</td></tr>';
   const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 
@@ -994,13 +999,15 @@
   async function loadReport() {
     let progressKnown = false;
     const setLoadingMessage = (message, processed = null, total = null) => {
-      updateProgressTitle.textContent = processed === null ? message : 'Обновление данных';
-      updateProgressCount.textContent = processed === null ? '' : `Обработано ${processed} из ${total} MR`;
+      updateProgressCount.textContent = processed === null ? message : `Обработано ${processed} из ${total} MR`;
       const percent = processed === null || !total ? 0 : Math.min(100,Math.round(processed/total*100));
       updateProgressTrack.setAttribute('aria-valuenow',String(percent));
       updateProgressBar.style.width = `${percent}%`;
     };
     refreshButton.disabled = true;
+    activeReportController?.abort();
+    const reportController = new AbortController();
+    activeReportController = reportController;
     updateProgress.hidden = false;
     status.textContent = '';
     setLoadingMessage('Посылаю запросы в космос…');
@@ -1022,7 +1029,7 @@
       } catch {}
     }, 1000);
     try {
-      const response = await fetch(`/api/report?from=${from}&to=${to}&team=all&job=${encodeURIComponent(job)}`);
+      const response = await fetch(`/api/report?from=${from}&to=${to}&team=all&job=${encodeURIComponent(job)}`,{signal:reportController.signal});
       const report = await response.json();
       if (!response.ok) throw new Error(report.error || 'Ошибка загрузки');
       lastReport = report;
@@ -1033,13 +1040,18 @@
       } catch (volumeError) {
         status.textContent = `Статистика обновлена. Динамика: ${volumeError.message}`;
       }
+    } catch (error) {
+      if (error.name === 'AbortError') { status.textContent = 'Обновление отменено'; return; }
+      throw error;
     } finally {
       timers.forEach(clearTimeout);
       clearInterval(progressTimer);
       refreshButton.disabled = false;
       updateProgress.hidden = true;
+      if (activeReportController === reportController) activeReportController = null;
     }
   }
+  updateCancel.addEventListener('click', () => activeReportController?.abort());
   root.querySelector('#rd-refresh').addEventListener('click', event => { event.stopImmediatePropagation(); loadReport().catch(error => status.textContent = error.message); });
   periodSelect.dispatchEvent(new Event('change'));
   loadConfig().then(config => !config.preview && config.gitlabConfigured ? loadReport() : null).catch(error => status.textContent = error.message);

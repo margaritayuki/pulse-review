@@ -34,6 +34,8 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`class="rd-person-filter"`,
 		`id="rd-update-progress"`,
 		`rd-custom-period`,
+		`id="rd-update-cancel"`,
+		`activeReportController?.abort()`,
 		`<option value="two_weeks">Последние 2 недели</option>`,
 		`['week','two_weeks','current_month','previous_month']`,
 		`id="rd-overall-chart"`,

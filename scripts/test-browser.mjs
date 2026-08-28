@@ -78,6 +78,10 @@ try {
   const presetControls=await cdp.evaluate(`(()=>{const controls=document.querySelector('#rd-analytics-controls'),period=document.querySelector('#rd-period'),refresh=document.querySelector('#rd-refresh'),main=document.querySelector('.rd-main');return {width:controls.getBoundingClientRect().width,mainWidth:main.getBoundingClientRect().width,gap:refresh.getBoundingClientRect().left-period.getBoundingClientRect().right}})()`);
   assert.ok(presetControls.width<presetControls.mainWidth*.75,JSON.stringify(presetControls));
   assert.ok(Math.abs(presetControls.gap-12)<=1,JSON.stringify(presetControls));
+  const controlsSurface=await cdp.evaluate(`(()=>{const style=getComputedStyle(document.querySelector('#rd-analytics-controls'));return {background:style.backgroundColor,border:style.borderTopWidth,padding:style.paddingTop}})()`);
+  assert.equal(controlsSurface.background,'rgba(0, 0, 0, 0)',JSON.stringify(controlsSurface));
+  assert.equal(controlsSurface.border,'0px',JSON.stringify(controlsSurface));
+  assert.equal(controlsSurface.padding,'0px',JSON.stringify(controlsSurface));
   await cdp.evaluate(`document.querySelector('#rd-period').value='custom';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
   const customControls=await cdp.evaluate(`(async()=>{await new Promise(resolve=>setTimeout(resolve,240));const controls=document.querySelector('#rd-analytics-controls'),to=document.querySelector('#rd-to'),refresh=document.querySelector('#rd-refresh');return {width:controls.getBoundingClientRect().width,gap:refresh.getBoundingClientRect().left-to.getBoundingClientRect().right,custom:controls.classList.contains('rd-custom-period')}})()`);
   assert.ok(customControls.width>presetControls.width,JSON.stringify({presetControls,customControls}));
@@ -151,6 +155,16 @@ try {
   assert.ok(edgeSpacing.left>=14);
   assert.ok(edgeSpacing.right>=20);
   assert.ok(edgeSpacing.headerRight>=20);
+
+  await cdp.evaluate(`(()=>{window.__pulseOriginalFetch=window.fetch;window.fetch=(url,options={})=>String(url).startsWith('/api/report')?new Promise((resolve,reject)=>options.signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true})):window.__pulseOriginalFetch(url,options);document.querySelector('#rd-refresh').click()})()`);
+  await waitFor(()=>cdp.evaluate(`!document.querySelector('#rd-update-progress').hidden`));
+  const cancelControl=await cdp.evaluate(`(()=>{const button=document.querySelector('#rd-update-cancel');return {tooltip:button.dataset.tooltip,count:document.querySelector('#rd-update-progress-count').textContent}})()`);
+  assert.equal(cancelControl.tooltip,'Обновление данных будет отменено');
+  assert.ok(cancelControl.count.length>0,JSON.stringify(cancelControl));
+  await cdp.evaluate(`document.querySelector('#rd-update-cancel').click()`);
+  await waitFor(()=>cdp.evaluate(`document.querySelector('#rd-update-progress').hidden`));
+  assert.equal(await cdp.evaluate(`document.querySelector('#rd-toast').textContent`),'Обновление отменено');
+  await cdp.evaluate(`window.fetch=window.__pulseOriginalFetch;delete window.__pulseOriginalFetch`);
 
   console.log('Browser checks passed: 25');
 } finally {
