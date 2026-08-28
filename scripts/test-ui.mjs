@@ -30,6 +30,8 @@ const contracts = [
   ['employee rows filter dynamics', 'class="rd-person-filter"'],
   ['full-width update progress', 'class="rd-update-progress" id="rd-update-progress"'],
   ['shared update progress precedes dashboard', 'id="rd-update-progress" aria-live="polite"'],
+  ['compact preset filters', '.rd-controls { width:min(100%,780px);'],
+  ['expanded custom-date filters', '.rd-controls.rd-custom-period { width:min(100%,1140px);'],
   ['report remains visible while loading', "updateProgress.hidden = false"],
   ['daily range ends at midnight', 'new Date(today.getFullYear(),today.getMonth(),today.getDate())'],
   ['line chart range padding', 'ownMin-ownRange*.14'],

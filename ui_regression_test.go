@@ -33,6 +33,7 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`rd-line-axis-weekend`,
 		`class="rd-person-filter"`,
 		`id="rd-update-progress"`,
+		`rd-custom-period`,
 		`<option value="two_weeks">Последние 2 недели</option>`,
 		`['week','two_weeks','current_month','previous_month']`,
 		`id="rd-overall-chart"`,
