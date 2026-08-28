@@ -246,6 +246,33 @@
     #review-dashboard-concept .rd-person-filtered { background:light-dark(#f2f3ff,#222a4b); }
     #review-dashboard-concept .rd-team-table-scroll .rd-avatar { width:25px; height:25px; font-size:9px; }
     #review-dashboard-concept .rd-chart-scale-note { color:light-dark(#98a2b3,#778397); font-size:9px; font-weight:500; }
+    #review-dashboard-concept .rd-dashboard-top { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:18px; }
+    #review-dashboard-concept .rd-dashboard-top .rd-chart-body { height:300px; }
+    #review-dashboard-concept .rd-dashboard-periods { padding:16px; display:grid; align-content:center; gap:13px; min-height:300px; }
+    #review-dashboard-concept .rd-dashboard-period-row { display:grid; grid-template-columns:92px minmax(0,1fr); align-items:center; gap:12px; }
+    #review-dashboard-concept .rd-dashboard-period-label { color:light-dark(#667085,#aab4c4); font-size:11px; white-space:nowrap; }
+    #review-dashboard-concept .rd-dashboard-period-track { height:14px; overflow:hidden; display:flex; border-radius:7px; background:light-dark(#edf0f5,#293342); }
+    #review-dashboard-concept .rd-dashboard-period-fill { height:100%; display:flex; overflow:hidden; border-radius:inherit; }
+    #review-dashboard-concept .rd-dashboard-period-fill i { height:100%; min-width:1px; }
+    #review-dashboard-concept .rd-dashboard-legend { justify-content:center; padding:0 14px 14px; }
+    #review-dashboard-concept .rd-dashboard-breakdown-head { display:flex; align-items:center; justify-content:flex-start; gap:12px; margin:0 0 10px; }
+    #review-dashboard-concept .rd-dashboard-breakdown-head strong { font-size:14px; }
+    #review-dashboard-concept .rd-dashboard-view { display:flex; gap:4px; padding:2px; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:8px; background:light-dark(#f8fafc,#111722); }
+    #review-dashboard-concept .rd-dashboard-view button { padding:5px 8px; border:0; border-radius:6px; color:light-dark(#667085,#aab4c4); background:transparent; font-size:11px; cursor:pointer; }
+    #review-dashboard-concept .rd-dashboard-view button[aria-pressed="true"] { color:#5965d8; background:light-dark(#fff,#222a4b); box-shadow:0 1px 3px rgba(23,32,51,.1); }
+    #review-dashboard-concept .rd-dashboard-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    #review-dashboard-concept .rd-dashboard-card-head { min-height:58px; padding:10px 15px; display:flex; align-items:center; justify-content:space-between; gap:14px; border-bottom:1px solid light-dark(#e7eaf0,#303a49); }
+    #review-dashboard-concept .rd-dashboard-card-title { display:flex; align-items:center; gap:6px; color:light-dark(#667085,#aab4c4); font-size:12px; font-weight:600; }
+    #review-dashboard-concept .rd-dashboard-card-total { color:inherit; font:inherit; }
+    #review-dashboard-concept .rd-dashboard-grouping { display:flex; align-items:center; gap:12px; }
+    #review-dashboard-concept .rd-dashboard-grouping button, #review-dashboard-concept .rd-dashboard-grouping span { padding:4px 0; border:0; color:light-dark(#98a2b3,#778397); background:transparent; font-size:11px; font-weight:500; cursor:pointer; }
+    #review-dashboard-concept .rd-dashboard-grouping button[aria-pressed="true"] { color:#5965d8; font-weight:650; }
+    #review-dashboard-concept .rd-dashboard-card-chart { height:250px; }
+    #review-dashboard-concept .rd-dashboard-card-bars { min-height:250px; padding:16px; display:grid; align-content:center; gap:11px; }
+    #review-dashboard-concept .rd-dashboard-bar-row { display:grid; grid-template-columns:90px minmax(0,1fr) 64px; align-items:center; gap:10px; }
+    #review-dashboard-concept .rd-dashboard-bar-value { font-size:11px; font-weight:600; text-align:right; }
+    #review-dashboard-concept .rd-dashboard-empty { padding:30px; color:light-dark(#98a2b3,#778397); text-align:center; font-size:12px; }
+    @media (max-width: 980px) { #review-dashboard-concept .rd-dashboard-top, #review-dashboard-concept .rd-dashboard-cards { grid-template-columns:1fr; } }
     @media (max-width: 980px) { #review-dashboard-concept .rd-team-analytics-body { grid-template-columns:1fr; } #review-dashboard-concept .rd-overall-panel { width:100%; } }
     @media (max-width: 760px) { #review-dashboard-concept .rd-controls, #review-dashboard-concept .rd-controls.rd-custom-period { width:100%; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row, #review-dashboard-concept .rd-connection-grid, #review-dashboard-concept .rd-volume-grid { grid-template-columns:1fr; } #review-dashboard-concept .rd-volume-custom { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-volume-kpis { grid-template-columns:1fr 1fr; } }
     @media (max-width: 520px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr; } #review-dashboard-concept .rd-date-row { grid-column:auto; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row:not(.visible) { grid-template-columns:40px; } #review-dashboard-concept .rd-run { grid-column:1 / -1; } #review-dashboard-concept .rd-summary { grid-template-columns:1fr; } #review-dashboard-concept .rd-engagement-head { flex-direction:column; } #review-dashboard-concept .rd-engagement-row { grid-template-columns:120px minmax(100px,1fr) 34px; gap:8px; } #review-dashboard-concept .rd-compare-row { grid-template-columns:1fr; gap:8px; padding-bottom:12px; border-bottom:1px solid light-dark(#edf0f5,#293342); } }
@@ -255,7 +282,8 @@
       <div class="rd-head-left">
         <div class="rd-brand"><img class="rd-logo" src="/pulse-review-mark.svg" alt=""><span>Pulse Review</span></div>
         <nav class="rd-tabs" aria-label="Разделы">
-          <button class="rd-tab active" data-view="dashboard" aria-selected="true">Статистика</button>
+          <button class="rd-tab active" data-view="overview" aria-selected="true">Дашборд</button>
+          <button class="rd-tab" data-view="dashboard" aria-selected="false">Ревью</button>
           <button class="rd-tab" data-view="volume" aria-selected="false">Динамика</button>
           <button class="rd-tab" data-view="settings" aria-selected="false">Настройки</button>
         </nav>
@@ -278,7 +306,16 @@
         </div>
         <div class="rd-update-track" role="progressbar" aria-label="Обработано merge requests" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="rd-update-bar"></span></div>
       </section>
-      <section class="rd-view" data-page="dashboard">
+      <section class="rd-view" data-page="overview">
+        <div class="rd-heading"><div><h1>Дашборд</h1></div></div>
+        <div class="rd-dashboard-top">
+          <section class="rd-panel rd-chart-shell"><div class="rd-panel-title"><strong>Все показатели</strong></div><div class="rd-chart-body"><div class="rd-line-chart" id="rd-dashboard-overall-chart"></div></div><div class="rd-metric-legend rd-dashboard-legend" id="rd-dashboard-overall-legend"></div></section>
+          <section class="rd-panel"><div class="rd-panel-title"><strong>По периодам</strong></div><div class="rd-dashboard-periods" id="rd-dashboard-periods"></div><div class="rd-metric-legend rd-dashboard-legend" id="rd-dashboard-period-legend"></div></section>
+        </div>
+        <div class="rd-dashboard-breakdown-head"><strong>Расшифровка</strong><div class="rd-dashboard-view" aria-label="Представление расшифровки"><button type="button" data-dashboard-view="line" aria-pressed="true">Линейный</button><button type="button" data-dashboard-view="bar" aria-pressed="false">Линейчатый</button></div></div>
+        <div class="rd-dashboard-cards" id="rd-dashboard-cards"></div>
+      </section>
+      <section class="rd-view" data-page="dashboard" hidden>
       <div class="rd-heading">
         <div><h1>Ревью команды</h1><div class="rd-sub" id="rd-caption">Статистика за последние 7 дней</div></div>
       </div>
@@ -478,6 +515,9 @@
   const volumeSort = new Map(volumeTeams.map(team=>[team.key,{key:'mrs',direction:'desc'}]));
   let selectedVolumePerson = null;
   const visibleVolumeMetrics = new Set(['mrs','added','deleted','files']);
+  const visibleDashboardMetrics = new Set(['mrs','added','deleted','files']);
+  const dashboardGroups = new Map([['mrs','days'],['added','days'],['deleted','days'],['files','days']]);
+  let dashboardView = 'line';
   let expandedVolumeChart = null;
   const formatNumber = value => new Intl.NumberFormat('ru-RU').format(value);
   const formatDelta = (current, previous) => `${current >= previous ? '+' : ''}${Math.round((current - previous) / Math.max(1, previous) * 100)}% к предыдущему такому же периоду`;
@@ -592,10 +632,10 @@
       return 1;
     }};
   }
-  function renderLineChart(container,labels,tooltipLabels,lines) {
+  function renderLineChart(container,labels,tooltipLabels,lines,metricVisibility=visibleVolumeMetrics) {
     container.classList.toggle('compact',labels.length <= 7);
     container.classList.toggle('semi-compact',labels.length > 7 && labels.length <= 14);
-    const visibleLines=lines.filter(line=>visibleVolumeMetrics.has(line.key));
+    const visibleLines=lines.filter(line=>metricVisibility.has(line.key));
     if (!visibleLines.length) { container.innerHTML='<div class="rd-chart-empty">Выберите хотя бы один показатель</div>'; return; }
     const dailyLabels = labels.length > 0 && labels.every(label => /^\d{2}\.\d{2}$/.test(label));
     const width = Math.max(320,Math.round(container.clientWidth || 640));
@@ -671,6 +711,86 @@
       hit.addEventListener('keydown',event=>{ if (event.key==='Enter'||event.key===' ') { event.preventDefault(); hit.dispatchEvent(new MouseEvent('click',{bubbles:true})); } if (event.key==='Escape') { pinnedIndex=null; hidePoint(); } });
     });
   }
+  const dashboardMetricOptions=[
+    {key:'mrs',name:'Влито MR',color:'#5965d8'}, {key:'added',name:'Добавлено строк',color:'#2f7ae5'},
+    {key:'deleted',name:'Удалено строк',color:'#e58b19'}, {key:'files',name:'Изменено файлов',color:'#2f8f5b'}
+  ];
+  const dashboardGroupNames={days:'Дни',weeks:'Недели',months:'Месяцы',quarters:'Кварталы'};
+  function dashboardAvailableGroups() {
+    return ({week:['days'],two_weeks:['days','weeks'],current_month:['days','weeks'],previous_month:['days','weeks'],current_quarter:['weeks','months'],previous_quarter:['weeks','months'],half_year:['months','quarters'],year:['months','quarters'],custom:['weeks','months']})[periodSelect.value] || ['weeks'];
+  }
+  function dashboardSource() {
+    if (teamSelect.value !== 'all') {
+      const team=volumeTeams.find(item=>String(item.key)===teamSelect.value);
+      if (team) return volumeIsLive && team.series ? team.series : sumSeries(team.people,team.name);
+    }
+    return volumeIsLive && liveOverall ? liveOverall : sumSeries(volumePeople,'Все команды');
+  }
+  function dashboardBucketKey(value,index,group,daily) {
+    const iso=String(value||'').match(/^(\d{4})-(\d{2})(?:-(\d{2}))?/), short=String(value||'').match(/^(\d{2})'(\d{2})$/);
+    if (group==='days') return {key:`d-${index}`,label:String(value||'')};
+    if (group==='weeks') return daily ? {key:`w-${Math.floor(index/7)}`,label:''} : {key:`w-${index}`,label:String(value||'')};
+    const year=iso?Number(iso[1]):short?2000+Number(short[2]):new Date().getFullYear(), month=iso?Number(iso[2]):short?Number(short[1]):1;
+    if (group==='quarters') return {key:`${year}-q${Math.ceil(month/3)}`,label:`${Math.ceil(month/3)}q'${String(year).slice(-2)}`};
+    return {key:`${year}-${month}`,label:`${String(month).padStart(2,'0')}'${String(year).slice(-2)}`};
+  }
+  function regroupDashboardSeries(source,group) {
+    const sliced=volumePeriodSlice(source), periods=sliced.tooltips||sliced.months, daily=sliced.months.every(label=>/^\d{2}\.\d{2}$/.test(label)), buckets=[];
+    periods.forEach((period,index)=>{
+      const descriptor=dashboardBucketKey(period,index,group,daily);
+      if (group==='days') descriptor.label=sliced.months[index];
+      let bucket=buckets.find(item=>item.key===descriptor.key);
+      if (!bucket) { bucket={key:descriptor.key,label:descriptor.label,mrs:0,added:0,deleted:0,files:0,first:index,last:index}; buckets.push(bucket); }
+      bucket.last=index;
+      dashboardMetricOptions.forEach(metric=>bucket[metric.key]+=Number(sliced[metric.key][index]||0));
+    });
+    buckets.forEach(bucket=>{ if(group==='weeks'&&daily) bucket.label=`${sliced.months[bucket.first]}–${sliced.months[bucket.last]}`; });
+    return {months:buckets.map(item=>item.label),tooltips:buckets.map(item=>item.label),...Object.fromEntries(dashboardMetricOptions.map(metric=>[metric.key,buckets.map(item=>item[metric.key])]))};
+  }
+  function removeZeroDashboardPeriods(series,metrics) {
+    const keep=series.months.map((_,index)=>metrics.some(metric=>Number(series[metric][index]||0)!==0));
+    return {months:series.months.filter((_,index)=>keep[index]),tooltips:(series.tooltips||series.months).filter((_,index)=>keep[index]),...Object.fromEntries(dashboardMetricOptions.map(metric=>[metric.key,series[metric.key].filter((_,index)=>keep[index])]))};
+  }
+  function dashboardLines(series) {
+    return dashboardMetricOptions.map(metric=>({key:metric.key,name:metric.name,values:series[metric.key],color:metric.color}));
+  }
+  function renderDashboardPeriodBars(series) {
+    const metrics=dashboardMetricOptions.filter(metric=>visibleDashboardMetrics.has(metric.key));
+    const filtered=removeZeroDashboardPeriods(series,metrics.map(metric=>metric.key));
+    const container=root.querySelector('#rd-dashboard-periods');
+    if (!metrics.length || !filtered.months.length) { container.innerHTML='<div class="rd-dashboard-empty">Нет данных за выбранный период</div>'; return; }
+    const maxima=Object.fromEntries(metrics.map(metric=>[metric.key,Math.max(1,...filtered[metric.key])]));
+    const rows=filtered.months.map((label,index)=>{const scores=metrics.map(metric=>filtered[metric.key][index]/maxima[metric.key]),sum=scores.reduce((total,value)=>total+value,0);return {label,index,scores,sum};});
+    const maximum=Math.max(1,...rows.map(row=>row.sum));
+    container.innerHTML=rows.map(row=>`<div class="rd-dashboard-period-row"><span class="rd-dashboard-period-label">${escapeHtml(row.label)}</span><span class="rd-dashboard-period-track"><span class="rd-dashboard-period-fill" style="width:${row.sum/maximum*100}%">${metrics.map((metric,index)=>`<i data-tooltip="${escapeHtml(metric.name)}: ${formatNumber(filtered[metric.key][row.index])}" style="width:${row.scores[index]/Math.max(row.sum,.0001)*100}%;background:${metric.color}" title="${escapeHtml(metric.name)}: ${formatNumber(filtered[metric.key][row.index])}"></i>`).join('')}</span></span></div>`).join('');
+  }
+  function renderDashboardCard(metric,source,groups) {
+    if (!groups.includes(dashboardGroups.get(metric.key))) dashboardGroups.set(metric.key,groups[0]);
+    const group=dashboardGroups.get(metric.key),series=removeZeroDashboardPeriods(regroupDashboardSeries(source,group),[metric.key]);
+    const total=series[metric.key].reduce((sum,value)=>sum+value,0),grouping=groups.length===1?`<span>${dashboardGroupNames[groups[0]]}</span>`:groups.map(item=>`<button type="button" data-dashboard-metric="${metric.key}" data-dashboard-group="${item}" aria-pressed="${group===item}">${dashboardGroupNames[item]}</button>`).join('');
+    const body=dashboardView==='line'?`<div class="rd-line-chart rd-dashboard-card-chart" id="rd-dashboard-card-${metric.key}"></div>`:`<div class="rd-dashboard-card-bars">${series.months.length?series.months.map((label,index)=>`<div class="rd-dashboard-bar-row"><span class="rd-dashboard-period-label">${escapeHtml(label)}</span><span class="rd-dashboard-period-track"><i style="display:block;width:${series[metric.key][index]/Math.max(1,...series[metric.key])*100}%;height:100%;border-radius:inherit;background:${metric.color}"></i></span><span class="rd-dashboard-bar-value">${formatNumber(series[metric.key][index])}</span></div>`).join(''):'<div class="rd-dashboard-empty">Нет данных</div>'}</div>`;
+    return {html:`<section class="rd-panel"><div class="rd-dashboard-card-head"><div class="rd-dashboard-card-title"><span>${metric.name}</span><span class="rd-dashboard-card-total">${formatNumber(total)}</span></div><div class="rd-dashboard-grouping">${grouping}</div></div>${body}</section>`,series};
+  }
+  function renderOverviewDashboard() {
+    const source=dashboardSource(),groups=dashboardAvailableGroups(),overall=removeZeroDashboardPeriods(regroupDashboardSeries(source,groups.at(-1)),dashboardMetricOptions.map(metric=>metric.key));
+    const legend=dashboardMetricOptions.map(metric=>`<span><i style="background:${metric.color}"></i>${metric.name}</span>`).join('');
+    root.querySelector('#rd-dashboard-overall-legend').innerHTML=legend;
+    root.querySelector('#rd-dashboard-period-legend').innerHTML=dashboardMetricOptions.map(metric=>`<button type="button" class="rd-metric-toggle" data-dashboard-period-metric="${metric.key}" aria-pressed="${visibleDashboardMetrics.has(metric.key)}"><i style="background:${metric.color}"></i>${metric.name}</button>`).join('');
+    renderLineChart(root.querySelector('#rd-dashboard-overall-chart'),overall.months,overall.tooltips,dashboardLines(overall),new Set(dashboardMetricOptions.map(metric=>metric.key)));
+    renderDashboardPeriodBars(overall);
+    const cards=dashboardMetricOptions.map(metric=>renderDashboardCard(metric,source,groups));
+    root.querySelector('#rd-dashboard-cards').innerHTML=cards.map(item=>item.html).join('');
+    if (dashboardView==='line') dashboardMetricOptions.forEach((metric,index)=>{const series=cards[index].series;renderLineChart(root.querySelector(`#rd-dashboard-card-${metric.key}`),series.months,series.tooltips,[{key:metric.key,name:metric.name,values:series[metric.key],color:metric.color}],new Set([metric.key]));});
+  }
+  root.addEventListener('click',event=>{
+    const view=event.target.closest('[data-dashboard-view]');
+    if (view) { dashboardView=view.dataset.dashboardView; root.querySelectorAll('[data-dashboard-view]').forEach(button=>button.setAttribute('aria-pressed',String(button===view))); renderOverviewDashboard(); return; }
+    const group=event.target.closest('[data-dashboard-group]');
+    if (group) { dashboardGroups.set(group.dataset.dashboardMetric,group.dataset.dashboardGroup); renderOverviewDashboard(); return; }
+    const metric=event.target.closest('[data-dashboard-period-metric]');
+    if (metric) { if(visibleDashboardMetrics.has(metric.dataset.dashboardPeriodMetric)&&visibleDashboardMetrics.size>1) visibleDashboardMetrics.delete(metric.dataset.dashboardPeriodMetric); else visibleDashboardMetrics.add(metric.dataset.dashboardPeriodMetric); renderOverviewDashboard(); return; }
+    if (event.target.closest('.rd-tab[data-view="overview"]')) requestAnimationFrame(renderOverviewDashboard);
+  });
   function renderVolumeConcept() {
     const metricOptions=[
       {key:'mrs',name:'Влито MR',color:'#5965d8'}, {key:'added',name:'Добавлено строк',color:'#2f7ae5'},
@@ -767,12 +887,14 @@
   });
   [volumeFrom,volumeTo].forEach(input => input.addEventListener('change', renderVolumeConcept));
   renderVolumeConcept();
+  renderOverviewDashboard();
 
   function fillTeams(routes) {
     configuredRoutes = routes;
     if (!volumeIsLive) volumeTeams.forEach((team,index) => { if (routes[index]?.name) team.name = routes[index].name; });
     teamSelect.innerHTML = '<option value="all">Все команды</option>' + routes.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name || 'Без названия')}</option>`).join('');
     renderVolumeConcept();
+    renderOverviewDashboard();
   }
 
   const volumeSeriesFromAPI = points => ({
@@ -794,6 +916,7 @@
     volumeTeams.forEach(team=>volumeSort.set(team.key,{key:'mrs',direction:'desc'}));
     volumeIsLive = true;
     renderVolumeConcept();
+    renderOverviewDashboard();
   }
   async function loadWorkVolume() {
     if (location.protocol === 'file:') return;
@@ -1064,10 +1187,11 @@
     if (range) { fromInput.value = toIsoDate(range[0]); toInput.value = toIsoDate(range[1]); captionLive.textContent = range[2]; }
     if (periodSelect.value === 'custom') captionLive.textContent = 'Статистика за выбранный период';
     renderVolumeConcept();
+    renderOverviewDashboard();
     status.textContent = 'Период изменён — нажмите обновить';
   });
-  [fromInput, toInput].forEach(input => input.addEventListener('change', () => { periodSelect.value = 'custom'; sharedDates.classList.add('visible'); analyticsControls.classList.add('rd-custom-period'); captionLive.textContent = 'Статистика за выбранный период'; renderVolumeConcept(); status.textContent = 'Период изменён — нажмите обновить'; }));
-  teamSelect.addEventListener('change', () => { selectedVolumePerson=null; renderSelectedTeam(); renderVolumeConcept(); });
+  [fromInput, toInput].forEach(input => input.addEventListener('change', () => { periodSelect.value = 'custom'; sharedDates.classList.add('visible'); analyticsControls.classList.add('rd-custom-period'); captionLive.textContent = 'Статистика за выбранный период'; renderVolumeConcept(); renderOverviewDashboard(); status.textContent = 'Период изменён — нажмите обновить'; }));
+  teamSelect.addEventListener('change', () => { selectedVolumePerson=null; renderSelectedTeam(); renderVolumeConcept(); renderOverviewDashboard(); });
   root.addEventListener('click', event => {
     const button = event.target.closest('.rd-export-team');
     if (!button) return;

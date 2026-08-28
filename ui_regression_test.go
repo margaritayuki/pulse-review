@@ -55,6 +55,18 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`id="rd-save-analytics" type="button">Сохранить</button>`,
 		`sumSeries(team.people,team.name)`,
 		`/api/work-volume?from=`,
+		`data-view="overview"`,
+		`data-view="dashboard" aria-selected="false">Ревью</button>`,
+		`id="rd-dashboard-overall-chart"`,
+		`id="rd-dashboard-periods"`,
+		`id="rd-dashboard-cards"`,
+		`<strong>Расшифровка</strong>`,
+		`data-dashboard-view="line"`,
+		`data-dashboard-view="bar"`,
+		`dashboardAvailableGroups()`,
+		`removeZeroDashboardPeriods`,
+		`visibleDashboardMetrics`,
+		`rd-dashboard-card-total { color:inherit; font:inherit; }`,
 	}
 	for _, fragment := range checks {
 		if !strings.Contains(page, fragment) {
@@ -90,6 +102,9 @@ func TestFrontendRegressionContracts(t *testing.T) {
 	}
 	if strings.Contains(page, `preserveAspectRatio="none"`) {
 		t.Error("chart text must not stretch with the SVG")
+	}
+	if count := strings.Count(page, `<h1>Ревью команды</h1>`); count != 1 {
+		t.Errorf("review page must remain present exactly once, got %d", count)
 	}
 }
 

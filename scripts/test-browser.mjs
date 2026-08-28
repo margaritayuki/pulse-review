@@ -67,6 +67,26 @@ try {
   await cdp.connect();
   await cdp.send('Runtime.enable');
   await waitFor(()=>cdp.evaluate('document.readyState === "complete"'));
+  const dashboardInitial=await cdp.evaluate(`(()=>({active:document.querySelector('.rd-tab.active')?.dataset.view,overviewVisible:!document.querySelector('[data-page="overview"]').hidden,reviewHidden:document.querySelector('[data-page="dashboard"]').hidden,cards:document.querySelectorAll('#rd-dashboard-cards > .rd-panel').length,overallLines:document.querySelectorAll('#rd-dashboard-overall-chart .rd-line-path').length,periodRows:document.querySelectorAll('#rd-dashboard-periods .rd-dashboard-period-row').length,reviewTitle:document.querySelector('[data-page="dashboard"] h1').textContent}))()`);
+  assert.equal(dashboardInitial.active,'overview',JSON.stringify(dashboardInitial));
+  assert.equal(dashboardInitial.overviewVisible,true,JSON.stringify(dashboardInitial));
+  assert.equal(dashboardInitial.reviewHidden,true,JSON.stringify(dashboardInitial));
+  assert.equal(dashboardInitial.cards,4,JSON.stringify(dashboardInitial));
+  assert.equal(dashboardInitial.overallLines,4,JSON.stringify(dashboardInitial));
+  assert.ok(dashboardInitial.periodRows>0,JSON.stringify(dashboardInitial));
+  assert.equal(dashboardInitial.reviewTitle,'Ревью команды',JSON.stringify(dashboardInitial));
+  const dashboardTypography=await cdp.evaluate(`(()=>{const title=document.querySelector('.rd-dashboard-card-title span:first-child'),total=document.querySelector('.rd-dashboard-card-total'),head=document.querySelector('.rd-dashboard-breakdown-head');return {titleSize:getComputedStyle(title).fontSize,totalSize:getComputedStyle(total).fontSize,titleWeight:getComputedStyle(title).fontWeight,totalWeight:getComputedStyle(total).fontWeight,breakdownLeft:head.getBoundingClientRect().left,cardsLeft:document.querySelector('#rd-dashboard-cards').getBoundingClientRect().left}})()`);
+  assert.equal(dashboardTypography.titleSize,dashboardTypography.totalSize,JSON.stringify(dashboardTypography));
+  assert.equal(dashboardTypography.titleWeight,dashboardTypography.totalWeight,JSON.stringify(dashboardTypography));
+  assert.ok(Math.abs(dashboardTypography.breakdownLeft-dashboardTypography.cardsLeft)<=1,JSON.stringify(dashboardTypography));
+  await cdp.evaluate(`document.querySelector('[data-dashboard-view="bar"]').click()`);
+  assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-bars').length`),4);
+  await cdp.evaluate(`document.querySelector('#rd-dashboard-period-legend [data-dashboard-period-metric="files"]').click()`);
+  assert.equal(await cdp.evaluate(`document.querySelector('#rd-dashboard-period-legend [data-dashboard-period-metric="files"]').getAttribute('aria-pressed')`),'false');
+  await cdp.evaluate(`document.querySelector('#rd-period').value='two_weeks';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
+  assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-cards [data-dashboard-group]').length`),8);
+  await cdp.evaluate(`document.querySelector('#rd-period').value='week';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('[data-dashboard-view="line"]').click()`);
+  assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-grouping button').length`),0);
   await cdp.evaluate(`document.querySelector('[data-view="volume"]').click()`);
 
   const updateProgressLayout=await cdp.evaluate(`(()=>{const progress=document.querySelector('#rd-update-progress'),dashboard=document.querySelector('[data-page="dashboard"]'),volume=document.querySelector('[data-page="volume"]');progress.hidden=false;const result={width:progress.getBoundingClientRect().width,viewWidth:volume.getBoundingClientRect().width,beforeDashboard:(progress.compareDocumentPosition(dashboard)&Node.DOCUMENT_POSITION_FOLLOWING)!==0,beforeVolume:(progress.compareDocumentPosition(volume)&Node.DOCUMENT_POSITION_FOLLOWING)!==0};document.querySelector('[data-view="volume"]').click();result.visibleInVolume=getComputedStyle(progress).display!=='none';progress.hidden=true;return result})()`);

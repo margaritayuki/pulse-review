@@ -65,6 +65,18 @@ const contracts = [
   ['analytics signal help', 'aria-label="Как работает персональный сигнал"'],
   ['analytics save is concise', 'id="rd-save-analytics" type="button">Сохранить</button>'],
   ['team totals aggregate employees', "sumSeries(team.people,team.name)"],
+  ['separate dashboard tab', 'data-view="overview" aria-selected="true">Дашборд</button>'],
+  ['review tab remains separate', 'data-view="dashboard" aria-selected="false">Ревью</button>'],
+  ['dashboard combined chart', 'id="rd-dashboard-overall-chart"'],
+  ['dashboard period bars', 'id="rd-dashboard-periods"'],
+  ['dashboard four metric cards', 'id="rd-dashboard-cards"'],
+  ['dashboard breakdown title', '<strong>Расшифровка</strong>'],
+  ['dashboard linear view', 'data-dashboard-view="line"'],
+  ['dashboard horizontal-bar view', 'data-dashboard-view="bar"'],
+  ['period-dependent groupings', 'function dashboardAvailableGroups()'],
+  ['zero periods are removed', 'function removeZeroDashboardPeriods('],
+  ['dashboard uses existing loaded source', 'function dashboardSource()'],
+  ['metric total inherits title typography', '.rd-dashboard-card-total { color:inherit; font:inherit; }'],
 ];
 
 for (const [name, fragment] of contracts) {
