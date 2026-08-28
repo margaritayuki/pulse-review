@@ -84,6 +84,22 @@ try {
   assert.deepEqual(dashboardLegends.overall,dashboardLegends.period,JSON.stringify(dashboardLegends));
   assert.equal(dashboardLegends.overall.length,4,JSON.stringify(dashboardLegends));
   assert.ok(dashboardLegends.overall.every(item=>item.dot&&item.pressed==='true'),JSON.stringify(dashboardLegends));
+  const dashboardLegendPlacement=await cdp.evaluate(`(()=>{const panels=[...document.querySelectorAll('.rd-dashboard-top > .rd-panel')];return panels.map(panel=>{const title=panel.querySelector('.rd-panel-title'),legend=panel.querySelector('.rd-dashboard-legend'),titleRect=title.getBoundingClientRect(),legendRect=legend.getBoundingClientRect();return {inHeader:legend.parentElement===title,rightGap:Math.round(titleRect.right-legendRect.right),topGap:Math.round(legendRect.top-titleRect.top)}})})()`);
+  assert.ok(dashboardLegendPlacement.every(item=>item.inHeader&&item.rightGap<=18&&item.topGap>=0),JSON.stringify(dashboardLegendPlacement));
+  await waitFor(()=>cdp.evaluate(`document.querySelectorAll('#live-team option').length>1`));
+  const compactControls=await cdp.evaluate(`(()=>{const team=document.querySelector('#live-team').getBoundingClientRect(),period=document.querySelector('#rd-period').getBoundingClientRect(),refresh=document.querySelector('#rd-refresh').getBoundingClientRect();return {teamWidth:team.width,periodWidth:period.width,refreshGap:refresh.left-period.right}})()`);
+  assert.ok(Math.abs(compactControls.teamWidth-267)<=1,JSON.stringify(compactControls));
+  assert.ok(Math.abs(compactControls.periodWidth-267)<=1,JSON.stringify(compactControls));
+  assert.ok(compactControls.refreshGap>=8&&compactControls.refreshGap<=11,JSON.stringify(compactControls));
+  const globalExport=await cdp.evaluate(`(async()=>{const select=document.querySelector('#live-team'),button=document.querySelector('#rd-export-all'),style=getComputedStyle(button),icon=button.querySelector('svg'),originalCreate=URL.createObjectURL,originalRevoke=URL.revokeObjectURL,originalClick=HTMLAnchorElement.prototype.click;let blob,filename;URL.createObjectURL=value=>{blob=value;return 'blob:pulse-review-test'};URL.revokeObjectURL=()=>{};HTMLAnchorElement.prototype.click=function(){filename=this.download};select.value='backend';select.dispatchEvent(new Event('change',{bubbles:true}));button.click();const content=await blob.text();URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;HTMLAnchorElement.prototype.click=originalClick;select.value='all';select.dispatchEvent(new Event('change',{bubbles:true}));return {aria:button.getAttribute('aria-label'),border:style.borderTopWidth,background:style.backgroundColor,iconWidth:icon.getBoundingClientRect().width,filename,content}})()`);
+  assert.equal(globalExport.aria,'Скачать все показатели в CSV',JSON.stringify(globalExport));
+  assert.equal(globalExport.border,'0px',JSON.stringify(globalExport));
+  assert.equal(globalExport.background,'rgba(0, 0, 0, 0)',JSON.stringify(globalExport));
+  assert.equal(globalExport.iconWidth,20,JSON.stringify(globalExport));
+  assert.match(globalExport.filename,/Backend-команда/,JSON.stringify(globalExport));
+  assert.match(globalExport.content,/Тип строки.*Добавлено строк.*Изменено файлов/,JSON.stringify(globalExport));
+  assert.match(globalExport.content,/Backend-команда/,JSON.stringify(globalExport));
+  assert.doesNotMatch(globalExport.content,/Mobile-команда/,JSON.stringify(globalExport));
   const dashboardTypography=await cdp.evaluate(`(()=>{const title=document.querySelector('.rd-dashboard-card-title span:first-child'),total=document.querySelector('.rd-dashboard-card-total'),head=document.querySelector('.rd-dashboard-breakdown-head');return {titleSize:getComputedStyle(title).fontSize,totalSize:getComputedStyle(total).fontSize,titleWeight:getComputedStyle(title).fontWeight,totalWeight:getComputedStyle(total).fontWeight,breakdownLeft:head.getBoundingClientRect().left,cardsLeft:document.querySelector('#rd-dashboard-cards').getBoundingClientRect().left}})()`);
   assert.equal(dashboardTypography.titleSize,dashboardTypography.totalSize,JSON.stringify(dashboardTypography));
   assert.equal(dashboardTypography.titleWeight,dashboardTypography.totalWeight,JSON.stringify(dashboardTypography));
@@ -207,7 +223,7 @@ try {
 
   const presetControls=await cdp.evaluate(`(()=>{const controls=document.querySelector('#rd-analytics-controls'),period=document.querySelector('#rd-period'),refresh=document.querySelector('#rd-refresh'),main=document.querySelector('.rd-main');return {width:controls.getBoundingClientRect().width,mainWidth:main.getBoundingClientRect().width,gap:refresh.getBoundingClientRect().left-period.getBoundingClientRect().right}})()`);
   assert.ok(presetControls.width<presetControls.mainWidth*.75,JSON.stringify(presetControls));
-  assert.ok(Math.abs(presetControls.gap-12)<=1,JSON.stringify(presetControls));
+  assert.ok(Math.abs(presetControls.gap-10)<=1,JSON.stringify(presetControls));
   const controlsSurface=await cdp.evaluate(`(()=>{const style=getComputedStyle(document.querySelector('#rd-analytics-controls'));return {background:style.backgroundColor,border:style.borderTopWidth,padding:style.paddingTop}})()`);
   assert.equal(controlsSurface.background,'rgba(0, 0, 0, 0)',JSON.stringify(controlsSurface));
   assert.equal(controlsSurface.border,'0px',JSON.stringify(controlsSurface));
@@ -221,7 +237,7 @@ try {
   await cdp.evaluate(`document.querySelector('#rd-period').value='custom';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
   const customControls=await cdp.evaluate(`(async()=>{await new Promise(resolve=>setTimeout(resolve,240));const controls=document.querySelector('#rd-analytics-controls'),to=document.querySelector('#rd-to'),refresh=document.querySelector('#rd-refresh');return {width:controls.getBoundingClientRect().width,gap:refresh.getBoundingClientRect().left-to.getBoundingClientRect().right,custom:controls.classList.contains('rd-custom-period')}})()`);
   assert.ok(customControls.width>presetControls.width,JSON.stringify({presetControls,customControls}));
-  assert.ok(Math.abs(customControls.gap-12)<=1,JSON.stringify(customControls));
+  assert.ok(Math.abs(customControls.gap-10)<=1,JSON.stringify(customControls));
   assert.equal(customControls.custom,true,JSON.stringify(customControls));
   await cdp.evaluate(`document.querySelector('#rd-period').value='week';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
 
@@ -330,7 +346,7 @@ try {
   assert.equal(normalChartText.buttonBackground,'rgba(0, 0, 0, 0)',JSON.stringify(normalChartText));
   assert.equal(normalChartText.iconWidth,22,JSON.stringify(normalChartText));
   assert.equal(normalChartText.iconHeight,22,JSON.stringify(normalChartText));
-  assert.match(normalChartText.iconPath,/M10 10 4 4/,JSON.stringify(normalChartText));
+  assert.match(normalChartText.iconPath,/M14 10l6-6/,JSON.stringify(normalChartText));
   await cdp.evaluate(`document.querySelector('[data-chart-key="overall"] .rd-chart-expand').click()`);
   const fullscreen=await cdp.evaluate(`(()=>{const shell=document.querySelector('[data-chart-key="overall"]'),rect=shell.getBoundingClientRect(),button=shell.querySelector('.rd-chart-expand'),svg=shell.querySelector('.rd-line-chart svg'),label=shell.querySelector('.rd-line-axis-date');return {expanded:shell.classList.contains('rd-chart-expanded'),width:rect.width,height:rect.height,viewportWidth:innerWidth,viewportHeight:innerHeight,label:button.getAttribute('aria-label'),title:button.title,iconPath:button.querySelector('svg path').getAttribute('d'),locked:document.documentElement.classList.contains('pulse-review-chart-lock'),fontSize:getComputedStyle(label).fontSize,viewWidth:svg.viewBox.baseVal.width,clientWidth:svg.getBoundingClientRect().width}})()`);
   assert.equal(fullscreen.expanded,true,JSON.stringify(fullscreen));
@@ -338,7 +354,7 @@ try {
   assert.ok(fullscreen.height<=1080&&fullscreen.height<=fullscreen.viewportHeight-47,JSON.stringify(fullscreen));
   assert.equal(fullscreen.label,'Свернуть график',JSON.stringify(fullscreen));
   assert.equal(fullscreen.title,'Свернуть график',JSON.stringify(fullscreen));
-  assert.match(fullscreen.iconPath,/M4 4l6 6/,JSON.stringify(fullscreen));
+  assert.match(fullscreen.iconPath,/M20 4l-6 6/,JSON.stringify(fullscreen));
   assert.equal(fullscreen.locked,true,JSON.stringify(fullscreen));
   assert.equal(fullscreen.fontSize,normalChartText.fontSize,JSON.stringify({normalChartText,fullscreen}));
   assert.ok(Math.abs(fullscreen.viewWidth-fullscreen.clientWidth)<=2,JSON.stringify(fullscreen));
@@ -356,6 +372,9 @@ try {
   assert.ok(Math.abs(chartAlignment.panelLeft-chartAlignment.teamLeft)<=2,JSON.stringify(chartAlignment));
   assert.equal(chartAlignment.firstX,68);
   assert.equal(chartAlignment.viewWidth-chartAlignment.lastX,28);
+  const chartVerticalSpacing=await cdp.evaluate(`(()=>{const svg=document.querySelector('[data-team="backend"] .rd-line-chart svg'),body=document.querySelector('[data-team="backend"] .rd-chart-body');return {bottomPlotGap:svg.viewBox.baseVal.height-Number(svg.dataset.zeroY),paddingTop:parseFloat(getComputedStyle(body).paddingTop),paddingBottom:parseFloat(getComputedStyle(body).paddingBottom)}})()`);
+  assert.equal(chartVerticalSpacing.bottomPlotGap,54,JSON.stringify(chartVerticalSpacing));
+  assert.ok(chartVerticalSpacing.paddingTop<=12&&chartVerticalSpacing.paddingBottom<=6,JSON.stringify(chartVerticalSpacing));
   const nonNegativeCurves=await cdp.evaluate(`(()=>[...document.querySelectorAll('.rd-line-chart svg')].every(svg=>{const zero=Number(svg.dataset.zeroY);return [...svg.querySelectorAll('.rd-line-path')].every(path=>path.getBBox().y+path.getBBox().height<=zero+1)}))()`);
   assert.equal(nonNegativeCurves,true);
   const edgeSpacing=await cdp.evaluate(`(()=>{const table=document.querySelector('[data-team="backend"] table'),first=table.querySelector('tbody td:first-child'),last=table.querySelector('tbody td:last-child'),lastHead=table.querySelector('thead th:last-child');return {left:parseFloat(getComputedStyle(first).paddingLeft),right:parseFloat(getComputedStyle(last).paddingRight),headerRight:parseFloat(getComputedStyle(lastHead).paddingRight)}})()`);
