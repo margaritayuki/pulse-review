@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestCountUnifiedDiffIgnoresHeaders(t *testing.T) {
@@ -115,5 +116,20 @@ func TestWorkVolumeHTTPAPI(t *testing.T) {
 	app.handler().ServeHTTP(response, request)
 	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), `"changedFiles":2`) {
 		t.Fatalf("unexpected response %d: %s", response.Code, response.Body.String())
+	}
+}
+
+func TestWorkVolumeUsesWeeklyBucketsForTwoMonths(t *testing.T) {
+	from := time.Date(2026, time.July, 1, 0, 0, 0, 0, time.UTC)
+	to := time.Date(2026, time.August, 28, 0, 0, 0, 0, time.UTC)
+	series := emptyVolumeSeries(from, to)
+	if len(series) != 9 {
+		t.Fatalf("expected 9 weekly buckets, got %d: %#v", len(series), series)
+	}
+	if series[0].Period != "2026-07-01" || series[0].Label != "01–07.07" {
+		t.Fatalf("unexpected first bucket: %#v", series[0])
+	}
+	if series[8].Period != "2026-08-26" || series[8].Label != "26–28.08" {
+		t.Fatalf("unexpected final bucket: %#v", series[8])
 	}
 }

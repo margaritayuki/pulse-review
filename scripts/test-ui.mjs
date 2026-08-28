@@ -37,7 +37,7 @@ const contracts = [
   ['cancel update hover explanation', 'data-tooltip="Обновление данных будет отменено"'],
   ['report remains visible while loading', "updateProgress.hidden = false"],
   ['daily range ends at midnight', 'new Date(today.getFullYear(),today.getMonth(),today.getDate())'],
-  ['line chart range padding', 'ownMin-ownRange*.14'],
+  ['line chart scale headroom', 'flatMap(line => line.values)) * 1.08'],
   ['overall all-teams chart', 'id="rd-overall-chart"'],
   ['one block per configured team', 'id="rd-team-analytics"'],
   ['scrollable employee tables', 'rd-team-table-scroll'],
@@ -50,7 +50,8 @@ const contracts = [
   ['table right edge spacing', 'td:last-child { padding-right:20px; }'],
   ['employee names are filter buttons', 'aria-pressed="${active}">${escapeHtml(item.name)}</button>'],
   ['changed files line', "name:'Изменено файлов'"],
-  ['all metrics use independent visual scales', 'const independentScales = lines.length > 2'],
+  ['changed-line metrics use right scale', "axis:'right'"],
+  ['chart axes are labelled', 'MR / файлы</text>'],
   ['team totals aggregate employees', "sumSeries(team.people,team.name)"],
 ];
 

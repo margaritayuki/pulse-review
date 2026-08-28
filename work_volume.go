@@ -246,20 +246,36 @@ type collectedMR struct {
 }
 
 func volumeBucket(value, from, to time.Time) (key, label string) {
-	if int(to.Sub(from).Hours()/24)+1 <= 31 {
+	days := int(to.Sub(from).Hours()/24) + 1
+	if days <= 31 {
 		return value.Format("2006-01-02"), value.Format("02.01")
+	}
+	if days <= 93 {
+		offset := int(value.Sub(from).Hours()/24) / 7
+		start := from.AddDate(0, 0, offset*7)
+		end := start.AddDate(0, 0, 6)
+		if end.After(to) {
+			end = to
+		}
+		label := start.Format("02") + "–" + end.Format("02.01")
+		if start.Month() != end.Month() {
+			label = start.Format("02.01") + "–" + end.Format("02.01")
+		}
+		return start.Format("2006-01-02"), label
 	}
 	return value.Format("2006-01"), value.Format("01'06")
 }
 
 func emptyVolumeSeries(from, to time.Time) []volumePoint {
-	daily := int(to.Sub(from).Hours()/24)+1 <= 31
+	days := int(to.Sub(from).Hours()/24) + 1
 	result := []volumePoint{}
 	for cursor := from; !cursor.After(to); {
 		key, label := volumeBucket(cursor, from, to)
 		result = append(result, volumePoint{Period: key, Label: label})
-		if daily {
+		if days <= 31 {
 			cursor = cursor.AddDate(0, 0, 1)
+		} else if days <= 93 {
+			cursor = cursor.AddDate(0, 0, 7)
 		} else {
 			cursor = time.Date(cursor.Year(), cursor.Month()+1, 1, 0, 0, 0, 0, time.UTC)
 		}

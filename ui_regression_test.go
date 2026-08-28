@@ -42,7 +42,8 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`id="rd-team-analytics"`,
 		`aria-pressed="${active}">${escapeHtml(item.name)}</button>`,
 		`name:'Изменено файлов'`,
-		`const independentScales = lines.length > 2`,
+		`axis:'right'`,
+		`MR / файлы</text>`,
 		`sumSeries(team.people,team.name)`,
 		`/api/work-volume?from=`,
 	}

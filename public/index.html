@@ -151,6 +151,7 @@
     #review-dashboard-concept .rd-line-chart svg { width:100%; height:100%; display:block; overflow:visible; }
     #review-dashboard-concept .rd-line-grid { stroke:light-dark(#e5e9f1,#303a49); stroke-width:1; stroke-dasharray:4 5; }
     #review-dashboard-concept .rd-line-axis { fill:light-dark(#667085,#aab4c4); font-size:10px; }
+    #review-dashboard-concept .rd-line-axis-title { fill:light-dark(#667085,#aab4c4); font-size:9px; font-weight:700; }
     #review-dashboard-concept .rd-line-axis-date { fill:#5965d8; dominant-baseline:middle; }
     #review-dashboard-concept .rd-line-axis-weekend { fill:light-dark(#8a93a5,#828da0); }
     #review-dashboard-concept .rd-line-path { fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
@@ -541,18 +542,15 @@
     container.classList.toggle('compact',labels.length <= 7);
     container.classList.toggle('semi-compact',labels.length > 7 && labels.length <= 14);
     const dailyLabels = labels.length > 0 && labels.every(label => /^\d{2}\.\d{2}$/.test(label));
-    const width = 640, height = 250, left = 48, right = 48, top = 14, bottom = dailyLabels ? 68 : 34;
+    const width = 640, height = 250, left = 48, right = 48, top = 24, bottom = dailyLabels ? 68 : 34;
     const plotWidth = width-left-right, plotHeight = height-top-bottom;
-    const independentScales = lines.length > 2;
     const primaryLines = lines.filter(line => line.axis !== 'right'), secondaryLines = lines.filter(line => line.axis === 'right');
     const ceiling = Math.max(1,...primaryLines.flatMap(line => line.values)) * 1.08;
     const secondaryCeiling = Math.max(1,...secondaryLines.flatMap(line => line.values)) * 1.08;
     const pointSets = lines.map(line => {
-      const ownMax = Math.max(1,...line.values), ownMin = Math.min(...line.values);
-      const ownRange = Math.max(1,ownMax-ownMin), ownFloor = Math.max(0,ownMin-ownRange*.14), ownCeiling = ownMax+ownRange*.14;
       return line.values.map((value,index) => ({
         x:left+(line.values.length === 1 ? plotWidth/2 : index/(line.values.length-1)*plotWidth),
-        y:top+plotHeight-((independentScales ? (value-ownFloor)/(ownCeiling-ownFloor) : value/(line.axis === 'right' ? secondaryCeiling : ceiling))*plotHeight), value
+        y:top+plotHeight-(value/(line.axis === 'right' ? secondaryCeiling : ceiling)*plotHeight), value
       }));
     });
     const smoothPath = points => {
@@ -580,8 +578,9 @@
     const grid = Array.from({length:5},(_,index) => {
       const y = top+index/4*plotHeight, value = ceiling*(4-index)/4;
       const secondaryValue = secondaryCeiling*(4-index)/4;
-      return `<line class="rd-line-grid" x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"></line>${independentScales ? '' : `<text class="rd-line-axis" x="${left-9}" y="${y+3}" text-anchor="end">${compact(value)}</text>${secondaryLines.length ? `<text class="rd-line-axis" x="${width-right+5}" y="${y+3}" text-anchor="start">${compact(secondaryValue)}</text>` : ''}`}`;
+      return `<line class="rd-line-grid" x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"></line><text class="rd-line-axis" x="${left-9}" y="${y+3}" text-anchor="end">${compact(value)}</text>${secondaryLines.length ? `<text class="rd-line-axis" x="${width-right+5}" y="${y+3}" text-anchor="start">${compact(secondaryValue)}</text>` : ''}`;
     }).join('');
+    const axisTitles = `<text class="rd-line-axis-title" x="${left}" y="12" text-anchor="start">MR / файлы</text>${secondaryLines.length ? `<text class="rd-line-axis-title" x="${width-right}" y="12" text-anchor="end">строки</text>` : ''}`;
     const labelY = height-40;
     const xLabels = labels.map((label,index) => label ? dailyLabels
       ? (() => { const date = chartDates[index], weekend = date && (date.getDay() === 0 || date.getDay() === 6); return `<text class="rd-line-axis rd-line-axis-date${weekend ? ' rd-line-axis-weekend' : ''}" x="${pointSets[0][index].x}" y="${labelY}" text-anchor="end" transform="rotate(-45 ${pointSets[0][index].x} ${labelY})">${escapeHtml(label)}</text>`; })()
@@ -595,7 +594,7 @@
     }).join('');
     const hitWidth = Math.max(28,plotWidth/Math.max(1,labels.length));
     const hits = labels.map((_,index) => `<rect class="rd-line-hit" data-point-index="${index}" tabindex="0" role="button" aria-label="Показать значения за ${escapeHtml(tooltipLabels[index])}" x="${Math.max(left,pointSets[0][index].x-hitWidth/2)}" y="${top}" width="${Math.min(hitWidth,width-right-Math.max(left,pointSets[0][index].x-hitWidth/2))}" height="${plotHeight}"></rect>`).join('');
-    container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Динамика: ${escapeHtml(lines.map(line=>line.name).join(', '))}" preserveAspectRatio="none"><defs>${definitions}</defs>${grid}<line class="rd-chart-guide" x1="0" x2="0" y1="${top}" y2="${top+plotHeight}" hidden></line>${xLabels}${renderedLines}${hits}</svg><div class="rd-chart-tooltip" role="tooltip" hidden></div>`;
+    container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Динамика: ${escapeHtml(lines.map(line=>line.name).join(', '))}" preserveAspectRatio="none"><defs>${definitions}</defs>${grid}${axisTitles}<line class="rd-chart-guide" x1="0" x2="0" y1="${top}" y2="${top+plotHeight}" hidden></line>${xLabels}${renderedLines}${hits}</svg><div class="rd-chart-tooltip" role="tooltip" hidden></div>`;
     const tooltip = container.querySelector('.rd-chart-tooltip'), guide = container.querySelector('.rd-chart-guide');
     let pinnedIndex = null;
     const showPoint = index => {
@@ -630,8 +629,8 @@
     const overall = volumePeriodSlice(overallData);
     renderLineChart(root.querySelector('#rd-overall-chart'),overall.months,overall.tooltips||overall.months,[
       {name:'Влито MR',values:overall.mrs,color:'#5965d8'},
-      {name:'Добавлено строк',values:overall.added,color:'#2f7ae5'},
-      {name:'Удалено строк',values:overall.deleted,color:'#e58b19'},
+      {name:'Добавлено строк',values:overall.added,color:'#2f7ae5',axis:'right'},
+      {name:'Удалено строк',values:overall.deleted,color:'#e58b19',axis:'right'},
       {name:'Изменено файлов',values:overall.files,color:'#2f8f5b'}
     ]);
     root.querySelector('#rd-team-analytics').innerHTML = visibleTeams.map(team => {
@@ -643,8 +642,8 @@
       if (!source) return;
       const series = volumePeriodSlice(source);
       renderLineChart(root.querySelector(`#rd-chart-${team.key}`),series.months,series.tooltips||series.months,[
-        {name:'Влито MR',values:series.mrs,color:'#5965d8'}, {name:'Добавлено строк',values:series.added,color:'#2f7ae5'},
-        {name:'Удалено строк',values:series.deleted,color:'#e58b19'}, {name:'Изменено файлов',values:series.files,color:'#2f8f5b'}
+        {name:'Влито MR',values:series.mrs,color:'#5965d8'}, {name:'Добавлено строк',values:series.added,color:'#2f7ae5',axis:'right'},
+        {name:'Удалено строк',values:series.deleted,color:'#e58b19',axis:'right'}, {name:'Изменено файлов',values:series.files,color:'#2f8f5b'}
       ]);
       const sort = volumeSort.get(team.key) || {key:'mrs',direction:'desc'};
       const metrics = team.people.map(item => {

@@ -174,7 +174,7 @@ GitLab collector
   -> MR normalizer
   -> diff counter
   -> local SQLite store
-  -> monthly aggregator
+  -> adaptive aggregator (daily up to 31 days, weekly up to 93 days, monthly after that)
   -> /api/work-volume
   -> вкладка «Динамика»
 ```
