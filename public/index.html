@@ -773,10 +773,10 @@
   }
   function renderOverviewDashboard() {
     const source=dashboardSource(),groups=dashboardAvailableGroups(),overall=removeZeroDashboardPeriods(regroupDashboardSeries(source,groups.at(-1)),dashboardMetricOptions.map(metric=>metric.key));
-    const legend=dashboardMetricOptions.map(metric=>`<span><i style="background:${metric.color}"></i>${metric.name}</span>`).join('');
+    const legend=dashboardMetricOptions.map(metric=>`<button type="button" class="rd-metric-toggle" data-dashboard-period-metric="${metric.key}" aria-pressed="${visibleDashboardMetrics.has(metric.key)}"><i style="background:${metric.color}"></i>${metric.name}</button>`).join('');
     root.querySelector('#rd-dashboard-overall-legend').innerHTML=legend;
-    root.querySelector('#rd-dashboard-period-legend').innerHTML=dashboardMetricOptions.map(metric=>`<button type="button" class="rd-metric-toggle" data-dashboard-period-metric="${metric.key}" aria-pressed="${visibleDashboardMetrics.has(metric.key)}"><i style="background:${metric.color}"></i>${metric.name}</button>`).join('');
-    renderLineChart(root.querySelector('#rd-dashboard-overall-chart'),overall.months,overall.tooltips,dashboardLines(overall),new Set(dashboardMetricOptions.map(metric=>metric.key)));
+    root.querySelector('#rd-dashboard-period-legend').innerHTML=legend;
+    renderLineChart(root.querySelector('#rd-dashboard-overall-chart'),overall.months,overall.tooltips,dashboardLines(overall),visibleDashboardMetrics);
     renderDashboardPeriodBars(overall);
     const cards=dashboardMetricOptions.map(metric=>renderDashboardCard(metric,source,groups));
     root.querySelector('#rd-dashboard-cards').innerHTML=cards.map(item=>item.html).join('');
