@@ -141,11 +141,28 @@ try {
   assert.ok(weeklyCalendar.weekendLabels.every(label=>/^\d{2}\.\d{2}$/.test(label)),JSON.stringify(weeklyCalendar));
   assert.notEqual(weeklyCalendar.weekdayColor,weeklyCalendar.weekendColor,JSON.stringify(weeklyCalendar));
   assert.equal(weeklyCalendar.inside,true,JSON.stringify(weeklyCalendar));
-  const chartScales=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart'),titles=[...chart.querySelectorAll('.rd-line-axis-title')].map(node=>node.textContent),ticks=[...chart.querySelectorAll('.rd-line-axis')],paths=[...chart.querySelectorAll('.rd-line-path')].map(node=>node.getAttribute('d'));return {titles,leftTicks:ticks.filter(node=>node.getAttribute('x')==='39').length,rightTicks:ticks.filter(node=>node.getAttribute('x')==='597').length,distinctPaths:new Set(paths).size,totalPaths:paths.length}})()`);
-  assert.deepEqual(chartScales.titles,['MR / файлы','строки'],JSON.stringify(chartScales));
-  assert.equal(chartScales.leftTicks,5,JSON.stringify(chartScales));
-  assert.equal(chartScales.rightTicks,5,JSON.stringify(chartScales));
-  assert.ok(chartScales.distinctPaths>=3,JSON.stringify(chartScales));
+  const chartRanges=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart'),titles=[...chart.querySelectorAll('.rd-subplot-title')].map(node=>node.textContent),ticks=[...chart.querySelectorAll('.rd-y-axis-tick')],paths=[...chart.querySelectorAll('.rd-line-path')].map(node=>node.getAttribute('d'));return {titles,ticks:ticks.length,tickLabels:ticks.map(node=>node.textContent),distinctPaths:new Set(paths).size,totalPaths:paths.length}})()`);
+  assert.deepEqual(chartRanges.titles,['MR / изменено файлов','Добавлено / удалено строк'],JSON.stringify(chartRanges));
+  assert.equal(chartRanges.ticks,10,JSON.stringify(chartRanges));
+  assert.ok(chartRanges.tickLabels.every(label=>label.length>0),JSON.stringify(chartRanges));
+  assert.equal(chartRanges.totalPaths,4,JSON.stringify(chartRanges));
+  assert.ok(chartRanges.distinctPaths>=3,JSON.stringify(chartRanges));
+
+  await cdp.evaluate(`(()=>{window.__pulseMetricFetches=0;window.__pulseMetricOriginalFetch=window.fetch;window.fetch=(...args)=>{window.__pulseMetricFetches++;return window.__pulseMetricOriginalFetch(...args)};document.querySelector('#rd-overall-legend [data-metric="added"]').click()})()`);
+  const hiddenMetric=await cdp.evaluate(`(()=>({pressed:[...document.querySelectorAll('[data-metric="added"]')].every(button=>button.getAttribute('aria-pressed')==='false'),paths:document.querySelectorAll('#rd-overall-chart .rd-line-path').length,fetches:window.__pulseMetricFetches}))()`);
+  assert.equal(hiddenMetric.pressed,true,JSON.stringify(hiddenMetric));
+  assert.equal(hiddenMetric.paths,3,JSON.stringify(hiddenMetric));
+  assert.equal(hiddenMetric.fetches,0,JSON.stringify(hiddenMetric));
+  await cdp.evaluate(`document.querySelector('#rd-overall-legend [data-metric="added"]').click()`);
+  assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-overall-chart .rd-line-path').length`),4);
+  await cdp.evaluate(`document.querySelector('#rd-view-mode').click()`);
+  const columnView=await cdp.evaluate(`(()=>({label:document.querySelector('#rd-view-mode').textContent,columns:document.querySelectorAll('#rd-overall-chart .rd-column').length,paths:document.querySelectorAll('#rd-overall-chart .rd-line-path').length,fetches:window.__pulseMetricFetches}))()`);
+  assert.equal(columnView.label,'Представление: столбцы',JSON.stringify(columnView));
+  assert.ok(columnView.columns>0,JSON.stringify(columnView));
+  assert.equal(columnView.paths,0,JSON.stringify(columnView));
+  assert.equal(columnView.fetches,0,JSON.stringify(columnView));
+  await cdp.evaluate(`document.querySelector('#rd-view-mode').click();window.fetch=window.__pulseMetricOriginalFetch;delete window.__pulseMetricOriginalFetch;delete window.__pulseMetricFetches`);
+  assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-overall-chart .rd-line-path').length`),4);
   await cdp.evaluate(`document.querySelector('#rd-period').value='current_month';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
   const monthlyDates=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart');return {hits:chart.querySelectorAll('.rd-line-hit').length,labels:chart.querySelectorAll('.rd-line-axis-date[transform^="rotate(-45"]').length}})()`);
   assert.equal(monthlyDates.labels,monthlyDates.hits,JSON.stringify(monthlyDates));
@@ -171,7 +188,7 @@ try {
   assert.equal(await cdp.evaluate(`document.querySelector('#rd-toast').textContent`),'Обновление отменено');
   await cdp.evaluate(`window.fetch=window.__pulseOriginalFetch;delete window.__pulseOriginalFetch`);
 
-  console.log('Browser checks passed: 25');
+  console.log('Browser checks passed: 31');
 } finally {
   cdp?.close();
   browser.kill('SIGTERM');

@@ -37,7 +37,7 @@ const contracts = [
   ['cancel update hover explanation', 'data-tooltip="Обновление данных будет отменено"'],
   ['report remains visible while loading', "updateProgress.hidden = false"],
   ['daily range ends at midnight', 'new Date(today.getFullYear(),today.getMonth(),today.getDate())'],
-  ['line chart scale headroom', 'flatMap(line => line.values)) * 1.08'],
+  ['line chart scale headroom', 'flatMap(line=>line.values))*1.08'],
   ['overall all-teams chart', 'id="rd-overall-chart"'],
   ['one block per configured team', 'id="rd-team-analytics"'],
   ['scrollable employee tables', 'rd-team-table-scroll'],
@@ -50,8 +50,12 @@ const contracts = [
   ['table right edge spacing', 'td:last-child { padding-right:20px; }'],
   ['employee names are filter buttons', 'aria-pressed="${active}">${escapeHtml(item.name)}</button>'],
   ['changed files line', "name:'Изменено файлов'"],
-  ['changed-line metrics use right scale', "axis:'right'"],
-  ['chart axes are labelled', 'MR / файлы</text>'],
+  ['volume metrics split into two chart ranges', "{key:'volume',title:'MR / изменено файлов'}"],
+  ['changed-line metrics use separate range', "{key:'lines',title:'Добавлено / удалено строк'}"],
+  ['metric visibility is local state', "visibleVolumeMetrics = new Set(['mrs','added','deleted','files'])"],
+  ['metric legend controls', 'rd-metric-toggle'],
+  ['line and column view switch', "volumeViewMode === 'columns'"],
+  ['chart ranges are labelled', 'rd-subplot-title'],
   ['team totals aggregate employees', "sumSeries(team.people,team.name)"],
 ];
 

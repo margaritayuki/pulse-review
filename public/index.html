@@ -144,7 +144,7 @@
     #review-dashboard-concept .rd-volume-kpi small { display:block; margin-top:4px; color:#3f9d70; font-size:11px; }
     #review-dashboard-concept .rd-volume-kpi small.down { color:#d86b68; }
     #review-dashboard-concept .rd-volume-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin-bottom:20px; }
-    #review-dashboard-concept .rd-chart-body { height:300px; padding:18px 14px 12px; display:flex; align-items:stretch; }
+    #review-dashboard-concept .rd-chart-body { height:420px; padding:14px 14px 10px; display:flex; align-items:stretch; }
     #review-dashboard-concept .rd-line-chart { position:relative; width:100%; min-width:0; }
     #review-dashboard-concept .rd-line-chart.compact { max-width:720px; margin-inline:auto; }
     #review-dashboard-concept .rd-line-chart.semi-compact { max-width:900px; margin-inline:auto; }
@@ -155,6 +155,7 @@
     #review-dashboard-concept .rd-line-axis-date { fill:#5965d8; dominant-baseline:middle; }
     #review-dashboard-concept .rd-line-axis-weekend { fill:light-dark(#8a93a5,#828da0); }
     #review-dashboard-concept .rd-line-path { fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+    #review-dashboard-concept .rd-column { opacity:.9; }
     #review-dashboard-concept .rd-line-area { opacity:.16; }
     #review-dashboard-concept .rd-line-point { stroke:light-dark(#fff,#18202c); stroke-width:2; }
     #review-dashboard-concept .rd-line-hit { fill:transparent; cursor:pointer; outline:none; }
@@ -216,7 +217,7 @@
     #review-dashboard-concept .rd-team-table-head { min-height:58px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid light-dark(#e7eaf0,#303a49); }
     #review-dashboard-concept .rd-team-table-head strong { display:block; font-size:14px; }
     #review-dashboard-concept .rd-team-table-head small { display:block; margin-top:3px; color:light-dark(#667085,#aab4c4); font-size:10px; }
-    #review-dashboard-concept .rd-team-table-scroll { height:310px; overflow:auto; }
+    #review-dashboard-concept .rd-team-table-scroll { height:420px; overflow:auto; }
     #review-dashboard-concept .rd-team-table-scroll thead { position:sticky; top:0; z-index:2; }
     #review-dashboard-concept .rd-team-table-scroll table { table-layout:fixed; }
     #review-dashboard-concept .rd-team-table-scroll th { padding:9px 5px; font-size:9px; cursor:pointer; white-space:nowrap; }
@@ -234,6 +235,12 @@
     #review-dashboard-concept .rd-person-filtered { background:light-dark(#f2f3ff,#222a4b); }
     #review-dashboard-concept .rd-team-table-scroll .rd-avatar { width:25px; height:25px; font-size:9px; }
     #review-dashboard-concept .rd-chart-scale-note { color:light-dark(#98a2b3,#778397); font-size:9px; font-weight:500; }
+    #review-dashboard-concept .rd-view-mode { padding:7px 10px; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:8px; color:light-dark(#505aa7,#c5cbff); background:light-dark(#fff,#202a38); cursor:pointer; font-size:11px; font-weight:700; white-space:nowrap; }
+    #review-dashboard-concept .rd-view-mode:hover { background:light-dark(#f2f3ff,#222a4b); }
+    #review-dashboard-concept .rd-metric-toggle { padding:3px 5px; display:inline-flex; align-items:center; gap:5px; border:0; border-radius:5px; color:inherit; background:transparent; cursor:pointer; font:inherit; font-weight:inherit; }
+    #review-dashboard-concept .rd-metric-toggle[aria-pressed="false"] { opacity:.42; text-decoration:line-through; }
+    #review-dashboard-concept .rd-metric-toggle:hover { background:light-dark(#f2f3ff,#222a4b); }
+    #review-dashboard-concept .rd-chart-empty { height:100%; display:grid; place-items:center; color:light-dark(#98a2b3,#778397); font-size:12px; }
     @media (max-width: 980px) { #review-dashboard-concept .rd-team-analytics-body { grid-template-columns:1fr; } #review-dashboard-concept .rd-overall-panel { width:100%; } }
     @media (max-width: 760px) { #review-dashboard-concept .rd-controls, #review-dashboard-concept .rd-controls.rd-custom-period { width:100%; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row, #review-dashboard-concept .rd-connection-grid, #review-dashboard-concept .rd-volume-grid { grid-template-columns:1fr; } #review-dashboard-concept .rd-volume-custom { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-volume-kpis { grid-template-columns:1fr 1fr; } }
     @media (max-width: 520px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr; } #review-dashboard-concept .rd-date-row { grid-column:auto; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row:not(.visible) { grid-template-columns:40px; } #review-dashboard-concept .rd-run { grid-column:1 / -1; } #review-dashboard-concept .rd-summary { grid-template-columns:1fr; } #review-dashboard-concept .rd-engagement-head { flex-direction:column; } #review-dashboard-concept .rd-engagement-row { grid-template-columns:120px minmax(100px,1fr) 34px; gap:8px; } #review-dashboard-concept .rd-compare-row { grid-template-columns:1fr; gap:8px; padding-bottom:12px; border-bottom:1px solid light-dark(#edf0f5,#293342); } }
@@ -299,7 +306,7 @@
       <div class="rd-toast" id="rd-toast"></div>
       </section>
       <section class="rd-view" data-page="volume" hidden>
-        <div class="rd-heading"><div><h1>Динамика</h1><div class="rd-sub">Общие показатели и расшифровка по сотрудникам</div></div></div>
+        <div class="rd-heading"><div><h1>Динамика</h1><div class="rd-sub">Общие показатели и расшифровка по сотрудникам</div></div><button type="button" class="rd-view-mode" id="rd-view-mode">Представление: линии</button></div>
         <section class="rd-panel rd-overall-panel">
           <div class="rd-panel-title"><strong id="rd-overall-title">Все команды</strong><div class="rd-metric-legend" id="rd-overall-legend"></div></div>
           <div class="rd-chart-body"><div class="rd-line-chart" id="rd-overall-chart"></div></div>
@@ -465,6 +472,9 @@
   const analyticsControls = root.querySelector('#rd-analytics-controls');
   const volumeSort = new Map(volumeTeams.map(team=>[team.key,{key:'mrs',direction:'desc'}]));
   let selectedVolumePerson = null;
+  const visibleVolumeMetrics = new Set(['mrs','added','deleted','files']);
+  let volumeViewMode = 'lines';
+  const volumeViewModeButton = root.querySelector('#rd-view-mode');
   const formatNumber = value => new Intl.NumberFormat('ru-RU').format(value);
   const formatDelta = (current, previous) => `${current >= previous ? '+' : ''}${Math.round((current - previous) / Math.max(1, previous) * 100)}% к предыдущему такому же периоду`;
   const changedFilesFor = data => data.files || data.mrs.map((count,index) => Math.max(1,Math.round(count*2.4+(index%3)*3)));
@@ -541,18 +551,17 @@
   function renderLineChart(container,labels,tooltipLabels,lines) {
     container.classList.toggle('compact',labels.length <= 7);
     container.classList.toggle('semi-compact',labels.length > 7 && labels.length <= 14);
+    const visibleLines = lines.filter(line => visibleVolumeMetrics.has(line.key));
+    if (!visibleLines.length) { container.innerHTML = '<div class="rd-chart-empty">Выберите хотя бы один показатель</div>'; return; }
     const dailyLabels = labels.length > 0 && labels.every(label => /^\d{2}\.\d{2}$/.test(label));
-    const width = 640, height = 250, left = 48, right = 48, top = 24, bottom = dailyLabels ? 68 : 34;
-    const plotWidth = width-left-right, plotHeight = height-top-bottom;
-    const primaryLines = lines.filter(line => line.axis !== 'right'), secondaryLines = lines.filter(line => line.axis === 'right');
-    const ceiling = Math.max(1,...primaryLines.flatMap(line => line.values)) * 1.08;
-    const secondaryCeiling = Math.max(1,...secondaryLines.flatMap(line => line.values)) * 1.08;
-    const pointSets = lines.map(line => {
-      return line.values.map((value,index) => ({
-        x:left+(line.values.length === 1 ? plotWidth/2 : index/(line.values.length-1)*plotWidth),
-        y:top+plotHeight-(value/(line.axis === 'right' ? secondaryCeiling : ceiling)*plotHeight), value
-      }));
-    });
+    const width = 640, height = 360, left = 48, right = 48, top = 28, bottom = dailyLabels ? 66 : 38, gap = 30;
+    const plotWidth = width-left-right;
+    const groups = [
+      {key:'volume',title:'MR / изменено файлов'},
+      {key:'lines',title:'Добавлено / удалено строк'}
+    ].map(group => ({...group,lines:visibleLines.filter(line=>line.group===group.key)})).filter(group=>group.lines.length);
+    const plotHeight = (height-top-bottom-gap*Math.max(0,groups.length-1))/groups.length;
+    const xPositions = labels.map((_,index)=>left+(labels.length===1 ? plotWidth/2 : index/(labels.length-1)*plotWidth));
     const smoothPath = points => {
       if (!points.length) return '';
       if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
@@ -575,36 +584,42 @@
       return new Date(year,Number(russian[2])-1,Number(russian[1]));
     };
     const chartDates = dailyLabels ? tooltipLabels.map(parseDailyDate) : [];
-    const grid = Array.from({length:5},(_,index) => {
-      const y = top+index/4*plotHeight, value = ceiling*(4-index)/4;
-      const secondaryValue = secondaryCeiling*(4-index)/4;
-      return `<line class="rd-line-grid" x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"></line><text class="rd-line-axis" x="${left-9}" y="${y+3}" text-anchor="end">${compact(value)}</text>${secondaryLines.length ? `<text class="rd-line-axis" x="${width-right+5}" y="${y+3}" text-anchor="start">${compact(secondaryValue)}</text>` : ''}`;
+    const renderedGroups = groups.map((group,groupIndex) => {
+      const groupTop = top+groupIndex*(plotHeight+gap), groupBottom = groupTop+plotHeight;
+      const ceiling = Math.max(1,...group.lines.flatMap(line=>line.values))*1.08;
+      const grid = Array.from({length:5},(_,index) => {
+        const y = groupTop+index/4*plotHeight, value = ceiling*(4-index)/4;
+        return `<line class="rd-line-grid" x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"></line><text class="rd-line-axis rd-y-axis-tick" x="${left-8}" y="${y+3}" text-anchor="end">${compact(value)}</text>`;
+      }).join('');
+      const title = `<text class="rd-line-axis-title rd-subplot-title" x="${left}" y="${groupTop-9}" text-anchor="start">${group.title}</text>`;
+      const pointSets = group.lines.map(line=>line.values.map((value,index)=>({x:xPositions[index],y:groupBottom-value/ceiling*plotHeight,value})));
+      const marks = volumeViewMode === 'columns' ? group.lines.map((line,lineIndex) => {
+        const step = labels.length>1 ? plotWidth/(labels.length-1) : plotWidth, clusterWidth = Math.min(34,step*.72), barWidth = clusterWidth/group.lines.length;
+        return pointSets[lineIndex].map((point,index)=>`<rect class="rd-column" data-metric="${line.key}" x="${point.x-clusterWidth/2+lineIndex*barWidth}" y="${point.y}" width="${Math.max(2,barWidth-1)}" height="${Math.max(0,groupBottom-point.y)}" rx="1.5" fill="${line.color}"></rect>`).join('');
+      }).join('') : group.lines.map((line,lineIndex) => {
+        const points = pointSets[lineIndex], path = smoothPath(points);
+        const dots = points.map(point => `<circle class="rd-line-point" cx="${point.x}" cy="${point.y}" r="3" fill="${line.color}"></circle>`).join('');
+        return `<path class="rd-line-path" data-metric="${line.key}" stroke="${line.color}" d="${path}"></path>${dots}`;
+      }).join('');
+      return `${grid}${title}${marks}`;
     }).join('');
-    const axisTitles = `<text class="rd-line-axis-title" x="${left}" y="12" text-anchor="start">MR / файлы</text>${secondaryLines.length ? `<text class="rd-line-axis-title" x="${width-right}" y="12" text-anchor="end">строки</text>` : ''}`;
-    const labelY = height-40;
+    const labelY = dailyLabels ? height-40 : height-9;
     const xLabels = labels.map((label,index) => label ? dailyLabels
-      ? (() => { const date = chartDates[index], weekend = date && (date.getDay() === 0 || date.getDay() === 6); return `<text class="rd-line-axis rd-line-axis-date${weekend ? ' rd-line-axis-weekend' : ''}" x="${pointSets[0][index].x}" y="${labelY}" text-anchor="end" transform="rotate(-45 ${pointSets[0][index].x} ${labelY})">${escapeHtml(label)}</text>`; })()
-      : `<text class="rd-line-axis" x="${pointSets[0][index].x}" y="${height-8}" text-anchor="middle">${escapeHtml(label)}</text>` : '').join('');
-    const definitions = lines.map((line,index) => `<linearGradient id="${container.id}-area-${index}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${line.color}" stop-opacity=".7"></stop><stop offset="100%" stop-color="${line.color}" stop-opacity="0"></stop></linearGradient>`).join('');
-    const renderedLines = lines.map((line,lineIndex) => {
-      const points = pointSets[lineIndex], path = smoothPath(points);
-      const area = line.area && points.length > 1 ? `<path class="rd-line-area" fill="url(#${container.id}-area-${lineIndex})" d="${path} L ${points[points.length-1].x} ${top+plotHeight} L ${points[0].x} ${top+plotHeight} Z"></path>` : '';
-      const dots = points.map(point => `<circle class="rd-line-point" cx="${point.x}" cy="${point.y}" r="3" fill="${line.color}"></circle>`).join('');
-      return `${area}<path class="rd-line-path" stroke="${line.color}" d="${path}"></path>${dots}`;
-    }).join('');
+      ? (() => { const date = chartDates[index], weekend = date && (date.getDay() === 0 || date.getDay() === 6); return `<text class="rd-line-axis rd-line-axis-date${weekend ? ' rd-line-axis-weekend' : ''}" x="${xPositions[index]}" y="${labelY}" text-anchor="end" transform="rotate(-45 ${xPositions[index]} ${labelY})">${escapeHtml(label)}</text>`; })()
+      : `<text class="rd-line-axis" x="${xPositions[index]}" y="${labelY}" text-anchor="middle">${escapeHtml(label)}</text>` : '').join('');
     const hitWidth = Math.max(28,plotWidth/Math.max(1,labels.length));
-    const hits = labels.map((_,index) => `<rect class="rd-line-hit" data-point-index="${index}" tabindex="0" role="button" aria-label="Показать значения за ${escapeHtml(tooltipLabels[index])}" x="${Math.max(left,pointSets[0][index].x-hitWidth/2)}" y="${top}" width="${Math.min(hitWidth,width-right-Math.max(left,pointSets[0][index].x-hitWidth/2))}" height="${plotHeight}"></rect>`).join('');
-    container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Динамика: ${escapeHtml(lines.map(line=>line.name).join(', '))}" preserveAspectRatio="none"><defs>${definitions}</defs>${grid}${axisTitles}<line class="rd-chart-guide" x1="0" x2="0" y1="${top}" y2="${top+plotHeight}" hidden></line>${xLabels}${renderedLines}${hits}</svg><div class="rd-chart-tooltip" role="tooltip" hidden></div>`;
+    const plotsBottom = top+groups.length*plotHeight+Math.max(0,groups.length-1)*gap;
+    const hits = labels.map((_,index) => { const start=Math.max(left,xPositions[index]-hitWidth/2); return `<rect class="rd-line-hit" data-point-index="${index}" tabindex="0" role="button" aria-label="Показать значения за ${escapeHtml(tooltipLabels[index])}" x="${start}" y="${top}" width="${Math.min(hitWidth,width-right-start)}" height="${plotsBottom-top}"></rect>`; }).join('');
+    container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Динамика: ${escapeHtml(visibleLines.map(line=>line.name).join(', '))}" preserveAspectRatio="none">${renderedGroups}<line class="rd-chart-guide" x1="0" x2="0" y1="${top}" y2="${plotsBottom}" hidden></line>${xLabels}${hits}</svg><div class="rd-chart-tooltip" role="tooltip" hidden></div>`;
     const tooltip = container.querySelector('.rd-chart-tooltip'), guide = container.querySelector('.rd-chart-guide');
     let pinnedIndex = null;
     const showPoint = index => {
-      const point = pointSets[0][index];
       const date = chartDates[index];
       const weekday = date ? `${new Intl.DateTimeFormat('ru-RU',{weekday:'long'}).format(date)}, ` : '';
-      tooltip.innerHTML = `<strong>${escapeHtml(weekday+tooltipLabels[index])}</strong>${lines.map(line=>`<span><b><i style="background:${line.color}"></i>${escapeHtml(line.name)}</b><em>${formatNumber(line.values[index])}</em></span>`).join('')}`;
+      tooltip.innerHTML = `<strong>${escapeHtml(weekday+tooltipLabels[index])}</strong>${visibleLines.map(line=>`<span><b><i style="background:${line.color}"></i>${escapeHtml(line.name)}</b><em>${formatNumber(line.values[index])}</em></span>`).join('')}`;
       tooltip.hidden = false;
-      tooltip.style.left = `${Math.max(13,Math.min(87,point.x/width*100))}%`;
-      guide.hidden = false; guide.setAttribute('x1',point.x); guide.setAttribute('x2',point.x);
+      tooltip.style.left = `${Math.max(13,Math.min(87,xPositions[index]/width*100))}%`;
+      guide.hidden = false; guide.setAttribute('x1',xPositions[index]); guide.setAttribute('x2',xPositions[index]);
     };
     const hidePoint = () => { if (pinnedIndex !== null) return; tooltip.hidden = true; guide.hidden = true; };
     container.querySelectorAll('.rd-line-hit').forEach(hit => {
@@ -618,7 +633,11 @@
     });
   }
   function renderVolumeConcept() {
-    const legend = '<span><i style="background:#5965d8"></i>Влито MR</span><span><i style="background:#2f7ae5"></i>Добавлено строк</span><span><i style="background:#e58b19"></i>Удалено строк</span><span><i style="background:#2f8f5b"></i>Изменено файлов</span>';
+    const metricOptions = [
+      {key:'mrs',name:'Влито MR',color:'#5965d8'}, {key:'added',name:'Добавлено строк',color:'#2f7ae5'},
+      {key:'deleted',name:'Удалено строк',color:'#e58b19'}, {key:'files',name:'Изменено файлов',color:'#2f8f5b'}
+    ];
+    const legend = metricOptions.map(metric=>`<button type="button" class="rd-metric-toggle" data-metric="${metric.key}" aria-pressed="${visibleVolumeMetrics.has(metric.key)}"><i style="background:${metric.color}"></i>${metric.name}</button>`).join('');
     root.querySelector('#rd-overall-legend').innerHTML = legend;
     const selectedPersonEntry = selectedVolumePerson ? volumeTeams.map(team=>({team,person:team.people.find(person=>person.key===selectedVolumePerson.personKey)})).find(item=>item.team.key===selectedVolumePerson.teamKey&&item.person) : null;
     const selectedTeam = selectedPersonEntry?.team || (teamSelect.value === 'all' ? null : volumeTeams.find(team=>team.key===teamSelect.value) || volumeTeams[teamSelect.selectedIndex-1] || null);
@@ -628,10 +647,10 @@
     root.querySelector('#rd-overall-title').textContent = selectedPersonEntry?.person.name || selectedTeam?.name || 'Все команды';
     const overall = volumePeriodSlice(overallData);
     renderLineChart(root.querySelector('#rd-overall-chart'),overall.months,overall.tooltips||overall.months,[
-      {name:'Влито MR',values:overall.mrs,color:'#5965d8'},
-      {name:'Добавлено строк',values:overall.added,color:'#2f7ae5',axis:'right'},
-      {name:'Удалено строк',values:overall.deleted,color:'#e58b19',axis:'right'},
-      {name:'Изменено файлов',values:overall.files,color:'#2f8f5b'}
+      {key:'mrs',group:'volume',name:'Влито MR',values:overall.mrs,color:'#5965d8'},
+      {key:'added',group:'lines',name:'Добавлено строк',values:overall.added,color:'#2f7ae5'},
+      {key:'deleted',group:'lines',name:'Удалено строк',values:overall.deleted,color:'#e58b19'},
+      {key:'files',group:'volume',name:'Изменено файлов',values:overall.files,color:'#2f8f5b'}
     ]);
     root.querySelector('#rd-team-analytics').innerHTML = visibleTeams.map(team => {
       const source = selectedPersonEntry?.team.key === team.key ? selectedPersonEntry.person : sourceFor(team);
@@ -642,8 +661,8 @@
       if (!source) return;
       const series = volumePeriodSlice(source);
       renderLineChart(root.querySelector(`#rd-chart-${team.key}`),series.months,series.tooltips||series.months,[
-        {name:'Влито MR',values:series.mrs,color:'#5965d8'}, {name:'Добавлено строк',values:series.added,color:'#2f7ae5',axis:'right'},
-        {name:'Удалено строк',values:series.deleted,color:'#e58b19',axis:'right'}, {name:'Изменено файлов',values:series.files,color:'#2f8f5b'}
+        {key:'mrs',group:'volume',name:'Влито MR',values:series.mrs,color:'#5965d8'}, {key:'added',group:'lines',name:'Добавлено строк',values:series.added,color:'#2f7ae5'},
+        {key:'deleted',group:'lines',name:'Удалено строк',values:series.deleted,color:'#e58b19'}, {key:'files',group:'volume',name:'Изменено файлов',values:series.files,color:'#2f8f5b'}
       ]);
       const sort = volumeSort.get(team.key) || {key:'mrs',direction:'desc'};
       const metrics = team.people.map(item => {
@@ -668,6 +687,19 @@
     if (!header) return;
     const current = volumeSort.get(header.dataset.team);
     volumeSort.set(header.dataset.team,{key:header.dataset.sortKey,direction:current.key===header.dataset.sortKey&&current.direction==='desc'?'asc':'desc'});
+    renderVolumeConcept();
+  });
+  root.addEventListener('click', event => {
+    const metric = event.target.closest('.rd-metric-toggle');
+    if (!metric) return;
+    const key = metric.dataset.metric;
+    visibleVolumeMetrics.has(key) ? visibleVolumeMetrics.delete(key) : visibleVolumeMetrics.add(key);
+    renderVolumeConcept();
+  });
+  volumeViewModeButton.addEventListener('click', () => {
+    volumeViewMode = volumeViewMode === 'lines' ? 'columns' : 'lines';
+    volumeViewModeButton.textContent = `Представление: ${volumeViewMode === 'lines' ? 'линии' : 'столбцы'}`;
+    volumeViewModeButton.setAttribute('aria-pressed',String(volumeViewMode === 'columns'));
     renderVolumeConcept();
   });
   root.querySelector('#rd-save-analytics').addEventListener('click', () => {
