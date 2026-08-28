@@ -142,6 +142,7 @@ try {
       expectedLabels:Object.fromEntries(groups.map(group=>[group,customLabels(range,group)]))
     }})
   ];
+  await cdp.evaluate(`window.__dashboardOriginalFetch=window.fetch;window.__dashboardFetches=0;window.fetch=(...args)=>{window.__dashboardFetches++;return window.__dashboardOriginalFetch(...args)}`);
   const groupingFailures=[];
   for (const testCase of groupingCases) {
     await setDashboardPeriod(testCase);
@@ -193,6 +194,8 @@ try {
   assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-cards [data-dashboard-group]').length`),8);
   await cdp.evaluate(`document.querySelector('#rd-period').value='week';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('[data-dashboard-view="line"]').click()`);
   assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-grouping button').length`),0);
+  assert.equal(await cdp.evaluate(`window.__dashboardFetches`),0,'Локальные переключения Дашборда не должны выполнять fetch');
+  await cdp.evaluate(`window.fetch=window.__dashboardOriginalFetch;delete window.__dashboardOriginalFetch;delete window.__dashboardFetches`);
   await cdp.evaluate(`document.querySelector('[data-view="volume"]').click()`);
   assert.ok(await cdp.evaluate(`(()=>[...document.querySelectorAll('[data-page="volume"] .rd-line-chart')].every(chart=>chart.querySelectorAll('.rd-line-area').length===chart.querySelectorAll('.rd-line-path').length))()`));
 
