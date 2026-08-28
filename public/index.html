@@ -267,8 +267,8 @@
     #review-dashboard-concept .rd-dashboard-grouping { display:flex; align-items:center; gap:12px; }
     #review-dashboard-concept .rd-dashboard-grouping button, #review-dashboard-concept .rd-dashboard-grouping span { padding:4px 0; border:0; color:light-dark(#98a2b3,#778397); background:transparent; font-size:11px; font-weight:500; cursor:pointer; }
     #review-dashboard-concept .rd-dashboard-grouping button[aria-pressed="true"] { color:#5965d8; font-weight:650; }
-    #review-dashboard-concept .rd-dashboard-card-chart { height:250px; }
-    #review-dashboard-concept .rd-dashboard-card-bars { min-height:250px; padding:16px; display:grid; align-content:center; gap:11px; }
+    #review-dashboard-concept .rd-dashboard-card-chart { height:200px; }
+    #review-dashboard-concept .rd-dashboard-card-bars { min-height:200px; padding:14px 16px; display:grid; align-content:center; gap:11px; }
     #review-dashboard-concept .rd-dashboard-bar-row { display:grid; grid-template-columns:90px minmax(0,1fr) 64px; align-items:center; gap:10px; }
     #review-dashboard-concept .rd-dashboard-bar-value { font-size:11px; font-weight:600; text-align:right; }
     #review-dashboard-concept .rd-dashboard-empty { padding:30px; color:light-dark(#98a2b3,#778397); text-align:center; font-size:12px; }
@@ -640,7 +640,9 @@
     const dailyLabels = labels.length > 0 && labels.every(label => /^\d{2}\.\d{2}$/.test(label));
     const width = Math.max(320,Math.round(container.clientWidth || 640));
     const height = Math.max(220,Math.round(container.clientHeight || 250));
-    const left = 48, right = 48, top = 24, bottom = dailyLabels ? 68 : 34;
+    // Reserve enough room for compact Y-axis values and give the reclaimed space
+    // on the right back to the plot instead of leaving an uneven empty margin.
+    const left = 68, right = 28, top = 24, bottom = dailyLabels ? 68 : 34;
     const plotWidth = width-left-right, plotHeight = height-top-bottom, scale=buildChartScale(visibleLines);
     const pointSets = visibleLines.map(line => line.values.map((value,index) => ({
       x:left+(line.values.length === 1 ? plotWidth/2 : index/(line.values.length-1)*plotWidth),

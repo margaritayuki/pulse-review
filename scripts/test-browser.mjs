@@ -75,6 +75,9 @@ try {
   assert.equal(dashboardInitial.overallLines,4,JSON.stringify(dashboardInitial));
   assert.ok(dashboardInitial.periodRows>0,JSON.stringify(dashboardInitial));
   assert.equal(dashboardInitial.reviewTitle,'Ревью команды',JSON.stringify(dashboardInitial));
+  const dashboardAxisSpacing=await cdp.evaluate(`(()=>{const svg=document.querySelector('#rd-dashboard-cards .rd-dashboard-card-chart svg'),tick=svg.querySelector('.rd-y-axis-tick'),grid=svg.querySelector('.rd-line-grid'),box=tick.getBBox(),width=svg.viewBox.baseVal.width;return {tickLeft:box.x,plotLeft:Number(grid.getAttribute('x1')),plotRightGap:width-Number(grid.getAttribute('x2'))}})()`);
+  assert.ok(dashboardAxisSpacing.tickLeft>=8,JSON.stringify(dashboardAxisSpacing));
+  assert.ok(dashboardAxisSpacing.plotLeft>dashboardAxisSpacing.plotRightGap,JSON.stringify(dashboardAxisSpacing));
   const dashboardLegends=await cdp.evaluate(`(()=>{const describe=id=>[...document.querySelectorAll(id+' .rd-metric-toggle')].map(button=>({text:button.textContent.trim(),dot:!!button.querySelector('i'),pressed:button.getAttribute('aria-pressed')}));return {overall:describe('#rd-dashboard-overall-legend'),period:describe('#rd-dashboard-period-legend')}})()`);
   assert.deepEqual(dashboardLegends.overall,dashboardLegends.period,JSON.stringify(dashboardLegends));
   assert.equal(dashboardLegends.overall.length,4,JSON.stringify(dashboardLegends));
@@ -85,6 +88,7 @@ try {
   assert.ok(Math.abs(dashboardTypography.breakdownLeft-dashboardTypography.cardsLeft)<=1,JSON.stringify(dashboardTypography));
   await cdp.evaluate(`document.querySelector('[data-dashboard-view="bar"]').click()`);
   assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-bars').length`),4);
+  assert.ok(await cdp.evaluate(`document.querySelector('#rd-dashboard-cards .rd-dashboard-card-bars').getBoundingClientRect().height<=202`));
   await cdp.evaluate(`document.querySelector('#rd-dashboard-overall-legend [data-dashboard-period-metric="files"]').click()`);
   const toggledDashboardLegends=await cdp.evaluate(`(()=>({overall:document.querySelector('#rd-dashboard-overall-legend [data-dashboard-period-metric="files"]').getAttribute('aria-pressed'),period:document.querySelector('#rd-dashboard-period-legend [data-dashboard-period-metric="files"]').getAttribute('aria-pressed'),overallLines:document.querySelectorAll('#rd-dashboard-overall-chart .rd-line-path').length}))()`);
   assert.deepEqual(toggledDashboardLegends,{overall:'false',period:'false',overallLines:3},JSON.stringify(toggledDashboardLegends));
@@ -213,8 +217,8 @@ try {
   const chartAlignment=await cdp.evaluate(`(()=>{const panel=document.querySelector('.rd-overall-panel'),overall=document.querySelector('#rd-overall-chart'),svg=overall.querySelector('svg'),team=document.querySelector('[data-team="backend"] .rd-team-chart'),teamCard=document.querySelector('[data-team="backend"]');const points=[...overall.querySelectorAll('.rd-line-point')],periods=overall.querySelectorAll('.rd-line-hit').length;return {panelWidth:panel.getBoundingClientRect().width,teamWidth:team.getBoundingClientRect().width,panelLeft:panel.getBoundingClientRect().left,teamLeft:teamCard.getBoundingClientRect().left,viewWidth:svg.viewBox.baseVal.width,firstX:Number(points[0].getAttribute('cx')),lastX:Number(points[periods-1].getAttribute('cx'))}})()`);
   assert.ok(Math.abs(chartAlignment.panelWidth-chartAlignment.teamWidth)<=2,JSON.stringify(chartAlignment));
   assert.ok(Math.abs(chartAlignment.panelLeft-chartAlignment.teamLeft)<=2,JSON.stringify(chartAlignment));
-  assert.equal(chartAlignment.firstX,48);
-  assert.equal(chartAlignment.viewWidth-chartAlignment.lastX,48);
+  assert.equal(chartAlignment.firstX,68);
+  assert.equal(chartAlignment.viewWidth-chartAlignment.lastX,28);
   const nonNegativeCurves=await cdp.evaluate(`(()=>[...document.querySelectorAll('.rd-line-chart svg')].every(svg=>{const zero=Number(svg.dataset.zeroY);return [...svg.querySelectorAll('.rd-line-path')].every(path=>path.getBBox().y+path.getBBox().height<=zero+1)}))()`);
   assert.equal(nonNegativeCurves,true);
   const edgeSpacing=await cdp.evaluate(`(()=>{const table=document.querySelector('[data-team="backend"] table'),first=table.querySelector('tbody td:first-child'),last=table.querySelector('tbody td:last-child'),lastHead=table.querySelector('thead th:last-child');return {left:parseFloat(getComputedStyle(first).paddingLeft),right:parseFloat(getComputedStyle(last).paddingRight),headerRight:parseFloat(getComputedStyle(lastHead).paddingRight)}})()`);

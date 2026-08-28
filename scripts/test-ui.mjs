@@ -47,7 +47,7 @@ const contracts = [
   ['short-period chart cap', '.rd-line-chart.compact { max-width:720px; margin-inline:auto; }'],
   ['overall frame matches team widget width', '.rd-overall-panel { width:calc((100% - 42px) * .525); margin:0 0 18px; }'],
   ['overall chart is left aligned', '.rd-overall-panel .rd-line-chart { max-width:none; margin-inline:0; }'],
-  ['symmetric chart side padding', 'left = 48, right = 48'],
+  ['chart padding reserves room for Y-axis labels', 'left = 68, right = 28'],
   ['table left edge spacing', 'td:first-child { padding-left:14px; }'],
   ['table right edge spacing', 'td:last-child { padding-right:20px; }'],
   ['employee names are filter buttons', 'aria-pressed="${active}">${escapeHtml(item.name)}</button>'],
