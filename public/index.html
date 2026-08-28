@@ -49,7 +49,9 @@
     #review-dashboard-concept .rd-engagement-title strong { display:block; font-size:15px; }
     #review-dashboard-concept .rd-engagement-title span { display:block; margin-top:4px; color:light-dark(#667085,#aab4c4); font-size:11px; }
     #review-dashboard-concept .rd-engagement-legend { display:flex; align-items:center; flex-wrap:wrap; gap:14px; color:light-dark(#667085,#aab4c4); font-size:11px; }
-    #review-dashboard-concept .rd-engagement-legend span { display:flex; align-items:center; gap:6px; }
+    #review-dashboard-concept .rd-engagement-legend button { display:flex; align-items:center; gap:6px; padding:2px 0; border:0; color:inherit; background:transparent; cursor:pointer; }
+    #review-dashboard-concept .rd-engagement-legend button[aria-pressed="false"] { opacity:.38; }
+    #review-dashboard-concept .rd-engagement-legend button:focus-visible { outline:2px solid #5965d8; outline-offset:3px; border-radius:3px; }
     #review-dashboard-concept .rd-engagement-legend i { width:10px; height:10px; border-radius:3px; }
     #review-dashboard-concept .rd-engagement-body { padding:2px 17px 17px; display:grid; gap:11px; }
     #review-dashboard-concept .rd-engagement-row { display:grid; grid-template-columns:minmax(150px,220px) minmax(160px,1fr) 44px; align-items:center; gap:14px; }
@@ -78,13 +80,18 @@
     #review-dashboard-concept .rd-person { display:flex; align-items:center; gap:9px; font-weight:650; }
     #review-dashboard-concept .rd-person a, #review-dashboard-concept .rd-number-link { color:inherit; text-decoration:none; border-bottom:1px solid light-dark(#c8cfdd,#596579); }
     #review-dashboard-concept .rd-person a:hover, #review-dashboard-concept .rd-number-link:hover { color:#5965d8; border-bottom-color:#5965d8; }
-    #review-dashboard-concept .rd-export-team { position:relative; width:34px; height:34px; padding:0; border:0; background:transparent; color:light-dark(#667085,#aab4c4); cursor:pointer; }
-    #review-dashboard-concept .rd-export-team::before { content:"↓"; position:absolute; inset:0 0 7px; font-size:25px; line-height:24px; text-align:center; }
-    #review-dashboard-concept .rd-export-team::after { content:""; position:absolute; left:9px; right:9px; bottom:5px; height:6px; border:2px solid currentColor; border-top:0; border-radius:0 0 3px 3px; }
-    #review-dashboard-concept .rd-export-team:hover { color:light-dark(#344054,#e4eaf4); }
+    #review-dashboard-concept .rd-export-team { width:34px; height:34px; padding:0; display:grid; place-items:center; border:0; border-radius:7px; background:transparent; color:light-dark(#667085,#aab4c4); cursor:pointer; }
+    #review-dashboard-concept .rd-export-team svg { width:20px; height:20px; display:block; pointer-events:none; }
+    #review-dashboard-concept .rd-export-team:hover { color:#5965d8; }
+    #review-dashboard-concept .rd-export-team:active { color:#4652c7; }
+    #review-dashboard-concept .rd-export-team:focus-visible { outline:2px solid #5965d8; outline-offset:2px; }
+    #review-dashboard-concept .rd-export-team:disabled { opacity:.38; cursor:default; }
     #review-dashboard-concept .rd-avatar { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; color:white; font-size:11px; background:#7280df; }
     #review-dashboard-concept .rd-zero { color:light-dark(#98a2b3,#778397); }
     #review-dashboard-concept .rd-settings { padding:16px; }
+    #review-dashboard-concept .rd-analytics-options { margin-top:14px; }
+    #review-dashboard-concept .rd-checkbox-option { display:inline-flex; align-items:center; gap:9px; margin:0; color:inherit; font-size:12px; font-weight:600; text-transform:none; letter-spacing:0; cursor:pointer; }
+    #review-dashboard-concept .rd-checkbox-option input { width:16px; height:16px; margin:0; accent-color:#5965d8; cursor:pointer; }
     #review-dashboard-concept .rd-switch-row { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:16px; }
     #review-dashboard-concept .rd-switch-copy strong { font-size:13px; display:block; }
     #review-dashboard-concept .rd-switch-copy small { color:light-dark(#667085,#aab4c4); }
@@ -213,8 +220,11 @@
     #review-dashboard-concept .rd-metric-toggle { padding:3px 2px; display:inline-flex; align-items:center; gap:5px; border:0; color:inherit; background:transparent; cursor:pointer; font:inherit; font-weight:inherit; }
     #review-dashboard-concept .rd-metric-toggle[aria-pressed="false"] { opacity:.38; }
     #review-dashboard-concept .rd-metric-legend i { width:8px; height:8px; border-radius:50%; }
-    #review-dashboard-concept .rd-chart-expand { width:30px; height:30px; padding:0; display:grid; place-items:center; flex:0 0 auto; border:0; border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; font-size:17px; line-height:1; }
+    #review-dashboard-concept .rd-chart-expand { width:38px; height:38px; padding:0; display:grid; place-items:center; flex:0 0 auto; border:0; border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; line-height:1; }
+    #review-dashboard-concept .rd-chart-expand svg { width:22px; height:22px; display:block; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     #review-dashboard-concept .rd-chart-expand:hover { color:#5965d8; }
+    #review-dashboard-concept .rd-chart-expand:focus { outline:none; }
+    #review-dashboard-concept .rd-chart-expand:focus-visible { outline:2px solid #8b93ea; outline-offset:2px; }
     #review-dashboard-concept .rd-chart-empty { height:100%; display:grid; place-items:center; color:light-dark(#98a2b3,#778397); font-size:12px; }
     #review-dashboard-concept .rd-chart-expanded { position:fixed !important; z-index:1000; top:50%; left:50%; width:min(1902px,calc(100vw - 48px)) !important; height:min(1080px,calc(100vh - 48px)) !important; margin:0 !important; display:flex; flex-direction:column; transform:translate(-50%,-50%); overflow:hidden; border-radius:14px; background:light-dark(#fff,#18202c); box-shadow:0 0 0 100vmax rgba(15,23,42,.46),0 20px 60px rgba(15,23,42,.28); }
     #review-dashboard-concept .rd-chart-expanded .rd-chart-body { height:auto; min-height:0; flex:1; }
@@ -328,7 +338,7 @@
       <section class="rd-panel rd-engagement" aria-labelledby="rd-engagement-title">
         <div class="rd-engagement-head">
           <div class="rd-engagement-title"><strong id="rd-engagement-title">Вовлечённость</strong><span>Approvals / 👍 + комментарии + созданные MR</span></div>
-          <div class="rd-engagement-legend" aria-label="Обозначения графика"><span><i class="rd-engagement-approvals"></i>Approvals / 👍</span><span><i class="rd-engagement-comments"></i>Комментарии</span><span><i class="rd-engagement-mrs"></i>Создано MR</span></div>
+          <div class="rd-engagement-legend" aria-label="Показатели вовлечённости"><button type="button" data-engagement-metric="approvals" aria-pressed="true"><i class="rd-engagement-approvals"></i>Approvals / 👍</button><button type="button" data-engagement-metric="comments" aria-pressed="true"><i class="rd-engagement-comments"></i>Комментарии</button><button type="button" data-engagement-metric="mrs" aria-pressed="true"><i class="rd-engagement-mrs"></i>Создано MR</button></div>
         </div>
         <div class="rd-engagement-body"><div class="rd-engagement-empty">График появится после загрузки данных</div></div>
       </section>
@@ -350,7 +360,7 @@
       <section class="rd-view" data-page="volume" hidden>
         <div class="rd-heading"><div><h1>Динамика</h1><div class="rd-sub">Общие показатели и расшифровка по сотрудникам</div></div></div>
         <section class="rd-panel rd-overall-panel rd-chart-shell" data-chart-key="overall">
-          <div class="rd-panel-title"><strong id="rd-overall-title">Все команды</strong><div class="rd-chart-title-actions"><div class="rd-metric-legend" id="rd-overall-legend"></div><button type="button" class="rd-chart-expand" data-chart-key="overall" aria-label="Развернуть график на весь экран" title="Развернуть график на весь экран">⛶</button></div></div>
+          <div class="rd-panel-title"><strong id="rd-overall-title">Все команды</strong><div class="rd-chart-title-actions"><div class="rd-metric-legend" id="rd-overall-legend"></div><button type="button" class="rd-chart-expand" data-chart-key="overall" aria-label="Развернуть график на весь экран" title="Развернуть график на весь экран"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 10 4 4m0 0v5m0-5h5M14 14l6 6m0 0v-5m0 5h-5"/></svg></button></div></div>
           <div class="rd-chart-body"><div class="rd-line-chart" id="rd-overall-chart"></div></div>
         </section>
         <div class="rd-team-analytics" id="rd-team-analytics"></div>
@@ -377,6 +387,7 @@
               <div><label for="rd-signal-minimum">Минимум влитых MR</label><input id="rd-signal-minimum" type="number" min="1" max="100" step="1" value="5"></div>
               <button class="rd-action" id="rd-save-analytics" type="button">Сохранить</button>
             </div>
+            <div class="rd-analytics-options"><label class="rd-checkbox-option" for="rd-hide-inactive-days"><input id="rd-hide-inactive-days" type="checkbox" checked>Скрывать дни без активностей</label></div>
             <p class="rd-connection-note">«В пределах нормы» означает, что средний размер MR отклоняется от личной медианы не больше указанного процента. При меньшей выборке показываем «Недостаточно данных».</p>
             <div class="rd-connection-status" id="rd-analytics-status"></div>
           </div>
@@ -471,6 +482,7 @@
   const toInput = root.querySelector('#rd-to');
   const captionLive = root.querySelector('#rd-caption');
   let lastReport = null;
+  let currentEngagementPeople = [];
   let activeReportController = null;
   tbody.innerHTML = '<tr><td colspan="4" class="rd-zero">Выберите команду и период, затем нажмите «Обновить»</td></tr>';
   const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
@@ -517,6 +529,7 @@
   let selectedVolumePerson = null;
   const visibleVolumeMetrics = new Set(['mrs','added','deleted','files']);
   const visibleDashboardMetrics = new Set(['mrs','added','deleted','files']);
+  const visibleEngagementMetrics = new Set(['approvals','comments','mrs']);
   const dashboardGroups = new Map([['mrs','days'],['added','days'],['deleted','days'],['files','days']]);
   let dashboardView = 'line';
   let expandedVolumeChart = null;
@@ -540,9 +553,23 @@
   const volumePolicy = new VolumeCalculationPolicy(Number(savedAnalyticsRule.threshold) || 20, Number(savedAnalyticsRule.minimum) || 5);
   const signalThresholdInput = root.querySelector('#rd-signal-threshold');
   const signalMinimumInput = root.querySelector('#rd-signal-minimum');
+  const hideInactiveDaysInput = root.querySelector('#rd-hide-inactive-days');
   const analyticsStatus = root.querySelector('#rd-analytics-status');
   signalThresholdInput.value = volumePolicy.signalThresholdPercent;
   signalMinimumInput.value = volumePolicy.minimumMergedMRs;
+  hideInactiveDaysInput.checked = savedAnalyticsRule.hideInactiveDays !== false;
+  const volumeMetricKeys = ['mrs','added','deleted','files'];
+  const isDailySeries = series => Boolean(series?.months?.length) && series.months.every(label => /^\d{2}\.\d{2}$/.test(label));
+  function filterInactiveDays(series,metrics=volumeMetricKeys) {
+    if (!hideInactiveDaysInput.checked || !isDailySeries(series)) return series;
+    const keep=series.months.map((_,index)=>metrics.some(metric=>Number(series[metric]?.[index]||0)!==0));
+    const result={...series};
+    ['months','tooltips',...volumeMetricKeys].forEach(key=>{
+      const values=series[key] || (key==='tooltips' ? series.months : null);
+      if (values) result[key]=values.filter((_,index)=>keep[index]);
+    });
+    return result;
+  }
   function volumePeriodSlice(data,fine=false) {
     if (volumeIsLive) return data;
     const last = data.months.length;
@@ -575,16 +602,18 @@
         : new Date(end.getFullYear(),end.getMonth(),1);
       const days = Math.round((end-start)/86400000)+1, sourceIndex = previousMonth ? last-2 : last-1;
       const scale = ['week','two_weeks'].includes(volumeRange.value) ? days / 30 : 1;
+      const dates = Array.from({length:days},(_,index) => new Date(start.getFullYear(),start.getMonth(),start.getDate()+index));
       const distribute = total => {
         const target = Math.max(0,Math.round(total*scale));
-        const weights = Array.from({length:days},(_,index)=>.76+((index*3+sourceIndex)%7)*.08);
+        // Preview data includes one genuinely inactive day so the local display
+        // preference can be exercised without changing the interval total.
+        const weights = Array.from({length:days},(_,index)=>index===1 ? 0 : .76+((index*3+sourceIndex)%7)*.08);
         const weightTotal = weights.reduce((sum,value)=>sum+value,0);
         const exact = weights.map(value=>target*value/weightTotal), result = exact.map(Math.floor);
         let remainder = target-result.reduce((sum,value)=>sum+value,0);
         exact.map((value,index)=>({index,fraction:value-result[index]})).sort((a,b)=>b.fraction-a.fraction).slice(0,remainder).forEach(item=>result[item.index]++);
         return result;
       };
-      const dates = Array.from({length:days},(_,index) => new Date(start.getFullYear(),start.getMonth(),start.getDate()+index));
       return {
         months:dates.map(date => `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}`),
         tooltips:dates.map(date => `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getFullYear()).slice(-2)}`),
@@ -765,7 +794,7 @@
     const sliced=volumePeriodSlice(source,true), periods=sliced.tooltips||sliced.months, daily=sliced.months.every(label=>/^\d{2}\.\d{2}$/.test(label)), buckets=[];
     const monthlyMock=!volumeIsLive&&sliced.months.every(label=>/^\d{2}'\d{2}$/.test(label));
     if (group==='weeks'&&monthlyMock) {
-      const result={months:[],tooltips:[],mrs:[],added:[],deleted:[],files:[]};
+      const result={months:[],tooltips:[],mrs:[],added:[],deleted:[],files:[],daily:false};
       sliced.months.forEach((label,monthIndex)=>{
         const match=label.match(/^(\d{2})'(\d{2})$/),month=Number(match[1]),year=2000+Number(match[2]);
         const daysInMonth=new Date(year,month,0).getDate(),lengths=[];
@@ -796,11 +825,10 @@
       dashboardMetricOptions.forEach(metric=>bucket[metric.key]+=Number(sliced[metric.key][index]||0));
     });
     buckets.forEach(bucket=>{ if(group==='weeks'&&daily) bucket.label=`${sliced.months[bucket.first]}–${sliced.months[bucket.last]}`; });
-    return {months:buckets.map(item=>item.label),tooltips:buckets.map(item=>item.label),...Object.fromEntries(dashboardMetricOptions.map(metric=>[metric.key,buckets.map(item=>item[metric.key])]))};
+    return {months:buckets.map(item=>item.label),tooltips:buckets.map(item=>item.label),daily:group==='days'&&daily,...Object.fromEntries(dashboardMetricOptions.map(metric=>[metric.key,buckets.map(item=>item[metric.key])]))};
   }
   function removeZeroDashboardPeriods(series,metrics) {
-    const keep=series.months.map((_,index)=>metrics.some(metric=>Number(series[metric][index]||0)!==0));
-    return {months:series.months.filter((_,index)=>keep[index]),tooltips:(series.tooltips||series.months).filter((_,index)=>keep[index]),...Object.fromEntries(dashboardMetricOptions.map(metric=>[metric.key,series[metric.key].filter((_,index)=>keep[index])]))};
+    return series.daily ? filterInactiveDays(series,metrics) : series;
   }
   function dashboardLines(series) {
     return dashboardMetricOptions.map(metric=>({key:metric.key,name:metric.name,values:series[metric.key],color:metric.color}));
@@ -842,6 +870,10 @@
     if (metric) { if(visibleDashboardMetrics.has(metric.dataset.dashboardPeriodMetric)&&visibleDashboardMetrics.size>1) visibleDashboardMetrics.delete(metric.dataset.dashboardPeriodMetric); else visibleDashboardMetrics.add(metric.dataset.dashboardPeriodMetric); renderOverviewDashboard(); return; }
     if (event.target.closest('.rd-tab[data-view="overview"]')) requestAnimationFrame(renderOverviewDashboard);
   });
+  function chartExpandIcon(expanded) {
+    const path=expanded?'M4 4l6 6m0 0V5m0 5H5M20 20l-6-6m0 0v5m0-5h5':'M10 10 4 4m0 0v5m0-5h5M14 14l6 6m0 0v-5m0 5h-5';
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${path}"/></svg>`;
+  }
   function renderVolumeConcept() {
     const metricOptions=[
       {key:'mrs',name:'Влито MR',color:'#5965d8'}, {key:'added',name:'Добавлено строк',color:'#2f7ae5'},
@@ -852,7 +884,7 @@
     const overallShell=root.querySelector('[data-chart-key="overall"]');
     overallShell.classList.toggle('rd-chart-expanded',expandedVolumeChart==='overall');
     const overallExpand=overallShell.querySelector('.rd-chart-expand');
-    overallExpand.textContent=expandedVolumeChart==='overall'?'×':'⛶';
+    overallExpand.innerHTML=chartExpandIcon(expandedVolumeChart==='overall');
     overallExpand.setAttribute('aria-label',expandedVolumeChart==='overall'?'Свернуть график':'Развернуть график на весь экран');
     overallExpand.title=overallExpand.getAttribute('aria-label');
     const selectedPersonEntry = selectedVolumePerson ? volumeTeams.map(team=>({team,person:team.people.find(person=>person.key===selectedVolumePerson.personKey)})).find(item=>item.team.key===selectedVolumePerson.teamKey&&item.person) : null;
@@ -861,7 +893,7 @@
     const sourceFor = team => volumeIsLive && team.series ? team.series : sumSeries(team.people,team.name);
     const overallData = selectedPersonEntry?.person || (selectedTeam ? sourceFor(selectedTeam) : (volumeIsLive && liveOverall ? liveOverall : sumSeries(volumePeople,'Все команды')));
     root.querySelector('#rd-overall-title').textContent = selectedPersonEntry?.person.name || selectedTeam?.name || 'Все команды';
-    const overall = volumePeriodSlice(overallData);
+    const overall = filterInactiveDays(volumePeriodSlice(overallData));
     renderLineChart(root.querySelector('#rd-overall-chart'),overall.months,overall.tooltips||overall.months,[
       {key:'mrs',name:'Влито MR',values:overall.mrs,color:'#5965d8'},
       {key:'added',name:'Добавлено строк',values:overall.added,color:'#2f7ae5'},
@@ -871,12 +903,12 @@
     root.querySelector('#rd-team-analytics').innerHTML = visibleTeams.map(team => {
       const source = selectedPersonEntry?.team.key === team.key ? selectedPersonEntry.person : sourceFor(team);
       const chartKey=`team-${team.key}`, expanded=expandedVolumeChart===chartKey;
-      return `<section class="rd-panel rd-team-analytics-card" data-team="${team.key}"><div class="rd-team-card-title">${escapeHtml(team.name)}</div><div class="rd-team-analytics-body"><div class="rd-team-chart rd-chart-shell${expanded?' rd-chart-expanded':''}" data-chart-key="${chartKey}"><div class="rd-panel-title"><span>Динамика команды</span><div class="rd-chart-title-actions"><div class="rd-metric-legend">${legend}</div><button type="button" class="rd-chart-expand" data-chart-key="${chartKey}" aria-label="${expanded?'Свернуть график':'Развернуть график на весь экран'}" title="${expanded?'Свернуть график':'Развернуть график на весь экран'}">${expanded?'×':'⛶'}</button></div></div><div class="rd-chart-body"><div class="rd-line-chart" id="rd-chart-${team.key}"></div></div></div><div class="rd-team-table"><div class="rd-team-table-head"><div><strong>Сотрудники</strong><small>${team.people.length} сотрудников</small></div></div><div class="rd-team-table-scroll"><table><thead><tr><th data-team="${team.key}" data-sort-key="name">Сотрудник ↕</th><th data-team="${team.key}" data-sort-key="mrs">MR ↕</th><th data-team="${team.key}" data-sort-key="added">Добавлено ↕</th><th data-team="${team.key}" data-sort-key="deleted">Удалено ↕</th><th data-team="${team.key}" data-sort-key="files">Файлов ↕</th></tr></thead><tbody id="rd-table-${team.key}"></tbody></table></div></div></div></section>`;
+      return `<section class="rd-panel rd-team-analytics-card" data-team="${team.key}"><div class="rd-team-card-title">${escapeHtml(team.name)}</div><div class="rd-team-analytics-body"><div class="rd-team-chart rd-chart-shell${expanded?' rd-chart-expanded':''}" data-chart-key="${chartKey}"><div class="rd-panel-title"><span>Динамика команды</span><div class="rd-chart-title-actions"><div class="rd-metric-legend">${legend}</div><button type="button" class="rd-chart-expand" data-chart-key="${chartKey}" aria-label="${expanded?'Свернуть график':'Развернуть график на весь экран'}" title="${expanded?'Свернуть график':'Развернуть график на весь экран'}">${chartExpandIcon(expanded)}</button></div></div><div class="rd-chart-body"><div class="rd-line-chart" id="rd-chart-${team.key}"></div></div></div><div class="rd-team-table"><div class="rd-team-table-head"><div><strong>Сотрудники</strong><small>${team.people.length} сотрудников</small></div></div><div class="rd-team-table-scroll"><table><thead><tr><th data-team="${team.key}" data-sort-key="name">Сотрудник ↕</th><th data-team="${team.key}" data-sort-key="mrs">MR ↕</th><th data-team="${team.key}" data-sort-key="added">Добавлено ↕</th><th data-team="${team.key}" data-sort-key="deleted">Удалено ↕</th><th data-team="${team.key}" data-sort-key="files">Файлов ↕</th></tr></thead><tbody id="rd-table-${team.key}"></tbody></table></div></div></div></section>`;
     }).join('');
     visibleTeams.forEach(team => {
       const source = sourceFor(team);
       if (!source) return;
-      const series = volumePeriodSlice(source);
+      const series = filterInactiveDays(volumePeriodSlice(source));
       renderLineChart(root.querySelector(`#rd-chart-${team.key}`),series.months,series.tooltips||series.months,[
         {key:'mrs',name:'Влито MR',values:series.mrs,color:'#5965d8'}, {key:'added',name:'Добавлено строк',values:series.added,color:'#2f7ae5'},
         {key:'deleted',name:'Удалено строк',values:series.deleted,color:'#e58b19'}, {key:'files',name:'Изменено файлов',values:series.files,color:'#2f8f5b'}
@@ -932,9 +964,10 @@
     volumePolicy.minimumMergedMRs = minimum;
     signalThresholdInput.value = threshold;
     signalMinimumInput.value = minimum;
-    localStorage.setItem('pulse-review-analytics-rule',JSON.stringify({threshold,minimum}));
-    analyticsStatus.textContent = 'Правило сохранено на этом компьютере';
+    localStorage.setItem('pulse-review-analytics-rule',JSON.stringify({threshold,minimum,hideInactiveDays:hideInactiveDaysInput.checked}));
+    analyticsStatus.textContent = 'Настройки сохранены на этом компьютере';
     renderVolumeConcept();
+    renderOverviewDashboard();
   });
   [volumeFrom,volumeTo].forEach(input => input.addEventListener('change', renderVolumeConcept));
   renderVolumeConcept();
@@ -1173,17 +1206,27 @@
   }
   root.querySelector('#rd-add-route').addEventListener('click', event => { event.stopImmediatePropagation(); routesContainer.appendChild(createRoute({ enabled:false })); updateRouteCount(); });
   root.querySelector('#rd-save-routes').addEventListener('click', event => { event.stopImmediatePropagation(); saveProjects().catch(error => settingsStatus.textContent = error.message); });
+  root.querySelector('.rd-engagement-legend').addEventListener('click', event => {
+    const button=event.target.closest('[data-engagement-metric]');
+    if (!button) return;
+    const metric=button.dataset.engagementMetric;
+    visibleEngagementMetrics.has(metric) ? visibleEngagementMetrics.delete(metric) : visibleEngagementMetrics.add(metric);
+    if (lastReport) renderSelectedTeam();
+    else if (currentEngagementPeople.length) renderEngagement(currentEngagementPeople);
+    else root.querySelectorAll('[data-engagement-metric]').forEach(item=>item.setAttribute('aria-pressed',String(visibleEngagementMetrics.has(item.dataset.engagementMetric))));
+  });
   function renderEngagement(people) {
-    const ranked = people.map(person => ({ ...person, engagement: (person.approvals || 0) + (person.comments || 0) + (person.createdMergeRequests || 0) }))
+    currentEngagementPeople = people;
+    root.querySelectorAll('[data-engagement-metric]').forEach(button=>button.setAttribute('aria-pressed',String(visibleEngagementMetrics.has(button.dataset.engagementMetric))));
+    const metricValue=(person,metric)=>metric==='mrs' ? Number(person.createdMergeRequests||0) : Number(person[metric]||0);
+    const ranked = people.map(person => ({ ...person, engagement: [...visibleEngagementMetrics].reduce((sum,metric)=>sum+metricValue(person,metric),0) }))
       .sort((a, b) => b.engagement - a.engagement || a.name.localeCompare(b.name, 'ru'));
     if (!ranked.length) { engagementBody.innerHTML = '<div class="rd-engagement-empty">Нет данных за выбранный период</div>'; return; }
     const max = Math.max(1, ...ranked.map(person => person.engagement));
     engagementBody.innerHTML = ranked.map(person => {
       const initials = person.name.split(' ').map(part => part[0]).join('').slice(0, 2);
-      const approvalsWidth = (person.approvals || 0) / max * 100;
-      const commentsWidth = (person.comments || 0) / max * 100;
-      const mrsWidth = (person.createdMergeRequests || 0) / max * 100;
-      return `<div class="rd-engagement-row"><div class="rd-engagement-person"><span class="rd-avatar">${escapeHtml(initials)}</span><span title="${escapeHtml(person.name)}">${escapeHtml(person.name)}</span></div><div class="rd-engagement-bar" aria-label="Вовлечённость ${escapeHtml(person.name)}: ${person.engagement}"><span class="rd-engagement-segment rd-engagement-approvals" style="width:${approvalsWidth}%" data-tooltip="Approvals / 👍: ${person.approvals || 0}"></span><span class="rd-engagement-segment rd-engagement-comments" style="width:${commentsWidth}%" data-tooltip="Комментарии: ${person.comments || 0}"></span><span class="rd-engagement-segment rd-engagement-mrs" style="width:${mrsWidth}%" data-tooltip="Создано MR: ${person.createdMergeRequests || 0}"></span></div><div class="rd-engagement-total" title="Суммарная вовлечённость">${person.engagement}</div></div>`;
+      const segment=(metric,className,label)=>visibleEngagementMetrics.has(metric) ? `<span class="rd-engagement-segment ${className}" style="width:${metricValue(person,metric)/max*100}%" data-tooltip="${label}: ${metricValue(person,metric)}"></span>` : '';
+      return `<div class="rd-engagement-row"><div class="rd-engagement-person"><span class="rd-avatar">${escapeHtml(initials)}</span><span title="${escapeHtml(person.name)}">${escapeHtml(person.name)}</span></div><div class="rd-engagement-bar" aria-label="Вовлечённость ${escapeHtml(person.name)}: ${person.engagement}">${segment('approvals','rd-engagement-approvals','Approvals / 👍')}${segment('comments','rd-engagement-comments','Комментарии')}${segment('mrs','rd-engagement-mrs','Создано MR')}</div><div class="rd-engagement-total" title="Суммарная вовлечённость">${person.engagement}</div></div>`;
     }).join('');
   }
   function renderReport(report) {
@@ -1202,7 +1245,7 @@
       const sumMrs = section.reviewers.reduce((sum, person) => sum + person.createdMergeRequests, 0);
       const sumReceivedComments = section.reviewers.reduce((sum, person) => sum + (person.receivedComments || 0), 0);
       const sumOpenedMrs = section.reviewers.reduce((sum, person) => sum + (person.openedMergeRequests || 0), 0);
-      return `<section class="rd-panel"><div class="rd-panel-title"><span>${escapeHtml(section.name || 'Без названия')}</span><button class="rd-export-team" data-section="${sectionIndex}" aria-label="Скачать CSV команды ${escapeHtml(section.name || 'Без названия')}" title="Скачать CSV"></button></div><table><thead><tr><th>Сотрудник</th><th>Approvals</th><th>Комментарии</th><th>Создано MR</th><th>Комментариев к MR</th><th>Открыто MR</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Итого</td><td>${sumApprovals}</td><td>${sumComments}</td><td>${sumMrs}</td><td>${sumReceivedComments}</td><td>${sumOpenedMrs}</td></tr></tfoot></table></section>`;
+      return `<section class="rd-panel"><div class="rd-panel-title"><span>${escapeHtml(section.name || 'Без названия')}</span><button class="rd-export-team" data-section="${sectionIndex}" aria-label="Скачать CSV команды ${escapeHtml(section.name || 'Без названия')}" title="Скачать CSV"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3.5v10m-3.5-3.5 3.5 3.5 3.5-3.5M4 17h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><table><thead><tr><th>Сотрудник</th><th>Approvals</th><th>Комментарии</th><th>Создано MR</th><th>Комментариев к MR</th><th>Открыто MR</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Итого</td><td>${sumApprovals}</td><td>${sumComments}</td><td>${sumMrs}</td><td>${sumReceivedComments}</td><td>${sumOpenedMrs}</td></tr></tfoot></table></section>`;
     }).join('');
     reportContent._visibleSections = sections;
   }
@@ -1312,6 +1355,14 @@
   }
   updateCancel.addEventListener('click', () => activeReportController?.abort());
   root.querySelector('#rd-refresh').addEventListener('click', event => { event.stopImmediatePropagation(); loadReport().catch(error => status.textContent = error.message); });
+  if (location.protocol === 'file:') renderEngagement([
+    {name:'Анна Смирнова',approvals:4,comments:11,createdMergeRequests:5},
+    {name:'Иван Петров',approvals:3,comments:9,createdMergeRequests:4},
+    {name:'Мария Ким',approvals:2,comments:8,createdMergeRequests:3},
+    {name:'Алексей Денисов',approvals:2,comments:6,createdMergeRequests:3},
+    {name:'Олег Белов',approvals:1,comments:4,createdMergeRequests:2},
+    {name:'Елена Новикова',approvals:0,comments:0,createdMergeRequests:0}
+  ]);
   periodSelect.dispatchEvent(new Event('change'));
   loadConfig().then(config => !config.preview && config.gitlabConfigured ? loadReport() : null).catch(error => status.textContent = error.message);
 })();
