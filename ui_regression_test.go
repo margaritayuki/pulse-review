@@ -47,6 +47,12 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`rd-metric-toggle`,
 		`rd-chart-expand`,
 		`width:min(1902px,calc(100vw - 48px))`,
+		`Math.round(container.clientWidth || 640)`,
+		`Math.max(minimumY,Math.min(maximumY`,
+		`data-zero-y="${top+plotHeight}"`,
+		`background-position:right 12px center`,
+		`aria-label="Как работает персональный сигнал"`,
+		`id="rd-save-analytics" type="button">Сохранить</button>`,
 		`sumSeries(team.people,team.name)`,
 		`/api/work-volume?from=`,
 	}
@@ -78,6 +84,12 @@ func TestFrontendRegressionContracts(t *testing.T) {
 	}
 	if strings.Contains(page, `Реальные значения на единой нелинейной шкале`) || strings.Contains(page, `Количество, реальная нелинейная шкала`) {
 		t.Error("unrequested chart captions must stay absent")
+	}
+	if strings.Contains(page, `text-decoration:line-through`) {
+		t.Error("hidden metric labels must not be struck through")
+	}
+	if strings.Contains(page, `preserveAspectRatio="none"`) {
+		t.Error("chart text must not stretch with the SVG")
 	}
 }
 

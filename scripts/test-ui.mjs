@@ -56,6 +56,14 @@ const contracts = [
   ['metric legend controls', 'rd-metric-toggle'],
   ['fullscreen chart control', 'rd-chart-expand'],
   ['fullscreen laptop bounds', 'width:min(1902px,calc(100vw - 48px))'],
+  ['fullscreen chart uses measured dimensions', 'Math.round(container.clientWidth || 640)'],
+  ['curves stay between adjacent values', 'Math.max(minimumY,Math.min(maximumY'],
+  ['chart exposes zero boundary', 'data-zero-y="${top+plotHeight}"'],
+  ['hidden metrics are faded', '.rd-metric-toggle[aria-pressed="false"] { opacity:.38; }'],
+  ['refresh icon has no surface', '#rd-refresh { border:0; color:#5965d8; background:transparent;'],
+  ['select arrow has an inset', 'background-position:right 12px center'],
+  ['analytics signal help', 'aria-label="Как работает персональный сигнал"'],
+  ['analytics save is concise', 'id="rd-save-analytics" type="button">Сохранить</button>'],
   ['team totals aggregate employees', "sumSeries(team.people,team.name)"],
 ];
 
@@ -73,5 +81,9 @@ assert.ok(!page.includes('id="rd-mr-bars"'), 'legacy split MR chart must be remo
 assert.ok(!page.includes('id="rd-lines-bars"'), 'legacy split changes chart must be removed');
 assert.ok(!page.includes('Реальные значения на единой нелинейной шкале'), 'unrequested chart captions must stay absent');
 assert.ok(!page.includes('Количество, реальная нелинейная шкала'), 'unrequested axis captions must stay absent');
+assert.ok(!page.includes('text-decoration:line-through'), 'hidden metric labels must not be struck through');
+assert.match(page,/\.rd-chart-expand \{[^}]*border:0;/, 'fullscreen icon must not have a border');
+assert.match(page,/\.rd-icon-action \{[^}]*border:0;/, 'route icon actions must not have a border');
+assert.ok(!page.includes('preserveAspectRatio="none"'), 'chart labels must not stretch with the SVG');
 
-console.log(`UI checks passed: ${contracts.length + 9}`);
+console.log(`UI checks passed: ${contracts.length + 13}`);

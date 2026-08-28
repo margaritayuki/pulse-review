@@ -82,6 +82,12 @@ try {
   assert.equal(controlsSurface.background,'rgba(0, 0, 0, 0)',JSON.stringify(controlsSurface));
   assert.equal(controlsSurface.border,'0px',JSON.stringify(controlsSurface));
   assert.equal(controlsSurface.padding,'0px',JSON.stringify(controlsSurface));
+  const controlChrome=await cdp.evaluate(`(()=>{const refresh=getComputedStyle(document.querySelector('#rd-refresh')),select=getComputedStyle(document.querySelector('#live-team'));return {refreshBorder:refresh.borderTopWidth,refreshBackground:refresh.backgroundColor,refreshColor:refresh.color,selectPaddingRight:parseFloat(select.paddingRight),selectBackgroundPosition:select.backgroundPosition}})()`);
+  assert.equal(controlChrome.refreshBorder,'0px',JSON.stringify(controlChrome));
+  assert.equal(controlChrome.refreshBackground,'rgba(0, 0, 0, 0)',JSON.stringify(controlChrome));
+  assert.match(controlChrome.refreshColor,/89, 101, 216|5965d8/i,JSON.stringify(controlChrome));
+  assert.ok(controlChrome.selectPaddingRight>=36,JSON.stringify(controlChrome));
+  assert.match(controlChrome.selectBackgroundPosition,/right 12px|calc\(100% - 12px\)/,JSON.stringify(controlChrome));
   await cdp.evaluate(`document.querySelector('#rd-period').value='custom';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
   const customControls=await cdp.evaluate(`(async()=>{await new Promise(resolve=>setTimeout(resolve,240));const controls=document.querySelector('#rd-analytics-controls'),to=document.querySelector('#rd-to'),refresh=document.querySelector('#rd-refresh');return {width:controls.getBoundingClientRect().width,gap:refresh.getBoundingClientRect().left-to.getBoundingClientRect().right,custom:controls.classList.contains('rd-custom-period')}})()`);
   assert.ok(customControls.width>presetControls.width,JSON.stringify({presetControls,customControls}));
@@ -154,17 +160,22 @@ try {
   assert.equal(classicScale.paths,1,JSON.stringify(classicScale));
   assert.deepEqual(classicScale.selected,['added'],JSON.stringify(classicScale));
   assert.equal(classicScale.fetches,0,JSON.stringify(classicScale));
+  assert.equal(await cdp.evaluate(`getComputedStyle(document.querySelector('#rd-overall-legend [aria-pressed="false"]')).textDecorationLine`),'none');
   await cdp.evaluate(`for(const key of ['mrs','deleted','files'])document.querySelector('#rd-overall-legend [data-metric="'+key+'"]').click()`);
   assert.equal(await cdp.evaluate(`document.querySelector('#rd-overall-chart svg').dataset.scaleMode`),'nonlinear');
   assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-overall-chart .rd-line-path').length`),4);
 
+  const normalChartText=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart'),svg=chart.querySelector('svg'),label=chart.querySelector('.rd-line-axis-date'),button=chart.closest('.rd-chart-shell').querySelector('.rd-chart-expand');return {fontSize:getComputedStyle(label).fontSize,viewWidth:svg.viewBox.baseVal.width,clientWidth:svg.getBoundingClientRect().width,buttonBorder:getComputedStyle(button).borderTopWidth}})()`);
+  assert.equal(normalChartText.buttonBorder,'0px',JSON.stringify(normalChartText));
   await cdp.evaluate(`document.querySelector('[data-chart-key="overall"] .rd-chart-expand').click()`);
-  const fullscreen=await cdp.evaluate(`(()=>{const shell=document.querySelector('[data-chart-key="overall"]'),rect=shell.getBoundingClientRect(),button=shell.querySelector('.rd-chart-expand');return {expanded:shell.classList.contains('rd-chart-expanded'),width:rect.width,height:rect.height,viewportWidth:innerWidth,viewportHeight:innerHeight,label:button.getAttribute('aria-label'),locked:document.documentElement.classList.contains('pulse-review-chart-lock')}})()`);
+  const fullscreen=await cdp.evaluate(`(()=>{const shell=document.querySelector('[data-chart-key="overall"]'),rect=shell.getBoundingClientRect(),button=shell.querySelector('.rd-chart-expand'),svg=shell.querySelector('svg'),label=shell.querySelector('.rd-line-axis-date');return {expanded:shell.classList.contains('rd-chart-expanded'),width:rect.width,height:rect.height,viewportWidth:innerWidth,viewportHeight:innerHeight,label:button.getAttribute('aria-label'),locked:document.documentElement.classList.contains('pulse-review-chart-lock'),fontSize:getComputedStyle(label).fontSize,viewWidth:svg.viewBox.baseVal.width,clientWidth:svg.getBoundingClientRect().width}})()`);
   assert.equal(fullscreen.expanded,true,JSON.stringify(fullscreen));
   assert.ok(fullscreen.width<=1902&&fullscreen.width<=fullscreen.viewportWidth-47,JSON.stringify(fullscreen));
   assert.ok(fullscreen.height<=1080&&fullscreen.height<=fullscreen.viewportHeight-47,JSON.stringify(fullscreen));
   assert.equal(fullscreen.label,'Свернуть график',JSON.stringify(fullscreen));
   assert.equal(fullscreen.locked,true,JSON.stringify(fullscreen));
+  assert.equal(fullscreen.fontSize,normalChartText.fontSize,JSON.stringify({normalChartText,fullscreen}));
+  assert.ok(Math.abs(fullscreen.viewWidth-fullscreen.clientWidth)<=2,JSON.stringify(fullscreen));
   await cdp.evaluate(`document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`);
   assert.equal(await cdp.evaluate(`document.querySelector('[data-chart-key="overall"]').classList.contains('rd-chart-expanded')`),false);
   assert.equal(await cdp.evaluate(`document.documentElement.classList.contains('pulse-review-chart-lock')`),false);
@@ -174,15 +185,25 @@ try {
   assert.equal(monthlyDates.labels,monthlyDates.hits,JSON.stringify(monthlyDates));
   assert.ok(monthlyDates.labels>=28,JSON.stringify(monthlyDates));
   await cdp.evaluate(`document.querySelector('#rd-period').value='week';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
-  const chartAlignment=await cdp.evaluate(`(()=>{const panel=document.querySelector('.rd-overall-panel'),overall=document.querySelector('#rd-overall-chart'),team=document.querySelector('[data-team="backend"] .rd-team-chart'),teamCard=document.querySelector('[data-team="backend"]');const points=[...overall.querySelectorAll('.rd-line-point')],periods=overall.querySelectorAll('.rd-line-hit').length;return {panelWidth:panel.getBoundingClientRect().width,teamWidth:team.getBoundingClientRect().width,panelLeft:panel.getBoundingClientRect().left,teamLeft:teamCard.getBoundingClientRect().left,firstX:Number(points[0].getAttribute('cx')),lastX:Number(points[periods-1].getAttribute('cx'))}})()`);
+  const chartAlignment=await cdp.evaluate(`(()=>{const panel=document.querySelector('.rd-overall-panel'),overall=document.querySelector('#rd-overall-chart'),svg=overall.querySelector('svg'),team=document.querySelector('[data-team="backend"] .rd-team-chart'),teamCard=document.querySelector('[data-team="backend"]');const points=[...overall.querySelectorAll('.rd-line-point')],periods=overall.querySelectorAll('.rd-line-hit').length;return {panelWidth:panel.getBoundingClientRect().width,teamWidth:team.getBoundingClientRect().width,panelLeft:panel.getBoundingClientRect().left,teamLeft:teamCard.getBoundingClientRect().left,viewWidth:svg.viewBox.baseVal.width,firstX:Number(points[0].getAttribute('cx')),lastX:Number(points[periods-1].getAttribute('cx'))}})()`);
   assert.ok(Math.abs(chartAlignment.panelWidth-chartAlignment.teamWidth)<=2,JSON.stringify(chartAlignment));
   assert.ok(Math.abs(chartAlignment.panelLeft-chartAlignment.teamLeft)<=2,JSON.stringify(chartAlignment));
   assert.equal(chartAlignment.firstX,48);
-  assert.equal(chartAlignment.lastX,592);
+  assert.equal(chartAlignment.viewWidth-chartAlignment.lastX,48);
+  const nonNegativeCurves=await cdp.evaluate(`(()=>[...document.querySelectorAll('.rd-line-chart svg')].every(svg=>{const zero=Number(svg.dataset.zeroY);return [...svg.querySelectorAll('.rd-line-path')].every(path=>path.getBBox().y+path.getBBox().height<=zero+1)}))()`);
+  assert.equal(nonNegativeCurves,true);
   const edgeSpacing=await cdp.evaluate(`(()=>{const table=document.querySelector('[data-team="backend"] table'),first=table.querySelector('tbody td:first-child'),last=table.querySelector('tbody td:last-child'),lastHead=table.querySelector('thead th:last-child');return {left:parseFloat(getComputedStyle(first).paddingLeft),right:parseFloat(getComputedStyle(last).paddingRight),headerRight:parseFloat(getComputedStyle(lastHead).paddingRight)}})()`);
   assert.ok(edgeSpacing.left>=14);
   assert.ok(edgeSpacing.right>=20);
   assert.ok(edgeSpacing.headerRight>=20);
+
+  await cdp.evaluate(`document.querySelector('[data-view="settings"]').click()`);
+  const settingsChrome=await cdp.evaluate(`(()=>{const remove=document.querySelector('.rd-icon-action'),help=document.querySelector('[aria-label="Как работает персональный сигнал"]'),popover=help.nextElementSibling;help.focus();return {removeBorder:getComputedStyle(remove).borderTopWidth,saveText:document.querySelector('#rd-save-analytics').textContent.trim(),popoverVisible:getComputedStyle(popover).display!=='none',popoverText:popover.textContent.trim()}})()`);
+  assert.equal(settingsChrome.removeBorder,'0px',JSON.stringify(settingsChrome));
+  assert.equal(settingsChrome.saveText,'Сохранить',JSON.stringify(settingsChrome));
+  assert.equal(settingsChrome.popoverVisible,true,JSON.stringify(settingsChrome));
+  assert.match(settingsChrome.popoverText,/личной медианы/,JSON.stringify(settingsChrome));
+  await cdp.evaluate(`document.querySelector('[data-view="volume"]').click()`);
 
   await cdp.evaluate(`(()=>{window.__pulseOriginalFetch=window.fetch;window.fetch=(url,options={})=>String(url).startsWith('/api/report')?new Promise((resolve,reject)=>options.signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true})):window.__pulseOriginalFetch(url,options);document.querySelector('#rd-refresh').click()})()`);
   await waitFor(()=>cdp.evaluate(`!document.querySelector('#rd-update-progress').hidden`));
@@ -194,7 +215,7 @@ try {
   assert.equal(await cdp.evaluate(`document.querySelector('#rd-toast').textContent`),'Обновление отменено');
   await cdp.evaluate(`window.fetch=window.__pulseOriginalFetch;delete window.__pulseOriginalFetch`);
 
-  console.log('Browser checks passed: 36');
+  console.log('Browser checks passed: 49');
 } finally {
   cdp?.close();
   browser.kill('SIGTERM');
