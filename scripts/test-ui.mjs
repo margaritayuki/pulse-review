@@ -24,6 +24,8 @@ const contracts = [
   ['daily labels include month', "String(date.getMonth()+1).padStart(2,'0')"],
   ['daily dates are shown in full', "months:dates.map(date =>"],
   ['daily date labels are angled', 'transform="rotate(-45'],
+  ['weekends are highlighted', 'class="rd-weekend-band"'],
+  ['weekday is present in tooltip', "weekday:'long'"],
   ['full-width update progress', 'class="rd-update-progress" id="rd-update-progress"'],
   ['shared update progress precedes dashboard', 'id="rd-update-progress" aria-live="polite"'],
   ['report remains visible while loading', "updateProgress.hidden = false"],

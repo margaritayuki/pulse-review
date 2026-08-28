@@ -91,6 +91,7 @@ try {
   assert.equal(await cdp.evaluate(`!document.querySelector('#rd-overall-chart .rd-chart-tooltip').hidden`),true);
   const tooltip=await cdp.evaluate(`document.querySelector('#rd-overall-chart .rd-chart-tooltip').innerText`);
   assert.match(tooltip,/Влито MR[\s\S]*Добавлено строк[\s\S]*Удалено строк[\s\S]*Изменено файлов/);
+  assert.match(tooltip,/(понедельник|вторник|среда|четверг|пятница|суббота|воскресенье)/i);
   await cdp.evaluate(`document.querySelectorAll('#rd-overall-chart .rd-line-hit')[3].dispatchEvent(new MouseEvent('click',{bubbles:true}));document.querySelectorAll('#rd-overall-chart .rd-line-hit')[3].dispatchEvent(new PointerEvent('pointerleave'))`);
   assert.equal(await cdp.evaluate(`!document.querySelector('#rd-overall-chart .rd-chart-tooltip').hidden`),true);
   await cdp.evaluate(`document.querySelectorAll('#rd-overall-chart .rd-line-hit')[3].dispatchEvent(new MouseEvent('click',{bubbles:true}));document.querySelectorAll('#rd-overall-chart .rd-line-hit')[3].dispatchEvent(new PointerEvent('pointerleave'))`);
@@ -113,6 +114,10 @@ try {
   assert.equal(weeklyChart.compact,true,JSON.stringify(weeklyChart));
   assert.equal(weeklyChart.labels.length,7);
   assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-overall-chart .rd-line-axis-date[transform^="rotate(-45"]').length`),7);
+  const weeklyCalendar=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart'),svg=chart.querySelector('svg'),height=svg.viewBox.baseVal.height,labels=[...chart.querySelectorAll('.rd-line-axis-date')];return {weekends:chart.querySelectorAll('.rd-weekend-band').length,weekendLabels:[...chart.querySelectorAll('.rd-weekend-label')].map(node=>node.textContent),inside:labels.every(node=>{const box=node.getBBox();return box.y>=0&&box.y+box.height<=height})}})()`);
+  assert.ok(weeklyCalendar.weekends>=2,JSON.stringify(weeklyCalendar));
+  assert.deepEqual(weeklyCalendar.weekendLabels.sort(),['вс','сб'],JSON.stringify(weeklyCalendar));
+  assert.equal(weeklyCalendar.inside,true,JSON.stringify(weeklyCalendar));
   await cdp.evaluate(`document.querySelector('#rd-period').value='current_month';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
   const monthlyDates=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart');return {hits:chart.querySelectorAll('.rd-line-hit').length,labels:chart.querySelectorAll('.rd-line-axis-date[transform^="rotate(-45"]').length}})()`);
   assert.equal(monthlyDates.labels,monthlyDates.hits,JSON.stringify(monthlyDates));

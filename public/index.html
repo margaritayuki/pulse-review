@@ -147,6 +147,8 @@
     #review-dashboard-concept .rd-line-grid { stroke:light-dark(#e5e9f1,#303a49); stroke-width:1; stroke-dasharray:4 5; }
     #review-dashboard-concept .rd-line-axis { fill:light-dark(#667085,#aab4c4); font-size:10px; }
     #review-dashboard-concept .rd-line-axis-date { dominant-baseline:middle; }
+    #review-dashboard-concept .rd-weekend-band { fill:light-dark(#f3f5ff,#222a42); }
+    #review-dashboard-concept .rd-weekend-label { fill:light-dark(#7a84b8,#9da7d9); font-size:9px; font-weight:700; text-transform:uppercase; }
     #review-dashboard-concept .rd-line-path { fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
     #review-dashboard-concept .rd-line-area { opacity:.16; }
     #review-dashboard-concept .rd-line-point { stroke:light-dark(#fff,#18202c); stroke-width:2; }
@@ -528,7 +530,7 @@
     container.classList.toggle('compact',labels.length <= 7);
     container.classList.toggle('semi-compact',labels.length > 7 && labels.length <= 14);
     const dailyLabels = labels.length > 0 && labels.every(label => /^\d{2}\.\d{2}$/.test(label));
-    const width = 640, height = 250, left = 48, right = 48, top = 14, bottom = dailyLabels ? 54 : 34;
+    const width = 640, height = 250, left = 48, right = 48, top = 14, bottom = dailyLabels ? 68 : 34;
     const plotWidth = width-left-right, plotHeight = height-top-bottom;
     const independentScales = lines.length > 2;
     const primaryLines = lines.filter(line => line.axis !== 'right'), secondaryLines = lines.filter(line => line.axis === 'right');
@@ -555,12 +557,27 @@
       return path;
     };
     const compact = value => new Intl.NumberFormat('ru-RU',{notation:'compact',maximumFractionDigits:1}).format(Math.round(value));
+    const parseDailyDate = value => {
+      const iso = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (iso) return new Date(Number(iso[1]),Number(iso[2])-1,Number(iso[3]));
+      const russian = String(value || '').match(/^(\d{2})\.(\d{2})(?:\.(\d{2}|\d{4}))?$/);
+      if (!russian) return null;
+      const year = russian[3] ? (russian[3].length === 2 ? 2000+Number(russian[3]) : Number(russian[3])) : new Date().getFullYear();
+      return new Date(year,Number(russian[2])-1,Number(russian[1]));
+    };
+    const chartDates = dailyLabels ? tooltipLabels.map(parseDailyDate) : [];
+    const step = labels.length > 1 ? plotWidth/(labels.length-1) : plotWidth;
+    const weekends = chartDates.map((date,index) => ({date,index})).filter(item => item.date && (item.date.getDay() === 0 || item.date.getDay() === 6)).map(item => {
+      const center = pointSets[0][item.index].x, x = Math.max(left,center-step/2), bandRight = Math.min(width-right,center+step/2);
+      const shortDay = item.date.getDay() === 6 ? 'сб' : 'вс';
+      return `<rect class="rd-weekend-band" x="${x}" y="${top}" width="${Math.max(0,bandRight-x)}" height="${plotHeight}"></rect><text class="rd-weekend-label" x="${center}" y="${top+11}" text-anchor="middle">${shortDay}</text>`;
+    }).join('');
     const grid = Array.from({length:5},(_,index) => {
       const y = top+index/4*plotHeight, value = ceiling*(4-index)/4;
       const secondaryValue = secondaryCeiling*(4-index)/4;
       return `<line class="rd-line-grid" x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"></line>${independentScales ? '' : `<text class="rd-line-axis" x="${left-9}" y="${y+3}" text-anchor="end">${compact(value)}</text>${secondaryLines.length ? `<text class="rd-line-axis" x="${width-right+5}" y="${y+3}" text-anchor="start">${compact(secondaryValue)}</text>` : ''}`}`;
     }).join('');
-    const labelY = height-10;
+    const labelY = height-28;
     const xLabels = labels.map((label,index) => label ? dailyLabels
       ? `<text class="rd-line-axis rd-line-axis-date" x="${pointSets[0][index].x}" y="${labelY}" text-anchor="end" transform="rotate(-45 ${pointSets[0][index].x} ${labelY})">${escapeHtml(label)}</text>`
       : `<text class="rd-line-axis" x="${pointSets[0][index].x}" y="${height-8}" text-anchor="middle">${escapeHtml(label)}</text>` : '').join('');
@@ -573,12 +590,14 @@
     }).join('');
     const hitWidth = Math.max(28,plotWidth/Math.max(1,labels.length));
     const hits = labels.map((_,index) => `<rect class="rd-line-hit" data-point-index="${index}" tabindex="0" role="button" aria-label="Показать значения за ${escapeHtml(tooltipLabels[index])}" x="${Math.max(left,pointSets[0][index].x-hitWidth/2)}" y="${top}" width="${Math.min(hitWidth,width-right-Math.max(left,pointSets[0][index].x-hitWidth/2))}" height="${plotHeight}"></rect>`).join('');
-    container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Динамика: ${escapeHtml(lines.map(line=>line.name).join(', '))}" preserveAspectRatio="none"><defs>${definitions}</defs>${grid}<line class="rd-chart-guide" x1="0" x2="0" y1="${top}" y2="${top+plotHeight}" hidden></line>${xLabels}${renderedLines}${hits}</svg><div class="rd-chart-tooltip" role="tooltip" hidden></div>`;
+    container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Динамика: ${escapeHtml(lines.map(line=>line.name).join(', '))}" preserveAspectRatio="none"><defs>${definitions}</defs>${weekends}${grid}<line class="rd-chart-guide" x1="0" x2="0" y1="${top}" y2="${top+plotHeight}" hidden></line>${xLabels}${renderedLines}${hits}</svg><div class="rd-chart-tooltip" role="tooltip" hidden></div>`;
     const tooltip = container.querySelector('.rd-chart-tooltip'), guide = container.querySelector('.rd-chart-guide');
     let pinnedIndex = null;
     const showPoint = index => {
       const point = pointSets[0][index];
-      tooltip.innerHTML = `<strong>${escapeHtml(tooltipLabels[index])}</strong>${lines.map(line=>`<span><b><i style="background:${line.color}"></i>${escapeHtml(line.name)}</b><em>${formatNumber(line.values[index])}</em></span>`).join('')}`;
+      const date = chartDates[index];
+      const weekday = date ? `${new Intl.DateTimeFormat('ru-RU',{weekday:'long'}).format(date)}, ` : '';
+      tooltip.innerHTML = `<strong>${escapeHtml(weekday+tooltipLabels[index])}</strong>${lines.map(line=>`<span><b><i style="background:${line.color}"></i>${escapeHtml(line.name)}</b><em>${formatNumber(line.values[index])}</em></span>`).join('')}`;
       tooltip.hidden = false;
       tooltip.style.left = `${Math.max(13,Math.min(87,point.x/width*100))}%`;
       guide.hidden = false; guide.setAttribute('x1',point.x); guide.setAttribute('x2',point.x);
