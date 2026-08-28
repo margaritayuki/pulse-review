@@ -73,6 +73,8 @@ try {
   assert.equal(dashboardInitial.reviewHidden,true,JSON.stringify(dashboardInitial));
   assert.equal(dashboardInitial.cards,4,JSON.stringify(dashboardInitial));
   assert.equal(dashboardInitial.overallLines,4,JSON.stringify(dashboardInitial));
+  assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-overall-chart .rd-line-area').length`),4);
+  assert.ok(await cdp.evaluate(`(()=>[...document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-chart')].every(chart=>chart.querySelectorAll('.rd-line-area').length===chart.querySelectorAll('.rd-line-path').length))()`));
   assert.ok(dashboardInitial.periodRows>0,JSON.stringify(dashboardInitial));
   assert.equal(dashboardInitial.reviewTitle,'Ревью команды',JSON.stringify(dashboardInitial));
   const dashboardAxisSpacing=await cdp.evaluate(`(()=>{const svg=document.querySelector('#rd-dashboard-cards .rd-dashboard-card-chart svg'),tick=svg.querySelector('.rd-y-axis-tick'),grid=svg.querySelector('.rd-line-grid'),box=tick.getBBox(),width=svg.viewBox.baseVal.width;return {tickLeft:box.x,plotLeft:Number(grid.getAttribute('x1')),plotRightGap:width-Number(grid.getAttribute('x2'))}})()`);
@@ -97,6 +99,7 @@ try {
   await cdp.evaluate(`document.querySelector('#rd-period').value='week';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('[data-dashboard-view="line"]').click()`);
   assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-grouping button').length`),0);
   await cdp.evaluate(`document.querySelector('[data-view="volume"]').click()`);
+  assert.ok(await cdp.evaluate(`(()=>[...document.querySelectorAll('[data-page="volume"] .rd-line-chart')].every(chart=>chart.querySelectorAll('.rd-line-area').length===chart.querySelectorAll('.rd-line-path').length))()`));
 
   const updateProgressLayout=await cdp.evaluate(`(()=>{const progress=document.querySelector('#rd-update-progress'),dashboard=document.querySelector('[data-page="dashboard"]'),volume=document.querySelector('[data-page="volume"]');progress.hidden=false;const result={width:progress.getBoundingClientRect().width,viewWidth:volume.getBoundingClientRect().width,beforeDashboard:(progress.compareDocumentPosition(dashboard)&Node.DOCUMENT_POSITION_FOLLOWING)!==0,beforeVolume:(progress.compareDocumentPosition(volume)&Node.DOCUMENT_POSITION_FOLLOWING)!==0};document.querySelector('[data-view="volume"]').click();result.visibleInVolume=getComputedStyle(progress).display!=='none';progress.hidden=true;return result})()`);
   assert.ok(Math.abs(updateProgressLayout.width-updateProgressLayout.viewWidth)<=1,JSON.stringify(updateProgressLayout));

@@ -684,7 +684,7 @@
     const definitions = visibleLines.map((line,index) => `<linearGradient id="${container.id}-area-${index}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${line.color}" stop-opacity=".7"></stop><stop offset="100%" stop-color="${line.color}" stop-opacity="0"></stop></linearGradient>`).join('');
     const renderedLines = visibleLines.map((line,lineIndex) => {
       const points = pointSets[lineIndex], path = smoothPath(points);
-      const area = line.area && points.length > 1 ? `<path class="rd-line-area" fill="url(#${container.id}-area-${lineIndex})" d="${path} L ${points[points.length-1].x} ${top+plotHeight} L ${points[0].x} ${top+plotHeight} Z"></path>` : '';
+      const area = points.length > 1 ? `<path class="rd-line-area" fill="url(#${container.id}-area-${lineIndex})" d="${path} L ${points[points.length-1].x} ${top+plotHeight} L ${points[0].x} ${top+plotHeight} Z"></path>` : '';
       const dots = points.map(point => `<circle class="rd-line-point" cx="${point.x}" cy="${point.y}" r="3" fill="${line.color}"></circle>`).join('');
       return `${area}<path class="rd-line-path" stroke="${line.color}" d="${path}"></path>${dots}`;
     }).join('');
