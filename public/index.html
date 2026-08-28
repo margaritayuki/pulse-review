@@ -719,7 +719,13 @@
   ];
   const dashboardGroupNames={days:'Дни',weeks:'Недели',months:'Месяцы',quarters:'Кварталы'};
   function dashboardAvailableGroups() {
-    return ({week:['days'],two_weeks:['days','weeks'],current_month:['days','weeks'],previous_month:['days','weeks'],current_quarter:['weeks','months'],previous_quarter:['weeks','months'],half_year:['months','quarters'],year:['months','quarters'],custom:['weeks','months']})[periodSelect.value] || ['weeks'];
+    if (periodSelect.value==='custom') {
+      const from=new Date(`${volumeFrom.value}T00:00:00`),to=new Date(`${volumeTo.value}T00:00:00`),days=Math.round((to-from)/86400000)+1;
+      if (Number.isFinite(days)&&days<=31) return ['days','weeks'];
+      if (Number.isFinite(days)&&days<=93) return ['weeks','months'];
+      return ['months','quarters'];
+    }
+    return ({week:['days'],two_weeks:['days','weeks'],current_month:['days','weeks'],previous_month:['days','weeks'],current_quarter:['weeks','months'],previous_quarter:['weeks','months'],half_year:['months','quarters'],year:['months','quarters']})[periodSelect.value] || ['weeks'];
   }
   function dashboardSource() {
     if (teamSelect.value !== 'all') {
@@ -738,9 +744,33 @@
   }
   function regroupDashboardSeries(source,group) {
     const sliced=volumePeriodSlice(source), periods=sliced.tooltips||sliced.months, daily=sliced.months.every(label=>/^\d{2}\.\d{2}$/.test(label)), buckets=[];
+    const monthlyMock=!volumeIsLive&&sliced.months.every(label=>/^\d{2}'\d{2}$/.test(label));
+    if (group==='weeks'&&monthlyMock) {
+      const result={months:[],tooltips:[],mrs:[],added:[],deleted:[],files:[]};
+      sliced.months.forEach((label,monthIndex)=>{
+        const match=label.match(/^(\d{2})'(\d{2})$/),month=Number(match[1]),year=2000+Number(match[2]);
+        const daysInMonth=new Date(year,month,0).getDate(),lengths=[];
+        for(let day=1;day<=daysInMonth;day+=7) lengths.push(Math.min(7,daysInMonth-day+1));
+        const distribute=total=>{
+          const exact=lengths.map(length=>Number(total||0)*length/daysInMonth),values=exact.map(Math.floor);
+          let remainder=Math.round(Number(total||0))-values.reduce((sum,value)=>sum+value,0);
+          exact.map((value,index)=>({index,fraction:value-values[index]})).sort((a,b)=>b.fraction-a.fraction).slice(0,remainder).forEach(item=>values[item.index]++);
+          return values;
+        };
+        const values=Object.fromEntries(dashboardMetricOptions.map(metric=>[metric.key,distribute(sliced[metric.key][monthIndex])]));
+        lengths.forEach((length,weekIndex)=>{
+          const start=weekIndex*7+1,end=start+length-1;
+          result.months.push(`${String(start).padStart(2,'0')}–${String(end).padStart(2,'0')}.${String(month).padStart(2,'0')}`);
+          result.tooltips.push(`${year}-${String(month).padStart(2,'0')}-${String(start).padStart(2,'0')}`);
+          dashboardMetricOptions.forEach(metric=>result[metric.key].push(values[metric.key][weekIndex]));
+        });
+      });
+      return result;
+    }
     periods.forEach((period,index)=>{
       const descriptor=dashboardBucketKey(period,index,group,daily);
       if (group==='days') descriptor.label=sliced.months[index];
+      if (group==='weeks'&&!daily) descriptor.label=sliced.months[index];
       let bucket=buckets.find(item=>item.key===descriptor.key);
       if (!bucket) { bucket={key:descriptor.key,label:descriptor.label,mrs:0,added:0,deleted:0,files:0,first:index,last:index}; buckets.push(bucket); }
       bucket.last=index;

@@ -91,6 +91,28 @@ try {
   await cdp.evaluate(`document.querySelector('[data-dashboard-view="bar"]').click()`);
   assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-bars').length`),4);
   assert.ok(await cdp.evaluate(`document.querySelector('#rd-dashboard-cards .rd-dashboard-card-bars').getBoundingClientRect().height<=202`));
+  const groupingCases=[
+    {period:'week',buttons:[],label:/^\d{2}\.\d{2}$/},
+    {period:'two_weeks',buttons:['Дни','Недели'],select:'Недели',label:/^\d{2}\.\d{2}–\d{2}\.\d{2}$/},
+    {period:'current_month',buttons:['Дни','Недели'],select:'Недели',label:/^\d{2}\.\d{2}–\d{2}\.\d{2}$/},
+    {period:'previous_month',buttons:['Дни','Недели'],select:'Недели',label:/^\d{2}\.\d{2}–\d{2}\.\d{2}$/},
+    {period:'current_quarter',buttons:['Недели','Месяцы'],select:'Недели',label:/^\d{2}–\d{2}\.\d{2}$/},
+    {period:'previous_quarter',buttons:['Недели','Месяцы'],select:'Недели',label:/^\d{2}–\d{2}\.\d{2}$/},
+    {period:'half_year',buttons:['Месяцы','Кварталы'],select:'Кварталы',label:/^\dq'\d{2}$/},
+    {period:'year',buttons:['Месяцы','Кварталы'],select:'Кварталы',label:/^\dq'\d{2}$/},
+    {period:'custom',buttons:['Недели','Месяцы'],select:'Недели',label:/^\d{2}–\d{2}\.\d{2}$/}
+  ];
+  for (const testCase of groupingCases) {
+    await cdp.evaluate(`(()=>{const period=document.querySelector('#rd-period');period.value=${JSON.stringify(testCase.period)};if(period.value==='custom'){document.querySelector('#rd-from').value='2026-07-01';document.querySelector('#rd-to').value='2026-08-28'}period.dispatchEvent(new Event('change',{bubbles:true}))})()`);
+    const buttons=await cdp.evaluate(`[...document.querySelector('#rd-dashboard-cards .rd-dashboard-grouping').querySelectorAll('button')].map(button=>button.textContent.trim())`);
+    assert.deepEqual(buttons,testCase.buttons,JSON.stringify({testCase,buttons}));
+    if(testCase.select) await cdp.evaluate(`(()=>{const button=[...document.querySelector('#rd-dashboard-cards .rd-dashboard-grouping').querySelectorAll('button')].find(item=>item.textContent.trim()===${JSON.stringify(testCase.select)});button.click()})()`);
+    const labels=await cdp.evaluate(`[...document.querySelector('#rd-dashboard-cards .rd-dashboard-card-bars').querySelectorAll('.rd-dashboard-period-label')].map(item=>item.textContent.trim())`);
+    assert.ok(labels.length>0,JSON.stringify({testCase,labels}));
+    assert.ok(labels.every(label=>testCase.label.test(label)),JSON.stringify({testCase,labels}));
+    const groupingTotals=await cdp.evaluate(`(()=>[...document.querySelectorAll('#rd-dashboard-cards > .rd-panel')].map(card=>{const number=text=>Number(text.replace(/[^0-9-]/g,''));return {name:card.querySelector('.rd-dashboard-card-title span').textContent,total:number(card.querySelector('.rd-dashboard-card-total').textContent),rows:[...card.querySelectorAll('.rd-dashboard-bar-value')].reduce((sum,item)=>sum+number(item.textContent),0)}}))()`);
+    assert.ok(groupingTotals.every(item=>item.total===item.rows),JSON.stringify({testCase,groupingTotals}));
+  }
   await cdp.evaluate(`document.querySelector('#rd-dashboard-overall-legend [data-dashboard-period-metric="files"]').click()`);
   const toggledDashboardLegends=await cdp.evaluate(`(()=>({overall:document.querySelector('#rd-dashboard-overall-legend [data-dashboard-period-metric="files"]').getAttribute('aria-pressed'),period:document.querySelector('#rd-dashboard-period-legend [data-dashboard-period-metric="files"]').getAttribute('aria-pressed'),overallLines:document.querySelectorAll('#rd-dashboard-overall-chart .rd-line-path').length}))()`);
   assert.deepEqual(toggledDashboardLegends,{overall:'false',period:'false',overallLines:3},JSON.stringify(toggledDashboardLegends));
