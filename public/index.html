@@ -505,6 +505,7 @@
     {key:'mobile',name:'Mobile',people:volumePeople.filter(person=>person.team==='mobile')}
   ];
   let liveOverall = null;
+  let liveDailyOverall = null;
   let volumeIsLive = false;
   let configuredRoutes = [];
   const volumeRange = periodSelect;
@@ -542,9 +543,27 @@
   const analyticsStatus = root.querySelector('#rd-analytics-status');
   signalThresholdInput.value = volumePolicy.signalThresholdPercent;
   signalMinimumInput.value = volumePolicy.minimumMergedMRs;
-  function volumePeriodSlice(data) {
+  function volumePeriodSlice(data,fine=false) {
     if (volumeIsLive) return data;
     const last = data.months.length;
+    if (fine) {
+      const start=new Date(`${volumeFrom.value}T00:00:00`),end=new Date(`${volumeTo.value}T00:00:00`);
+      if (Number.isFinite(start.getTime())&&Number.isFinite(end.getTime())&&start<=end) {
+        const dates=[];
+        for(let cursor=new Date(start);cursor<=end;cursor.setDate(cursor.getDate()+1)) dates.push(new Date(cursor));
+        const result={months:dates.map(date=>`${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}`),tooltips:dates.map(date=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`),mrs:Array(dates.length).fill(0),added:Array(dates.length).fill(0),deleted:Array(dates.length).fill(0),files:Array(dates.length).fill(0),daily:true};
+        const monthGroups=new Map();
+        dates.forEach((date,index)=>{const key=`${date.getFullYear()}-${date.getMonth()}`;if(!monthGroups.has(key))monthGroups.set(key,[]);monthGroups.get(key).push(index)});
+        const fileValues=changedFilesFor(data),endMonth=end.getFullYear()*12+end.getMonth();
+        monthGroups.forEach(indices=>{
+          const date=dates[indices[0]],offset=endMonth-(date.getFullYear()*12+date.getMonth()),sourceIndex=Math.max(0,Math.min(last-1,last-1-offset)),daysInMonth=new Date(date.getFullYear(),date.getMonth()+1,0).getDate();
+          const distribute=total=>{const target=Math.round(Number(total||0)*indices.length/daysInMonth),base=Math.floor(target/indices.length),remainder=target-base*indices.length;return indices.map((_,index)=>base+(index<remainder?1:0));};
+          const values={mrs:distribute(data.mrs[sourceIndex]),added:distribute(data.added[sourceIndex]),deleted:distribute(data.deleted[sourceIndex]),files:distribute(fileValues[sourceIndex])};
+          indices.forEach((targetIndex,index)=>dashboardMetricOptions.forEach(metric=>result[metric.key][targetIndex]=values[metric.key][index]));
+        });
+        return result;
+      }
+    }
     const presets = {
       current_month:[last-1,last], previous_month:[last-2,last-1], current_quarter:[last-3,last], previous_quarter:[last-6,last-3], half_year:[last-6,last], year:[0,last], custom:[last-6,last]
     };
@@ -730,9 +749,9 @@
   function dashboardSource() {
     if (teamSelect.value !== 'all') {
       const team=volumeTeams.find(item=>String(item.key)===teamSelect.value);
-      if (team) return volumeIsLive && team.series ? team.series : sumSeries(team.people,team.name);
+      if (team) return volumeIsLive && (team.daily||team.series) ? (team.daily||team.series) : sumSeries(team.people,team.name);
     }
-    return volumeIsLive && liveOverall ? liveOverall : sumSeries(volumePeople,'Все команды');
+    return volumeIsLive && (liveDailyOverall||liveOverall) ? (liveDailyOverall||liveOverall) : sumSeries(volumePeople,'Все команды');
   }
   function dashboardBucketKey(value,index,group,daily) {
     const iso=String(value||'').match(/^(\d{4})-(\d{2})(?:-(\d{2}))?/), short=String(value||'').match(/^(\d{2})'(\d{2})$/);
@@ -743,7 +762,7 @@
     return {key:`${year}-${month}`,label:`${String(month).padStart(2,'0')}'${String(year).slice(-2)}`};
   }
   function regroupDashboardSeries(source,group) {
-    const sliced=volumePeriodSlice(source), periods=sliced.tooltips||sliced.months, daily=sliced.months.every(label=>/^\d{2}\.\d{2}$/.test(label)), buckets=[];
+    const sliced=volumePeriodSlice(source,true), periods=sliced.tooltips||sliced.months, daily=sliced.months.every(label=>/^\d{2}\.\d{2}$/.test(label)), buckets=[];
     const monthlyMock=!volumeIsLive&&sliced.months.every(label=>/^\d{2}'\d{2}$/.test(label));
     if (group==='weeks'&&monthlyMock) {
       const result={months:[],tooltips:[],mrs:[],added:[],deleted:[],files:[]};
@@ -939,9 +958,10 @@
   });
   function applyWorkVolume(result) {
     liveOverall = {...volumeSeriesFromAPI(result.overall),name:'Все команды'};
+    liveDailyOverall = result.daily ? {...volumeSeriesFromAPI(result.daily),name:'Все команды'} : null;
     volumeTeams = (result.teams || []).map(team => ({
-      key:String(team.id), name:team.name, series:{...volumeSeriesFromAPI(team.series),name:team.name},
-      people:(team.people || []).map(person=>({team:String(team.id),key:person.username,name:person.name || person.username,...volumeSeriesFromAPI(person.series)}))
+      key:String(team.id), name:team.name, series:{...volumeSeriesFromAPI(team.series),name:team.name}, daily:team.daily?{...volumeSeriesFromAPI(team.daily),name:team.name}:null,
+      people:(team.people || []).map(person=>({team:String(team.id),key:person.username,name:person.name || person.username,...volumeSeriesFromAPI(person.series),daily:person.daily?volumeSeriesFromAPI(person.daily):null}))
     }));
     volumePeople = volumeTeams.flatMap(team=>team.people);
     volumeSort.clear();

@@ -92,6 +92,9 @@ func TestBuildWorkVolumeUsesMergedAtAndConfiguredTeams(t *testing.T) {
 	if len(got.Overall) != 7 || got.Collected != 2 {
 		t.Fatalf("unexpected range: periods=%d collected=%d", len(got.Overall), got.Collected)
 	}
+	if len(got.Daily) != 7 || len(got.Teams[0].Daily) != 7 || len(got.Teams[0].People[0].Daily) != 7 {
+		t.Fatalf("daily contract must be present at every aggregation level: %+v", got)
+	}
 	if len(got.Teams) != 2 || len(got.Teams[0].People) != 1 || len(got.Teams[1].People) != 2 {
 		t.Fatalf("configured teams were not preserved: %+v", got.Teams)
 	}
@@ -114,7 +117,7 @@ func TestWorkVolumeHTTPAPI(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/api/work-volume?from=2026-08-22&to=2026-08-28", nil)
 	response := httptest.NewRecorder()
 	app.handler().ServeHTTP(response, request)
-	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), `"changedFiles":2`) {
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), `"changedFiles":2`) || !strings.Contains(response.Body.String(), `"daily":[`) {
 		t.Fatalf("unexpected response %d: %s", response.Code, response.Body.String())
 	}
 }
@@ -131,5 +134,100 @@ func TestWorkVolumeUsesWeeklyBucketsForTwoMonths(t *testing.T) {
 	}
 	if series[8].Period != "2026-08-26" || series[8].Label != "26–28.08" {
 		t.Fatalf("unexpected final bucket: %#v", series[8])
+	}
+}
+
+func TestEmptyDailyVolumeSeriesIsInclusiveAcrossCalendarBoundaries(t *testing.T) {
+	tests := []struct {
+		name        string
+		from        time.Time
+		to          time.Time
+		wantPeriods []string
+	}{
+		{
+			name:        "single day",
+			from:        time.Date(2026, time.August, 28, 0, 0, 0, 0, time.UTC),
+			to:          time.Date(2026, time.August, 28, 23, 59, 59, 0, time.UTC),
+			wantPeriods: []string{"2026-08-28"},
+		},
+		{
+			name:        "month boundary",
+			from:        time.Date(2026, time.August, 30, 0, 0, 0, 0, time.UTC),
+			to:          time.Date(2026, time.September, 2, 23, 59, 59, 0, time.UTC),
+			wantPeriods: []string{"2026-08-30", "2026-08-31", "2026-09-01", "2026-09-02"},
+		},
+		{
+			name:        "year boundary",
+			from:        time.Date(2026, time.December, 30, 0, 0, 0, 0, time.UTC),
+			to:          time.Date(2027, time.January, 2, 23, 59, 59, 0, time.UTC),
+			wantPeriods: []string{"2026-12-30", "2026-12-31", "2027-01-01", "2027-01-02"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := emptyDailyVolumeSeries(tt.from, tt.to)
+			if len(got) != len(tt.wantPeriods) {
+				t.Fatalf("got %d daily points, want %d: %#v", len(got), len(tt.wantPeriods), got)
+			}
+			for index, want := range tt.wantPeriods {
+				if got[index].Period != want {
+					t.Fatalf("point %d period = %q, want %q", index, got[index].Period, want)
+				}
+			}
+		})
+	}
+}
+
+func TestAggregateDailyVolumePreservesZeroDaysAndExactMetrics(t *testing.T) {
+	from := time.Date(2026, time.December, 30, 0, 0, 0, 0, time.UTC)
+	to := time.Date(2027, time.January, 2, 23, 59, 59, 0, time.UTC)
+	records := []collectedMR{
+		{
+			MR:    mergeRequest{MergedAt: "2026-12-30T10:00:00Z"},
+			Stats: diffStats{Additions: 10, Deletions: 4, Files: 2, Complete: true},
+		},
+		{
+			// A non-UTC offset is normalized to the UTC day used by from/to.
+			MR:    mergeRequest{MergedAt: "2027-01-02T02:30:00+03:00"},
+			Stats: diffStats{Additions: 20, Deletions: 5, Files: 3, Complete: false},
+		},
+	}
+
+	got := aggregateDailyVolume(records, from, to, defaultVolumePolicy{})
+	if len(got) != 4 {
+		t.Fatalf("got %d points, want 4: %#v", len(got), got)
+	}
+	if got[0].MergedMRs != 1 || got[0].Additions != 10 || got[0].Deletions != 4 || got[0].ChangedLines != 14 || got[0].ChangedFiles != 2 || got[0].MedianChangedLinesPerMR != 14 {
+		t.Fatalf("unexpected first day: %#v", got[0])
+	}
+	if got[1].MergedMRs != 0 || got[1].Additions != 0 || got[1].ChangedLines != 0 || got[1].ChangedFiles != 0 {
+		t.Fatalf("zero day must be explicit: %#v", got[1])
+	}
+	if got[2].Period != "2027-01-01" || got[2].MergedMRs != 1 || got[2].IncompleteMRs != 1 || got[2].ChangedLines != 25 {
+		t.Fatalf("offset timestamp must land on its UTC date: %#v", got[2])
+	}
+	if got[3].MergedMRs != 0 {
+		t.Fatalf("inclusive final day must be present even when empty: %#v", got[3])
+	}
+}
+
+func TestDailyContractKeepsLegacyAdaptiveSeries(t *testing.T) {
+	from := time.Date(2026, time.July, 1, 0, 0, 0, 0, time.UTC)
+	to := time.Date(2026, time.August, 28, 23, 59, 59, 0, time.UTC)
+	records := []collectedMR{{
+		MR:    mergeRequest{MergedAt: "2026-08-28T23:59:59Z"},
+		Stats: diffStats{Additions: 3, Deletions: 2, Files: 1, Complete: true},
+	}}
+
+	legacy := aggregateVolume(records, from, to, defaultVolumePolicy{})
+	daily := aggregateDailyVolume(records, from, to, defaultVolumePolicy{})
+	if len(legacy) != 9 {
+		t.Fatalf("legacy series changed: got %d buckets", len(legacy))
+	}
+	if len(daily) != 59 {
+		t.Fatalf("daily series must have one point per inclusive day, got %d", len(daily))
+	}
+	if daily[58].Period != "2026-08-28" || daily[58].MergedMRs != 1 || daily[58].ChangedLines != 5 {
+		t.Fatalf("inclusive final-day metrics are wrong: %#v", daily[58])
 	}
 }

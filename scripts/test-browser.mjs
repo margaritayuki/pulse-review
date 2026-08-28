@@ -55,7 +55,7 @@ const executablePath=await findBrowser();
 const profile=await mkdtemp(join(tmpdir(),'pulse-review-browser-'));
 const pageURL=new URL('../public/index.html',import.meta.url).href;
 const port=9300+process.pid%500;
-const browser=spawn(executablePath,['--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check','--window-size=1440,900',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,pageURL],{stdio:'ignore'});
+const browser=spawn(executablePath,['--headless=new','--disable-gpu','--disable-extensions','--disable-crash-reporter','--disable-breakpad','--noerrdialogs','--no-first-run','--no-default-browser-check','--window-size=1440,900',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,pageURL],{stdio:'ignore'});
 let cdp;
 
 try {
@@ -88,31 +88,104 @@ try {
   assert.equal(dashboardTypography.titleSize,dashboardTypography.totalSize,JSON.stringify(dashboardTypography));
   assert.equal(dashboardTypography.titleWeight,dashboardTypography.totalWeight,JSON.stringify(dashboardTypography));
   assert.ok(Math.abs(dashboardTypography.breakdownLeft-dashboardTypography.cardsLeft)<=1,JSON.stringify(dashboardTypography));
-  await cdp.evaluate(`document.querySelector('[data-dashboard-view="bar"]').click()`);
-  assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-bars').length`),4);
-  assert.ok(await cdp.evaluate(`document.querySelector('#rd-dashboard-cards .rd-dashboard-card-bars').getBoundingClientRect().height<=202`));
+  const dashboardMetrics=['mrs','added','deleted','files'];
+  const dashboardGroupKeys={'Дни':'days','Недели':'weeks','Месяцы':'months','Кварталы':'quarters'};
+  const formatISO=date=>date.toISOString().slice(0,10);
+  const customRange=days=>{
+    const to=new Date(Date.UTC(2026,7,28)),from=new Date(to);
+    from.setUTCDate(from.getUTCDate()-days+1);
+    return {from:formatISO(from),to:formatISO(to)};
+  };
+  const customLabels=(range,group)=>{
+    const dates=[];
+    for (let date=new Date(`${range.from}T00:00:00Z`),to=new Date(`${range.to}T00:00:00Z`);date<=to;date=new Date(date.getTime()+86400000)) dates.push(date);
+    const day=date=>`${String(date.getUTCDate()).padStart(2,'0')}.${String(date.getUTCMonth()+1).padStart(2,'0')}`;
+    if (group==='Дни') return dates.map(day);
+    if (group==='Недели') return Array.from({length:Math.ceil(dates.length/7)},(_,index)=>`${day(dates[index*7])}–${day(dates[Math.min(dates.length-1,index*7+6)])}`);
+    if (group==='Месяцы') return [...new Set(dates.map(date=>`${String(date.getUTCMonth()+1).padStart(2,'0')}'${String(date.getUTCFullYear()).slice(-2)}`))];
+    return [...new Set(dates.map(date=>`${Math.floor(date.getUTCMonth()/3)+1}q'${String(date.getUTCFullYear()).slice(-2)}`))];
+  };
+  const setDashboardPeriod=async testCase=>{
+    await cdp.evaluate(`(()=>{const period=document.querySelector('#rd-period');period.value=${JSON.stringify(testCase.period)};period.dispatchEvent(new Event('change',{bubbles:true}));${testCase.range ? `const from=document.querySelector('#rd-from'),to=document.querySelector('#rd-to');from.value=${JSON.stringify(testCase.range.from)};to.value=${JSON.stringify(testCase.range.to)};from.dispatchEvent(new Event('change',{bubbles:true}));to.dispatchEvent(new Event('change',{bubbles:true}));` : ''}})()`);
+  };
+  const setDashboardView=async view=>{
+    await cdp.evaluate(`document.querySelector('[data-dashboard-view=${JSON.stringify(view)}]').click()`);
+    const state=await cdp.evaluate(`(()=>({active:document.querySelector('[data-dashboard-view=${JSON.stringify(view)}]').getAttribute('aria-pressed'),lineCharts:document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-chart').length,barCharts:document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-bars').length,cards:document.querySelectorAll('#rd-dashboard-cards > .rd-panel').length}))()`);
+    assert.equal(state.active,'true',JSON.stringify({view,state}));
+    assert.equal(state.cards,4,JSON.stringify({view,state}));
+    assert.equal(state.lineCharts,view==='line'?4:0,JSON.stringify({view,state}));
+    assert.equal(state.barCharts,view==='bar'?4:0,JSON.stringify({view,state}));
+  };
+  const selectDashboardGroup=async group=>{
+    for (const metric of dashboardMetrics) {
+      const clicked=await cdp.evaluate(`(()=>{const button=document.querySelector('[data-dashboard-metric=${JSON.stringify(metric)}][data-dashboard-group=${JSON.stringify(dashboardGroupKeys[group])}]');if(!button)return false;button.click();return true})()`);
+      assert.equal(clicked,true,JSON.stringify({metric,group,error:'Не найдена кнопка группировки'}));
+    }
+  };
+  const readDashboardBars=()=>cdp.evaluate(`(()=>{const number=text=>Number(String(text).replace(/[^0-9-]/g,''));return [...document.querySelectorAll('#rd-dashboard-cards > .rd-panel')].map(card=>{const title=card.querySelector('.rd-dashboard-card-title span:first-child').textContent.trim(),key=({"Влито MR":"mrs","Добавлено строк":"added","Удалено строк":"deleted","Изменено файлов":"files"})[title],buttons=[...card.querySelectorAll('.rd-dashboard-grouping button')],rows=[...card.querySelectorAll('.rd-dashboard-bar-row')].map(row=>({label:row.querySelector('.rd-dashboard-period-label').textContent.trim(),value:number(row.querySelector('.rd-dashboard-bar-value').textContent)}));return {key,title,total:number(card.querySelector('.rd-dashboard-card-total').textContent),groups:[...card.querySelectorAll('.rd-dashboard-grouping button,.rd-dashboard-grouping span')].map(item=>item.textContent.trim()),active:buttons.filter(button=>button.getAttribute('aria-pressed')==='true').map(button=>button.textContent.trim()),rows}})})()`);
   const groupingCases=[
-    {period:'week',buttons:[],label:/^\d{2}\.\d{2}$/},
-    {period:'two_weeks',buttons:['Дни','Недели'],select:'Недели',label:/^\d{2}\.\d{2}–\d{2}\.\d{2}$/},
-    {period:'current_month',buttons:['Дни','Недели'],select:'Недели',label:/^\d{2}\.\d{2}–\d{2}\.\d{2}$/},
-    {period:'previous_month',buttons:['Дни','Недели'],select:'Недели',label:/^\d{2}\.\d{2}–\d{2}\.\d{2}$/},
-    {period:'current_quarter',buttons:['Недели','Месяцы'],select:'Недели',label:/^\d{2}–\d{2}\.\d{2}$/},
-    {period:'previous_quarter',buttons:['Недели','Месяцы'],select:'Недели',label:/^\d{2}–\d{2}\.\d{2}$/},
-    {period:'half_year',buttons:['Месяцы','Кварталы'],select:'Кварталы',label:/^\dq'\d{2}$/},
-    {period:'year',buttons:['Месяцы','Кварталы'],select:'Кварталы',label:/^\dq'\d{2}$/},
-    {period:'custom',buttons:['Недели','Месяцы'],select:'Недели',label:/^\d{2}–\d{2}\.\d{2}$/}
+    {name:'последняя неделя',period:'week',groups:['Дни'],labels:{'Дни':/^\d{2}\.\d{2}$/}},
+    {name:'последние 2 недели',period:'two_weeks',groups:['Дни','Недели'],labels:{'Дни':/^\d{2}\.\d{2}$/,'Недели':/^\d{2}\.\d{2}–\d{2}\.\d{2}$/}},
+    {name:'текущий месяц',period:'current_month',groups:['Дни','Недели'],labels:{'Дни':/^\d{2}\.\d{2}$/,'Недели':/^\d{2}\.\d{2}–\d{2}\.\d{2}$/}},
+    {name:'прошлый месяц',period:'previous_month',groups:['Дни','Недели'],labels:{'Дни':/^\d{2}\.\d{2}$/,'Недели':/^\d{2}\.\d{2}–\d{2}\.\d{2}$/}},
+    {name:'текущий квартал',period:'current_quarter',groups:['Недели','Месяцы'],labels:{'Недели':/^\d{2}\.\d{2}–\d{2}\.\d{2}$/,'Месяцы':/^\d{2}'\d{2}$/}},
+    {name:'прошлый квартал',period:'previous_quarter',groups:['Недели','Месяцы'],labels:{'Недели':/^\d{2}\.\d{2}–\d{2}\.\d{2}$/,'Месяцы':/^\d{2}'\d{2}$/}},
+    {name:'последние полгода',period:'half_year',groups:['Месяцы','Кварталы'],labels:{'Месяцы':/^\d{2}'\d{2}$/,'Кварталы':/^\dq'\d{2}$/}},
+    {name:'последний год',period:'year',groups:['Месяцы','Кварталы'],labels:{'Месяцы':/^\d{2}'\d{2}$/,'Кварталы':/^\dq'\d{2}$/}},
+    ...[
+      [7,['Дни','Недели']], [14,['Дни','Недели']], [31,['Дни','Недели']],
+      [32,['Недели','Месяцы']], [93,['Недели','Месяцы']],
+      [94,['Месяцы','Кварталы']], [180,['Месяцы','Кварталы']], [365,['Месяцы','Кварталы']]
+    ].map(([days,groups])=>{const range=customRange(days);return {
+      name:`свои даты — ${days} дней`,period:'custom',range,groups,
+      labels:Object.fromEntries(groups.map(group=>[group,group==='Дни'?/^\d{2}\.\d{2}$/:group==='Недели'?/^\d{2}\.\d{2}–\d{2}\.\d{2}$/:group==='Месяцы'?/^\d{2}'\d{2}$/:/^\dq'\d{2}$/])),
+      expectedLabels:Object.fromEntries(groups.map(group=>[group,customLabels(range,group)]))
+    }})
   ];
+  const groupingFailures=[];
   for (const testCase of groupingCases) {
-    await cdp.evaluate(`(()=>{const period=document.querySelector('#rd-period');period.value=${JSON.stringify(testCase.period)};if(period.value==='custom'){document.querySelector('#rd-from').value='2026-07-01';document.querySelector('#rd-to').value='2026-08-28'}period.dispatchEvent(new Event('change',{bubbles:true}))})()`);
-    const buttons=await cdp.evaluate(`[...document.querySelector('#rd-dashboard-cards .rd-dashboard-grouping').querySelectorAll('button')].map(button=>button.textContent.trim())`);
-    assert.deepEqual(buttons,testCase.buttons,JSON.stringify({testCase,buttons}));
-    if(testCase.select) await cdp.evaluate(`(()=>{const button=[...document.querySelector('#rd-dashboard-cards .rd-dashboard-grouping').querySelectorAll('button')].find(item=>item.textContent.trim()===${JSON.stringify(testCase.select)});button.click()})()`);
-    const labels=await cdp.evaluate(`[...document.querySelector('#rd-dashboard-cards .rd-dashboard-card-bars').querySelectorAll('.rd-dashboard-period-label')].map(item=>item.textContent.trim())`);
-    assert.ok(labels.length>0,JSON.stringify({testCase,labels}));
-    assert.ok(labels.every(label=>testCase.label.test(label)),JSON.stringify({testCase,labels}));
-    const groupingTotals=await cdp.evaluate(`(()=>[...document.querySelectorAll('#rd-dashboard-cards > .rd-panel')].map(card=>{const number=text=>Number(text.replace(/[^0-9-]/g,''));return {name:card.querySelector('.rd-dashboard-card-title span').textContent,total:number(card.querySelector('.rd-dashboard-card-total').textContent),rows:[...card.querySelectorAll('.rd-dashboard-bar-value')].reduce((sum,item)=>sum+number(item.textContent),0)}}))()`);
-    assert.ok(groupingTotals.every(item=>item.total===item.rows),JSON.stringify({testCase,groupingTotals}));
+    await setDashboardPeriod(testCase);
+    await setDashboardView('line');
+    const lineState=await cdp.evaluate(`(()=>[...document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-chart')].map(chart=>({paths:chart.querySelectorAll('.rd-line-path').length,areas:chart.querySelectorAll('.rd-line-area').length,points:chart.querySelectorAll('.rd-line-point').length})))()`);
+    assert.ok(lineState.every(card=>card.paths===1&&card.areas===1&&card.points>0),JSON.stringify({case:testCase.name,view:'Линейный',lineState}));
+    await setDashboardView('bar');
+    if (testCase.period==='week') assert.ok(await cdp.evaluate(`document.querySelector('#rd-dashboard-cards .rd-dashboard-card-bars').getBoundingClientRect().height<=202`),JSON.stringify({case:testCase.name,view:'Линейчатый'}));
+    let cards=await readDashboardBars();
+    assert.ok(cards.every(card=>JSON.stringify(card.groups)===JSON.stringify(testCase.groups)),JSON.stringify({case:testCase.name,expected:testCase.groups,cards}));
+    const expectedTotals=Object.fromEntries(cards.map(card=>[card.key,card.total]));
+    for (const group of testCase.groups) {
+      if (testCase.groups.length>1) await selectDashboardGroup(group);
+      cards=await readDashboardBars();
+      for (const card of cards) {
+        assert.equal(card.total,expectedTotals[card.key],JSON.stringify({case:testCase.name,group,metric:card.title,error:'Итог изменился при смене группировки',card}));
+        assert.equal(card.rows.reduce((sum,row)=>sum+row.value,0),card.total,JSON.stringify({case:testCase.name,group,metric:card.title,error:'Сумма интервалов не равна итогу',card}));
+        assert.ok(card.rows.length>0,JSON.stringify({case:testCase.name,group,metric:card.title,error:'Нет интервалов'}));
+        assert.ok(card.rows.every(row=>row.value>0),JSON.stringify({case:testCase.name,group,metric:card.title,error:'Нулевой интервал не должен отображаться',rows:card.rows}));
+        const actualLabels=card.rows.map(row=>row.label),formatValid=actualLabels.every(label=>testCase.labels[group].test(label)),expectedLabels=testCase.expectedLabels?.[group];
+        let expectedIndex=-1;
+        const rangeValid=!expectedLabels||actualLabels.every(label=>{expectedIndex=expectedLabels.indexOf(label,expectedIndex+1);return expectedIndex>=0;});
+        if (!formatValid||!rangeValid) {
+          const existing=groupingFailures.find(item=>item.case===testCase.name&&item.group===group);
+          if (existing) existing.metrics.push(card.title);
+          else {
+            const summarize=labels=>labels&&({count:labels.length,first:labels[0],last:labels.at(-1)});
+            groupingFailures.push({case:testCase.name,group,metrics:[card.title],error:formatValid?'Интервалы не соответствуют выбранным датам':'Неверный формат подписи',expected:summarize(testCase.expectedLabels?.[group]),actual:summarize(actualLabels)});
+          }
+        }
+        if (testCase.groups.length>1) assert.deepEqual(card.active,[group],JSON.stringify({case:testCase.name,group,metric:card.title,error:'Неверная активная группировка',card}));
+        else assert.deepEqual(card.active,[],JSON.stringify({case:testCase.name,group,metric:card.title,error:'Для единственной группировки не нужна кнопка',card}));
+      }
+    }
   }
+  // У backend за неделю мок даёт несколько дней с 0 MR. Они должны быть
+  // полностью исключены из расшифровки, но итог карточки обязан сохраниться.
+  await cdp.evaluate(`(()=>{const team=document.querySelector('#live-team');team.value='backend';team.dispatchEvent(new Event('change',{bubbles:true}));const period=document.querySelector('#rd-period');period.value='week';period.dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('[data-dashboard-view="bar"]').click()})()`);
+  const zeroPeriodState=await cdp.evaluate(`(()=>{const card=[...document.querySelectorAll('#rd-dashboard-cards > .rd-panel')].find(item=>item.querySelector('.rd-dashboard-card-title').textContent.includes('Влито MR')),number=text=>Number(String(text).replace(/[^0-9-]/g,'')),values=[...card.querySelectorAll('.rd-dashboard-bar-value')].map(item=>number(item.textContent));return {total:number(card.querySelector('.rd-dashboard-card-total').textContent),values,labels:[...card.querySelectorAll('.rd-dashboard-period-label')].map(item=>item.textContent.trim())}})()`);
+  assert.ok(zeroPeriodState.values.length>0&&zeroPeriodState.values.length<7,JSON.stringify({error:'Нулевые дневные интервалы MR не отфильтрованы',zeroPeriodState}));
+  assert.ok(zeroPeriodState.values.every(value=>value>0),JSON.stringify({error:'В карточке остался нулевой интервал',zeroPeriodState}));
+  assert.equal(zeroPeriodState.values.reduce((sum,value)=>sum+value,0),zeroPeriodState.total,JSON.stringify({error:'После фильтрации нулей изменился итог',zeroPeriodState}));
+  await cdp.evaluate(`(()=>{const team=document.querySelector('#live-team');team.value='all';team.dispatchEvent(new Event('change',{bubbles:true}))})()`);
+  if (groupingFailures.length) assert.fail(JSON.stringify({error:'Подписи группировок не соответствуют выбранному периоду',failures:groupingFailures}));
   await cdp.evaluate(`document.querySelector('#rd-dashboard-overall-legend [data-dashboard-period-metric="files"]').click()`);
   const toggledDashboardLegends=await cdp.evaluate(`(()=>({overall:document.querySelector('#rd-dashboard-overall-legend [data-dashboard-period-metric="files"]').getAttribute('aria-pressed'),period:document.querySelector('#rd-dashboard-period-legend [data-dashboard-period-metric="files"]').getAttribute('aria-pressed'),overallLines:document.querySelectorAll('#rd-dashboard-overall-chart .rd-line-path').length}))()`);
   assert.deepEqual(toggledDashboardLegends,{overall:'false',period:'false',overallLines:3},JSON.stringify(toggledDashboardLegends));
@@ -269,11 +342,16 @@ try {
   assert.equal(await cdp.evaluate(`document.querySelector('#rd-toast').textContent`),'Обновление отменено');
   await cdp.evaluate(`window.fetch=window.__pulseOriginalFetch;delete window.__pulseOriginalFetch`);
 
-  console.log('Browser checks passed: 49');
+  console.log(`Browser checks passed: 49 core + ${groupingCases.length} dashboard grouping cases`);
 } finally {
   cdp?.close();
-  browser.kill('SIGTERM');
-  if (browser.exitCode===null) await Promise.race([once(browser,'exit'),new Promise(resolve=>setTimeout(resolve,2000))]);
+  const exited=()=>browser.exitCode!==null||browser.signalCode!==null;
+  const waitForExit=timeout=>exited()?Promise.resolve(true):Promise.race([once(browser,'exit').then(()=>true),new Promise(resolve=>setTimeout(()=>resolve(false),timeout))]);
+  if (!exited()) browser.kill('SIGTERM');
+  if (!await waitForExit(2000)) {
+    browser.kill('SIGKILL');
+    await waitForExit(500);
+  }
   for (let attempt=0;attempt<4;attempt++) {
     try { await rm(profile,{recursive:true,force:true,maxRetries:3,retryDelay:80}); break; }
     catch (error) { if (attempt===3) throw error; await new Promise(resolve=>setTimeout(resolve,120)); }

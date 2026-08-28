@@ -217,6 +217,7 @@ type volumePerson struct {
 	Name     string        `json:"name"`
 	Username string        `json:"username"`
 	Series   []volumePoint `json:"series"`
+	Daily    []volumePoint `json:"daily"`
 	Total    volumePoint   `json:"total"`
 }
 
@@ -224,6 +225,7 @@ type workVolumeTeam struct {
 	ID     any            `json:"id"`
 	Name   string         `json:"name"`
 	Series []volumePoint  `json:"series"`
+	Daily  []volumePoint  `json:"daily"`
 	People []volumePerson `json:"people"`
 }
 
@@ -231,6 +233,7 @@ type workVolumeResponse struct {
 	From      string           `json:"from"`
 	To        string           `json:"to"`
 	Overall   []volumePoint    `json:"overall"`
+	Daily     []volumePoint    `json:"daily"`
 	Teams     []workVolumeTeam `json:"teams"`
 	Collected int              `json:"collectedMRs"`
 }
@@ -283,9 +286,38 @@ func emptyVolumeSeries(from, to time.Time) []volumePoint {
 	return result
 }
 
+// emptyDailyVolumeSeries returns one point for every calendar day in the
+// inclusive range. Unlike Series, Daily never changes granularity with the
+// length of the requested range. Consumers can therefore regroup it locally
+// into weeks, months or quarters without another GitLab request.
+func emptyDailyVolumeSeries(from, to time.Time) []volumePoint {
+	result := []volumePoint{}
+	for cursor := dayStartUTC(from); !cursor.After(dayStartUTC(to)); cursor = cursor.AddDate(0, 0, 1) {
+		result = append(result, volumePoint{Period: cursor.Format("2006-01-02"), Label: cursor.Format("02.01")})
+	}
+	return result
+}
+
+func dayStartUTC(value time.Time) time.Time {
+	value = value.UTC()
+	return time.Date(value.Year(), value.Month(), value.Day(), 0, 0, 0, 0, time.UTC)
+}
+
+func aggregateDailyVolume(records []collectedMR, from, to time.Time, policy volumePolicy) []volumePoint {
+	return aggregateVolumeSeries(emptyDailyVolumeSeries(from, to), records, policy, func(merged time.Time) string {
+		return merged.UTC().Format("2006-01-02")
+	})
+}
+
 func aggregateVolume(records []collectedMR, from, to time.Time, policy volumePolicy) []volumePoint {
-	result := emptyVolumeSeries(from, to)
-	indexes := map[string]int{}
+	return aggregateVolumeSeries(emptyVolumeSeries(from, to), records, policy, func(merged time.Time) string {
+		key, _ := volumeBucket(merged.UTC(), from, to)
+		return key
+	})
+}
+
+func aggregateVolumeSeries(result []volumePoint, records []collectedMR, policy volumePolicy, bucketKey func(time.Time) string) []volumePoint {
+	indexes := make(map[string]int, len(result))
 	for index := range result {
 		indexes[result[index].Period] = index
 	}
@@ -294,8 +326,7 @@ func aggregateVolume(records []collectedMR, from, to time.Time, policy volumePol
 		if err != nil {
 			continue
 		}
-		key, _ := volumeBucket(merged, from, to)
-		index, ok := indexes[key]
+		index, ok := indexes[bucketKey(merged)]
 		if !ok {
 			continue
 		}
@@ -474,7 +505,14 @@ func (a *application) buildWorkVolume(ctx context.Context, fromValue, toValue st
 			}
 		}
 	}
-	response := workVolumeResponse{From: fromValue, To: toValue, Overall: aggregateVolume(overallRecords, from, to, policy), Collected: len(records), Teams: make([]workVolumeTeam, 0, len(routes))}
+	response := workVolumeResponse{
+		From:      fromValue,
+		To:        toValue,
+		Overall:   aggregateVolume(overallRecords, from, to, policy),
+		Daily:     aggregateDailyVolume(overallRecords, from, to, policy),
+		Collected: len(records),
+		Teams:     make([]workVolumeTeam, 0, len(routes)),
+	}
 	for _, route := range routes {
 		members := map[string]bool{}
 		for _, username := range route.Members {
@@ -502,10 +540,22 @@ func (a *application) buildWorkVolume(ctx context.Context, fromValue, toValue st
 			usernames = append(usernames, username)
 		}
 		sort.Strings(usernames)
-		team := workVolumeTeam{ID: route.ID, Name: route.Name, Series: aggregateVolume(teamRecords, from, to, policy), People: make([]volumePerson, 0, len(usernames))}
+		team := workVolumeTeam{
+			ID:     route.ID,
+			Name:   route.Name,
+			Series: aggregateVolume(teamRecords, from, to, policy),
+			Daily:  aggregateDailyVolume(teamRecords, from, to, policy),
+			People: make([]volumePerson, 0, len(usernames)),
+		}
 		for _, username := range usernames {
 			series := aggregateVolume(byUsername[username], from, to, policy)
-			team.People = append(team.People, volumePerson{Name: names[username], Username: username, Series: series, Total: totalVolume(series, byUsername[username], policy)})
+			team.People = append(team.People, volumePerson{
+				Name:     names[username],
+				Username: username,
+				Series:   series,
+				Daily:    aggregateDailyVolume(byUsername[username], from, to, policy),
+				Total:    totalVolume(series, byUsername[username], policy),
+			})
 		}
 		response.Teams = append(response.Teams, team)
 	}
