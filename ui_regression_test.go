@@ -60,6 +60,7 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`aria-label="Как работает персональный сигнал"`,
 		`rd-personal-signal-setting`,
 		`config.personalSignalEnabled === true`,
+		`#rd-analytics-status:empty { display:none; }`,
 		`input.addEventListener('blur',saveAnalyticsRule)`,
 		`sumSeries(team.people,team.name)`,
 		`/api/work-volume?from=`,

@@ -100,6 +100,8 @@
     #review-dashboard-concept .rd-personal-signal-setting { display:none; }
     #review-dashboard-concept.rd-personal-signal-enabled .rd-personal-signal-setting { display:block; }
     #review-dashboard-concept.rd-personal-signal-enabled .rd-analytics-rule-row { grid-template-columns:170px 170px minmax(230px,max-content); }
+    #review-dashboard-concept:not(.rd-personal-signal-enabled) .rd-analytics-settings { padding-block:14px; }
+    #review-dashboard-concept:not(.rd-personal-signal-enabled) #rd-analytics-status:empty { display:none; }
     #review-dashboard-concept .rd-analytics-options { min-height:40px; display:flex; align-items:center; padding-bottom:2px; }
     #review-dashboard-concept .rd-checkbox-option { display:inline-flex; align-items:center; gap:9px; margin:0; color:inherit; font-size:12px; font-weight:600; text-transform:none; letter-spacing:0; cursor:pointer; }
     #review-dashboard-concept .rd-checkbox-option input { width:16px; height:16px; margin:0; accent-color:#5965d8; cursor:pointer; }
@@ -397,7 +399,7 @@
         </section>
         <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
           <div class="rd-panel-title"><span>Настройки аналитики</span><span class="rd-sub rd-personal-signal-setting">Правила персонального сигнала <span class="rd-info-wrap"><button type="button" class="rd-info" aria-label="Как работает персональный сигнал">?</button><span class="rd-info-popover" role="tooltip">Настройка задаёт допустимое отклонение среднего размера MR от личной медианы и минимальное число влитых MR для расчёта сигнала.</span></span></span></div>
-          <div class="rd-settings">
+          <div class="rd-settings rd-analytics-settings">
             <div class="rd-analytics-rule-row">
               <div class="rd-personal-signal-setting"><label for="rd-signal-threshold">Допустимое отклонение, %</label><input id="rd-signal-threshold" type="number" min="1" max="100" step="1" value="20"></div>
               <div class="rd-personal-signal-setting"><label for="rd-signal-minimum">Минимум влитых MR</label><input id="rd-signal-minimum" type="number" min="1" max="100" step="1" value="5"></div>

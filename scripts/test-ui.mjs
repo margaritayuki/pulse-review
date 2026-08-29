@@ -76,6 +76,7 @@ const contracts = [
   ['analytics signal help', 'aria-label="Как работает персональный сигнал"'],
   ['personal signal controls are feature flagged', 'rd-personal-signal-setting'],
   ['personal signal flag comes from config', "config.personalSignalEnabled === true"],
+  ['compact analytics settings without signal', '#rd-analytics-status:empty { display:none; }'],
   ['analytics auto-save', "input.addEventListener('blur',saveAnalyticsRule)"],
   ['inactive days preference', 'id="rd-hide-inactive-days" type="checkbox" checked'],
   ['inactive days default to hidden', 'savedAnalyticsRule.hideInactiveDays !== false'],
