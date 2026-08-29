@@ -52,7 +52,7 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`data-zero-y="${top+plotHeight}"`,
 		`background-position:right 12px center`,
 		`aria-label="Как работает персональный сигнал"`,
-		`id="rd-save-analytics" type="button">Сохранить</button>`,
+		`input.addEventListener('blur',saveAnalyticsRule)`,
 		`sumSeries(team.people,team.name)`,
 		`/api/work-volume?from=`,
 		`data-view="overview"`,
@@ -67,6 +67,10 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`removeZeroDashboardPeriods`,
 		`visibleDashboardMetrics`,
 		`rd-dashboard-card-total { color:inherit; font:inherit; }`,
+		`const fixed=[0,1,3,5,7,10]`,
+		`class="rd-dashboard-period-total"`,
+		`class="rd-dashboard-period-metric"`,
+		`const savedTokenMask = '••••••••••••'`,
 	}
 	for _, fragment := range checks {
 		if !strings.Contains(page, fragment) {
@@ -81,6 +85,12 @@ func TestFrontendRegressionContracts(t *testing.T) {
 	}
 	if strings.Contains(page, `id="rd-volume-filter"`) {
 		t.Error("employee filter chip must not return to the dynamics view")
+	}
+	if strings.Contains(page, `Ревью команды`) {
+		t.Error("review heading must stay concise")
+	}
+	if strings.Contains(page, `id="rd-save-analytics"`) {
+		t.Error("analytics settings must save without a separate button")
 	}
 	if strings.Contains(page, `class="rd-info-popover" role="tooltip" hidden`) {
 		t.Error("help popovers must not require click-controlled hidden state")
@@ -103,7 +113,7 @@ func TestFrontendRegressionContracts(t *testing.T) {
 	if strings.Contains(page, `preserveAspectRatio="none"`) {
 		t.Error("chart text must not stretch with the SVG")
 	}
-	if count := strings.Count(page, `<h1>Ревью команды</h1>`); count != 1 {
+	if count := strings.Count(page, `<h1>Ревью</h1>`); count != 1 {
 		t.Errorf("review page must remain present exactly once, got %d", count)
 	}
 }

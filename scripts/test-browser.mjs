@@ -76,7 +76,10 @@ try {
   assert.equal(await cdp.evaluate(`document.querySelectorAll('#rd-dashboard-overall-chart .rd-line-area').length`),4);
   assert.ok(await cdp.evaluate(`(()=>[...document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-chart')].every(chart=>chart.querySelectorAll('.rd-line-area').length===chart.querySelectorAll('.rd-line-path').length))()`));
   assert.ok(dashboardInitial.periodRows>0,JSON.stringify(dashboardInitial));
-  assert.equal(dashboardInitial.reviewTitle,'Ревью команды',JSON.stringify(dashboardInitial));
+  assert.equal(dashboardInitial.reviewTitle,'Ревью',JSON.stringify(dashboardInitial));
+  const mixedScale=await cdp.evaluate(`(()=>[...document.querySelectorAll('#rd-dashboard-overall-chart .rd-y-axis-tick')].map(item=>item.textContent.trim()))()`);
+  for (const value of ['1','3','5','7','10']) assert.ok(mixedScale.includes(value),JSON.stringify(mixedScale));
+  assert.ok(mixedScale.some(value=>value.includes('тыс')),JSON.stringify(mixedScale));
   const dashboardAxisSpacing=await cdp.evaluate(`(()=>{const svg=document.querySelector('#rd-dashboard-cards .rd-dashboard-card-chart svg'),tick=svg.querySelector('.rd-y-axis-tick'),grid=svg.querySelector('.rd-line-grid'),box=tick.getBBox(),width=svg.viewBox.baseVal.width;return {tickLeft:box.x,plotLeft:Number(grid.getAttribute('x1')),plotRightGap:width-Number(grid.getAttribute('x2'))}})()`);
   assert.ok(dashboardAxisSpacing.tickLeft>=8,JSON.stringify(dashboardAxisSpacing));
   assert.ok(dashboardAxisSpacing.plotLeft>dashboardAxisSpacing.plotRightGap,JSON.stringify(dashboardAxisSpacing));
@@ -86,13 +89,18 @@ try {
   assert.ok(dashboardLegends.overall.every(item=>item.dot&&item.pressed==='true'),JSON.stringify(dashboardLegends));
   const dashboardLegendPlacement=await cdp.evaluate(`(()=>{const panels=[...document.querySelectorAll('.rd-dashboard-top > .rd-panel')];return panels.map(panel=>{const title=panel.querySelector('.rd-panel-title'),legend=panel.querySelector('.rd-dashboard-legend'),titleRect=title.getBoundingClientRect(),legendRect=legend.getBoundingClientRect();return {inHeader:legend.parentElement===title,rightGap:Math.round(titleRect.right-legendRect.right),topGap:Math.round(legendRect.top-titleRect.top)}})})()`);
   assert.ok(dashboardLegendPlacement.every(item=>item.inHeader&&item.rightGap<=18&&item.topGap>=0),JSON.stringify(dashboardLegendPlacement));
+  const periodDetails=await cdp.evaluate(`(()=>{const first=document.querySelector('#rd-dashboard-periods [data-period-index="0"]');first.dispatchEvent(new PointerEvent('pointerenter',{bubbles:true}));const tooltip=document.querySelector('#rd-dashboard-periods .rd-chart-tooltip'),row=first.closest('.rd-dashboard-period-row');return {total:row.querySelector('.rd-dashboard-period-total').textContent.trim(),tooltip:tooltip.textContent.trim(),hidden:tooltip.hidden,aria:first.getAttribute('aria-label')}})()`);
+  assert.match(periodDetails.total,/\d/,JSON.stringify(periodDetails));
+  assert.equal(periodDetails.hidden,false,JSON.stringify(periodDetails));
+  assert.match(periodDetails.tooltip,/Влито MR.*Добавлено строк.*Удалено строк.*Изменено файлов/s,JSON.stringify(periodDetails));
   await waitFor(()=>cdp.evaluate(`document.querySelectorAll('#live-team option').length>1`));
   const compactControls=await cdp.evaluate(`(()=>{const team=document.querySelector('#live-team').getBoundingClientRect(),period=document.querySelector('#rd-period').getBoundingClientRect(),refresh=document.querySelector('#rd-refresh').getBoundingClientRect();return {teamWidth:team.width,periodWidth:period.width,refreshGap:refresh.left-period.right}})()`);
   assert.ok(Math.abs(compactControls.teamWidth-267)<=1,JSON.stringify(compactControls));
   assert.ok(Math.abs(compactControls.periodWidth-267)<=1,JSON.stringify(compactControls));
   assert.ok(compactControls.refreshGap>=8&&compactControls.refreshGap<=11,JSON.stringify(compactControls));
-  const globalExport=await cdp.evaluate(`(async()=>{const select=document.querySelector('#live-team'),button=document.querySelector('#rd-export-all'),style=getComputedStyle(button),icon=button.querySelector('svg'),originalCreate=URL.createObjectURL,originalRevoke=URL.revokeObjectURL,originalClick=HTMLAnchorElement.prototype.click;let blob,filename;URL.createObjectURL=value=>{blob=value;return 'blob:pulse-review-test'};URL.revokeObjectURL=()=>{};HTMLAnchorElement.prototype.click=function(){filename=this.download};select.value='backend';select.dispatchEvent(new Event('change',{bubbles:true}));button.click();const content=await blob.text();URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;HTMLAnchorElement.prototype.click=originalClick;select.value='all';select.dispatchEvent(new Event('change',{bubbles:true}));return {aria:button.getAttribute('aria-label'),border:style.borderTopWidth,background:style.backgroundColor,iconWidth:icon.getBoundingClientRect().width,filename,content}})()`);
+  const globalExport=await cdp.evaluate(`(async()=>{const select=document.querySelector('#live-team'),button=document.querySelector('#rd-export-all'),style=getComputedStyle(button),icon=button.querySelector('svg'),originalCreate=URL.createObjectURL,originalRevoke=URL.revokeObjectURL,originalClick=HTMLAnchorElement.prototype.click;let blob,filename;URL.createObjectURL=value=>{blob=value;return 'blob:pulse-review-test'};URL.revokeObjectURL=()=>{};HTMLAnchorElement.prototype.click=function(){filename=this.download};select.value='backend';select.dispatchEvent(new Event('change',{bubbles:true}));button.click();const content=await blob.text();URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;HTMLAnchorElement.prototype.click=originalClick;select.value='all';select.dispatchEvent(new Event('change',{bubbles:true}));return {aria:button.getAttribute('aria-label'),tooltip:button.dataset.tooltip,border:style.borderTopWidth,background:style.backgroundColor,iconWidth:icon.getBoundingClientRect().width,filename,content}})()`);
   assert.equal(globalExport.aria,'Скачать все показатели в CSV',JSON.stringify(globalExport));
+  assert.match(globalExport.tooltip,/выбранной команды/,JSON.stringify(globalExport));
   assert.equal(globalExport.border,'0px',JSON.stringify(globalExport));
   assert.equal(globalExport.background,'rgba(0, 0, 0, 0)',JSON.stringify(globalExport));
   assert.equal(globalExport.iconWidth,20,JSON.stringify(globalExport));
@@ -164,9 +172,9 @@ try {
     await setDashboardPeriod(testCase);
     await setDashboardView('line');
     const lineState=await cdp.evaluate(`(()=>[...document.querySelectorAll('#rd-dashboard-cards .rd-dashboard-card-chart')].map(chart=>({paths:chart.querySelectorAll('.rd-line-path').length,areas:chart.querySelectorAll('.rd-line-area').length,points:chart.querySelectorAll('.rd-line-point').length})))()`);
-    assert.ok(lineState.every(card=>card.paths===1&&card.areas===1&&card.points>0),JSON.stringify({case:testCase.name,view:'Линейный',lineState}));
+    assert.ok(lineState.every(card=>card.paths===1&&card.points>0&&card.areas===(card.points>1?1:0)),JSON.stringify({case:testCase.name,view:'График',lineState}));
     await setDashboardView('bar');
-    if (testCase.period==='week') assert.ok(await cdp.evaluate(`document.querySelector('#rd-dashboard-cards .rd-dashboard-card-bars').getBoundingClientRect().height<=202`),JSON.stringify({case:testCase.name,view:'Линейчатый'}));
+    if (testCase.period==='week') assert.ok(await cdp.evaluate(`document.querySelector('#rd-dashboard-cards .rd-dashboard-card-bars').getBoundingClientRect().height<=202`),JSON.stringify({case:testCase.name,view:'Линейчатая'}));
     let cards=await readDashboardBars();
     assert.ok(cards.every(card=>JSON.stringify(card.groups)===JSON.stringify(testCase.groups)),JSON.stringify({case:testCase.name,expected:testCase.groups,cards}));
     const expectedTotals=Object.fromEntries(cards.map(card=>[card.key,card.total]));
@@ -223,7 +231,7 @@ try {
 
   const presetControls=await cdp.evaluate(`(()=>{const controls=document.querySelector('#rd-analytics-controls'),period=document.querySelector('#rd-period'),refresh=document.querySelector('#rd-refresh'),main=document.querySelector('.rd-main');return {width:controls.getBoundingClientRect().width,mainWidth:main.getBoundingClientRect().width,gap:refresh.getBoundingClientRect().left-period.getBoundingClientRect().right}})()`);
   assert.ok(presetControls.width<presetControls.mainWidth*.75,JSON.stringify(presetControls));
-  assert.ok(Math.abs(presetControls.gap-10)<=1,JSON.stringify(presetControls));
+  assert.ok(Math.abs(presetControls.gap-8)<=1,JSON.stringify(presetControls));
   const controlsSurface=await cdp.evaluate(`(()=>{const style=getComputedStyle(document.querySelector('#rd-analytics-controls'));return {background:style.backgroundColor,border:style.borderTopWidth,padding:style.paddingTop}})()`);
   assert.equal(controlsSurface.background,'rgba(0, 0, 0, 0)',JSON.stringify(controlsSurface));
   assert.equal(controlsSurface.border,'0px',JSON.stringify(controlsSurface));
@@ -237,7 +245,7 @@ try {
   await cdp.evaluate(`document.querySelector('#rd-period').value='custom';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
   const customControls=await cdp.evaluate(`(async()=>{await new Promise(resolve=>setTimeout(resolve,240));const controls=document.querySelector('#rd-analytics-controls'),to=document.querySelector('#rd-to'),refresh=document.querySelector('#rd-refresh');return {width:controls.getBoundingClientRect().width,gap:refresh.getBoundingClientRect().left-to.getBoundingClientRect().right,custom:controls.classList.contains('rd-custom-period')}})()`);
   assert.ok(customControls.width>presetControls.width,JSON.stringify({presetControls,customControls}));
-  assert.ok(Math.abs(customControls.gap-10)<=1,JSON.stringify(customControls));
+  assert.ok(Math.abs(customControls.gap-8)<=1,JSON.stringify(customControls));
   assert.equal(customControls.custom,true,JSON.stringify(customControls));
   await cdp.evaluate(`document.querySelector('#rd-period').value='week';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
 
@@ -383,18 +391,24 @@ try {
   assert.ok(edgeSpacing.headerRight>=20);
 
   await cdp.evaluate(`document.querySelector('[data-view="settings"]').click()`);
-  const settingsChrome=await cdp.evaluate(`(()=>{const remove=document.querySelector('.rd-icon-action'),help=document.querySelector('[aria-label="Как работает персональный сигнал"]'),popover=help.nextElementSibling;help.focus();return {removeBorder:getComputedStyle(remove).borderTopWidth,saveText:document.querySelector('#rd-save-analytics').textContent.trim(),popoverVisible:getComputedStyle(popover).display!=='none',popoverText:popover.textContent.trim()}})()`);
+  const settingsChrome=await cdp.evaluate(`(()=>{const remove=document.querySelector('.rd-icon-action'),help=document.querySelector('[aria-label="Как работает персональный сигнал"]'),popover=help.nextElementSibling,row=document.querySelector('.rd-analytics-rule-row'),token=document.querySelector('#rd-gitlab-token');help.focus();return {removeBorder:getComputedStyle(remove).borderTopWidth,saveCount:document.querySelectorAll('#rd-save-analytics').length,analyticsColumns:getComputedStyle(row).gridTemplateColumns.split(' ').length,tokenMasked:token.value.length>0&&token.dataset.saved==='true',popoverVisible:getComputedStyle(popover).display!=='none',popoverText:popover.textContent.trim()}})()`);
   assert.equal(settingsChrome.removeBorder,'0px',JSON.stringify(settingsChrome));
-  assert.equal(settingsChrome.saveText,'Сохранить',JSON.stringify(settingsChrome));
+  assert.equal(settingsChrome.saveCount,0,JSON.stringify(settingsChrome));
+  assert.equal(settingsChrome.analyticsColumns,3,JSON.stringify(settingsChrome));
+  assert.equal(settingsChrome.tokenMasked,true,JSON.stringify(settingsChrome));
   assert.equal(settingsChrome.popoverVisible,true,JSON.stringify(settingsChrome));
   assert.match(settingsChrome.popoverText,/личной медианы/,JSON.stringify(settingsChrome));
+  const tokenEditing=await cdp.evaluate(`(()=>{const token=document.querySelector('#rd-gitlab-token');token.dispatchEvent(new InputEvent('beforeinput',{bubbles:true,inputType:'insertText',data:'x'}));token.value='secret-value';return {type:token.type,saved:token.dataset.saved,value:token.value}})()`);
+  assert.deepEqual(tokenEditing,{type:'password',saved:'false',value:'secret-value'},JSON.stringify(tokenEditing));
   const inactiveDaysDefault=await cdp.evaluate(`(()=>{const input=document.querySelector('#rd-hide-inactive-days'),saved=JSON.parse(localStorage.getItem('pulse-review-analytics-rule')||'{}');return {checked:input.checked,hasSaved:Object.hasOwn(saved,'hideInactiveDays')}})()`);
   assert.deepEqual(inactiveDaysDefault,{checked:true,hasSaved:false},JSON.stringify(inactiveDaysDefault));
-  await cdp.evaluate(`(()=>{window.__analyticsFetches=0;window.__analyticsOriginalFetch=window.fetch;window.fetch=(...args)=>{window.__analyticsFetches++;return window.__analyticsOriginalFetch(...args)};const input=document.querySelector('#rd-hide-inactive-days');input.checked=false;document.querySelector('#rd-save-analytics').click()})()`);
+  const analyticsAutosave=await cdp.evaluate(`(()=>{window.__analyticsFetches=0;window.__analyticsOriginalFetch=window.fetch;window.fetch=(...args)=>{window.__analyticsFetches++;return window.__analyticsOriginalFetch(...args)};const threshold=document.querySelector('#rd-signal-threshold'),minimum=document.querySelector('#rd-signal-minimum');threshold.value='25';threshold.dispatchEvent(new Event('blur'));minimum.value='7';minimum.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));const saved=JSON.parse(localStorage.getItem('pulse-review-analytics-rule'));return {threshold:saved.threshold,minimum:saved.minimum,status:document.querySelector('#rd-analytics-status').textContent.trim(),fetches:window.__analyticsFetches}})()`);
+  assert.deepEqual(analyticsAutosave,{threshold:25,minimum:7,status:'Настройки сохранены на этом компьютере',fetches:0},JSON.stringify(analyticsAutosave));
+  await cdp.evaluate(`(()=>{const input=document.querySelector('#rd-hide-inactive-days');input.checked=false;input.dispatchEvent(new Event('change',{bubbles:true}))})()`);
   await cdp.evaluate(`document.querySelector('[data-view="volume"]').click()`);
   const inactiveDaysShown=await cdp.evaluate(`(()=>({points:document.querySelectorAll('#rd-overall-chart .rd-line-hit').length,fetches:window.__analyticsFetches,saved:JSON.parse(localStorage.getItem('pulse-review-analytics-rule')).hideInactiveDays}))()`);
   assert.deepEqual(inactiveDaysShown,{points:7,fetches:0,saved:false},JSON.stringify(inactiveDaysShown));
-  await cdp.evaluate(`document.querySelector('[data-view="settings"]').click();const input=document.querySelector('#rd-hide-inactive-days');input.checked=true;document.querySelector('#rd-save-analytics').click();document.querySelector('[data-view="volume"]').click()`);
+  await cdp.evaluate(`document.querySelector('[data-view="settings"]').click();const input=document.querySelector('#rd-hide-inactive-days');input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('[data-view="volume"]').click()`);
   const inactiveDaysHidden=await cdp.evaluate(`(()=>({points:document.querySelectorAll('#rd-overall-chart .rd-line-hit').length,fetches:window.__analyticsFetches,saved:JSON.parse(localStorage.getItem('pulse-review-analytics-rule')).hideInactiveDays}))()`);
   assert.deepEqual(inactiveDaysHidden,{points:6,fetches:0,saved:true},JSON.stringify(inactiveDaysHidden));
   await cdp.evaluate(`window.fetch=window.__analyticsOriginalFetch;delete window.__analyticsOriginalFetch;delete window.__analyticsFetches`);

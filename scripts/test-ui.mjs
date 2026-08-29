@@ -30,7 +30,7 @@ const contracts = [
   ['employee rows filter dynamics', 'class="rd-person-filter"'],
   ['full-width update progress', 'class="rd-update-progress" id="rd-update-progress"'],
   ['shared update progress precedes dashboard', 'id="rd-update-progress" aria-live="polite"'],
-  ['compact preset filters', '.rd-controls { width:min(100%,594px);'],
+  ['compact preset filters', '.rd-controls { width:min(100%,572px);'],
   ['filter controls have no backing panel', 'padding:0; border:0; background:transparent;'],
   ['expanded custom-date filters', '.rd-controls.rd-custom-period { width:min(100%,1100px);'],
   ['update can be cancelled', "activeReportController?.abort()"],
@@ -67,13 +67,13 @@ const contracts = [
   ['chart exposes zero boundary', 'data-zero-y="${top+plotHeight}"'],
   ['hidden metrics are faded', '.rd-metric-toggle[aria-pressed="false"] { opacity:.38; }'],
   ['refresh icon has no surface', '#rd-refresh { border:0; color:#5965d8; background:transparent;'],
-  ['compact shared controls', '.rd-controls { width:min(100%,594px); display:grid; grid-template-columns:267px 267px 40px;'],
+  ['compact shared controls', '.rd-controls { width:min(100%,572px); display:grid; grid-template-columns:267px 267px 22px;'],
   ['global export control', 'id="rd-export-all" aria-label="Скачать все показатели в CSV"'],
   ['global export respects team selection', 'function selectedExportTeams()'],
   ['global export contains period and employee rows', "createCsvDownload([header,...periodRows,...peopleRows]"],
   ['select arrow has an inset', 'background-position:right 12px center'],
   ['analytics signal help', 'aria-label="Как работает персональный сигнал"'],
-  ['analytics save is concise', 'id="rd-save-analytics" type="button">Сохранить</button>'],
+  ['analytics auto-save', "input.addEventListener('blur',saveAnalyticsRule)"],
   ['inactive days preference', 'id="rd-hide-inactive-days" type="checkbox" checked'],
   ['inactive days default to hidden', 'savedAnalyticsRule.hideInactiveDays !== false'],
   ['inactive day filtering stays local', 'function filterInactiveDays('],
@@ -84,7 +84,14 @@ const contracts = [
   ['review tab remains separate', 'data-view="dashboard" aria-selected="false">Ревью</button>'],
   ['dashboard combined chart', 'id="rd-dashboard-overall-chart"'],
   ['dashboard period bars', 'id="rd-dashboard-periods"'],
-  ['dashboard legends live in panel headers', '<strong>Все показатели</strong><div class="rd-metric-legend rd-dashboard-legend"'],
+  ['dashboard legends live in panel headers', '<strong class="rd-widget-title">Все показатели</strong><div class="rd-metric-legend rd-dashboard-legend"'],
+  ['mixed small-MR scale', 'const fixed=[0,1,3,5,7,10]'],
+  ['period totals are visible', 'class="rd-dashboard-period-total"'],
+  ['period metrics use independent tracks', 'class="rd-dashboard-period-metric"'],
+  ['period total means changed lines', 'Добавлено + удалено'],
+  ['period bars have interactive details', 'data-period-index="${rowIndex}"'],
+  ['saved token is visibly masked', "const savedTokenMask = '••••••••••••'"],
+  ['export explains current filter', 'data-tooltip="Скачать показатели с учётом выбранной команды"'],
   ['dashboard legends align right', '.rd-dashboard-legend { justify-content:flex-end; padding:0; }'],
   ['dashboard four metric cards', 'id="rd-dashboard-cards"'],
   ['dashboard breakdown title', '<strong>Расшифровка</strong>'],
@@ -111,6 +118,8 @@ assert.ok(!page.includes('id="rd-lines-bars"'), 'legacy split changes chart must
 assert.ok(!page.includes('Реальные значения на единой нелинейной шкале'), 'unrequested chart captions must stay absent');
 assert.ok(!page.includes('Количество, реальная нелинейная шкала'), 'unrequested axis captions must stay absent');
 assert.ok(!page.includes('text-decoration:line-through'), 'hidden metric labels must not be struck through');
+assert.ok(!page.includes('Ревью команды'), 'review heading must stay concise');
+assert.ok(!page.includes('id="rd-save-analytics"'), 'analytics must save without a separate button');
 assert.match(page,/\.rd-chart-expand \{[^}]*border:0;/, 'fullscreen icon must not have a border');
 assert.match(page,/\.rd-icon-action \{[^}]*border:0;/, 'route icon actions must not have a border');
 assert.ok(!page.includes('preserveAspectRatio="none"'), 'chart labels must not stretch with the SVG');

@@ -16,11 +16,13 @@
     #review-dashboard-concept .rd-head-left { display:flex; align-items:center; gap:28px; height:100%; }
     #review-dashboard-concept .rd-brand { display:flex; align-items:center; gap:12px; font-weight:750; letter-spacing:-.02em; }
     #review-dashboard-concept .rd-logo { width:32px; height:32px; display:block; flex:none; }
-    #review-dashboard-concept .rd-export-all { width:34px; height:34px; padding:0; display:grid; place-items:center; flex:none; border:0; border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; }
+    #review-dashboard-concept .rd-export-all { position:relative; width:34px; height:34px; padding:0; display:grid; place-items:center; flex:none; border:0; border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; }
     #review-dashboard-concept .rd-export-all svg { width:20px; height:20px; display:block; pointer-events:none; }
     #review-dashboard-concept .rd-export-all:hover { color:#5965d8; }
     #review-dashboard-concept .rd-export-all:active { color:#4652c7; }
     #review-dashboard-concept .rd-export-all:focus-visible { outline:2px solid #5965d8; outline-offset:2px; }
+    #review-dashboard-concept .rd-export-all::after { content:attr(data-tooltip); display:none; position:absolute; z-index:30; right:0; top:calc(100% + 8px); width:max-content; max-width:280px; padding:7px 9px; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:7px; color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); box-shadow:0 8px 24px rgba(23,32,51,.16); font-size:11px; font-weight:500; white-space:nowrap; }
+    #review-dashboard-concept .rd-export-all:hover::after, #review-dashboard-concept .rd-export-all:focus-visible::after { display:block; }
     #review-dashboard-concept .rd-tabs { display:flex; align-items:stretch; height:100%; gap:20px; }
     #review-dashboard-concept .rd-tab { position:relative; border:0; padding:0 2px; background:transparent; color:light-dark(#667085,#aab4c4); cursor:pointer; font-weight:650; }
     #review-dashboard-concept .rd-tab.active { color:light-dark(#172033,#eef3ff); }
@@ -32,17 +34,17 @@
     #review-dashboard-concept button, #review-dashboard-concept select, #review-dashboard-concept input { font:inherit; }
     #review-dashboard-concept .rd-action { border:0; background:#5965d8; color:white; border-radius:9px; padding:10px 15px; font-weight:650; cursor:pointer; }
     #review-dashboard-concept .rd-action.secondary { color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); border:1px solid light-dark(#d7dde8,#3a4657); }
-    #review-dashboard-concept .rd-controls { width:min(100%,594px); display:grid; grid-template-columns:267px 267px 40px; align-items:end; gap:10px; padding:0; border:0; background:transparent; margin-bottom:20px; transition:width .18s ease; }
+    #review-dashboard-concept .rd-controls { width:min(100%,572px); display:grid; grid-template-columns:267px 267px 22px; align-items:end; gap:8px; padding:0; border:0; background:transparent; margin-bottom:20px; transition:width .18s ease; }
     #review-dashboard-concept .rd-controls.rd-custom-period { width:min(100%,1100px); grid-template-columns:267px 267px minmax(420px,1fr); }
     #review-dashboard-concept .rd-period-row { min-width:0; }
-    #review-dashboard-concept .rd-date-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; align-items:end; gap:10px; }
+    #review-dashboard-concept .rd-date-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; align-items:end; gap:8px; }
     #review-dashboard-concept .rd-date-row:not(.visible) > div { display:none; }
-    #review-dashboard-concept .rd-date-row:not(.visible) { grid-template-columns:40px; justify-content:start; }
+    #review-dashboard-concept .rd-date-row:not(.visible) { grid-template-columns:22px; justify-content:start; }
     #review-dashboard-concept .rd-date-row > div { min-width:0; }
     #review-dashboard-concept label { display:block; color:light-dark(#667085,#aab4c4); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
     #review-dashboard-concept select, #review-dashboard-concept input { width:100%; color:inherit; background:light-dark(#f8fafc,#111722); border:1px solid light-dark(#d7dde8,#3a4657); border-radius:8px; padding:9px 10px; }
     #review-dashboard-concept select { appearance:none; padding-right:36px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23667085' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-size:12px 8px; }
-    #review-dashboard-concept .rd-run { width:40px; height:40px; align-self:end; justify-self:start; display:grid; place-items:center; padding:0; font-size:21px; line-height:1; }
+    #review-dashboard-concept .rd-run { width:22px; height:40px; align-self:end; justify-self:start; display:grid; place-items:center; padding:0; font-size:21px; line-height:1; }
     #review-dashboard-concept #rd-refresh { border:0; color:#5965d8; background:transparent; box-shadow:none; }
     #review-dashboard-concept #rd-refresh:hover { color:#4652c7; background:transparent; }
     #review-dashboard-concept .rd-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:18px; }
@@ -51,8 +53,7 @@
     #review-dashboard-concept .rd-kpi strong { display:block; font-size:28px; margin-top:5px; letter-spacing:-.04em; }
     #review-dashboard-concept .rd-engagement { margin-bottom:20px; overflow:visible; }
     #review-dashboard-concept .rd-engagement-head { padding:15px 17px 12px; display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
-    #review-dashboard-concept .rd-engagement-title strong { display:block; font-size:15px; }
-    #review-dashboard-concept .rd-engagement-title span { display:block; margin-top:4px; color:light-dark(#667085,#aab4c4); font-size:11px; }
+    #review-dashboard-concept .rd-engagement-title strong { display:block; }
     #review-dashboard-concept .rd-engagement-legend { display:flex; align-items:center; flex-wrap:wrap; gap:14px; color:light-dark(#667085,#aab4c4); font-size:11px; }
     #review-dashboard-concept .rd-engagement-legend button { display:flex; align-items:center; gap:6px; padding:2px 0; border:0; color:inherit; background:transparent; cursor:pointer; }
     #review-dashboard-concept .rd-engagement-legend button[aria-pressed="false"] { opacity:.38; }
@@ -94,7 +95,9 @@
     #review-dashboard-concept .rd-avatar { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; color:white; font-size:11px; background:#7280df; }
     #review-dashboard-concept .rd-zero { color:light-dark(#98a2b3,#778397); }
     #review-dashboard-concept .rd-settings { padding:16px; }
-    #review-dashboard-concept .rd-analytics-options { margin-top:14px; }
+    #review-dashboard-concept .rd-analytics-row { display:grid; grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) auto; gap:12px; align-items:end; }
+    #review-dashboard-concept .rd-analytics-rule-row { display:grid; grid-template-columns:170px 170px minmax(230px,max-content); gap:12px; align-items:end; }
+    #review-dashboard-concept .rd-analytics-options { min-height:40px; display:flex; align-items:center; padding-bottom:2px; }
     #review-dashboard-concept .rd-checkbox-option { display:inline-flex; align-items:center; gap:9px; margin:0; color:inherit; font-size:12px; font-weight:600; text-transform:none; letter-spacing:0; cursor:pointer; }
     #review-dashboard-concept .rd-checkbox-option input { width:16px; height:16px; margin:0; accent-color:#5965d8; cursor:pointer; }
     #review-dashboard-concept .rd-switch-row { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:16px; }
@@ -263,12 +266,16 @@
     #review-dashboard-concept .rd-chart-scale-note { color:light-dark(#98a2b3,#778397); font-size:9px; font-weight:500; }
     #review-dashboard-concept .rd-dashboard-top { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:18px; }
     #review-dashboard-concept .rd-dashboard-top .rd-chart-body { height:300px; }
-    #review-dashboard-concept .rd-dashboard-periods { padding:16px; display:grid; align-content:center; gap:13px; min-height:300px; }
-    #review-dashboard-concept .rd-dashboard-period-row { display:grid; grid-template-columns:92px minmax(0,1fr); align-items:center; gap:12px; }
+    #review-dashboard-concept .rd-widget-title { color:light-dark(#475467,#cbd5e1); font-size:15px; font-weight:650; letter-spacing:-.01em; }
+    #review-dashboard-concept .rd-dashboard-periods { position:relative; padding:16px; display:grid; align-content:center; gap:13px; min-height:300px; }
+    #review-dashboard-concept .rd-dashboard-period-row { display:grid; grid-template-columns:80px minmax(0,1fr) 92px; align-items:center; gap:12px; }
     #review-dashboard-concept .rd-dashboard-period-label { color:light-dark(#667085,#aab4c4); font-size:11px; white-space:nowrap; }
-    #review-dashboard-concept .rd-dashboard-period-track { height:14px; overflow:hidden; display:flex; border-radius:7px; background:light-dark(#edf0f5,#293342); }
-    #review-dashboard-concept .rd-dashboard-period-fill { height:100%; display:flex; overflow:hidden; border-radius:inherit; }
-    #review-dashboard-concept .rd-dashboard-period-fill i { height:100%; min-width:1px; }
+    #review-dashboard-concept .rd-dashboard-period-track { width:100%; min-height:34px; padding:2px 0; display:grid; align-content:center; gap:3px; border:0; background:transparent; cursor:pointer; }
+    #review-dashboard-concept .rd-dashboard-period-track:focus-visible { outline:2px solid #5965d8; outline-offset:3px; }
+    #review-dashboard-concept .rd-dashboard-period-metric { height:4px; overflow:hidden; border-radius:4px; background:light-dark(#edf0f5,#293342); }
+    #review-dashboard-concept .rd-dashboard-period-metric i { display:block; height:100%; min-width:1px; border-radius:inherit; }
+    #review-dashboard-concept .rd-dashboard-period-total { color:light-dark(#344054,#d9e0eb); font-size:11px; font-weight:650; text-align:right; white-space:nowrap; }
+    #review-dashboard-concept .rd-dashboard-periods .rd-chart-tooltip { top:auto; bottom:18px; }
     #review-dashboard-concept .rd-dashboard-legend { justify-content:flex-end; padding:0; }
     #review-dashboard-concept .rd-dashboard-top .rd-panel-title { align-items:flex-start; }
     #review-dashboard-concept .rd-dashboard-breakdown-head { display:flex; align-items:center; justify-content:flex-start; gap:12px; margin:0 0 10px; }
@@ -284,14 +291,14 @@
     #review-dashboard-concept .rd-dashboard-grouping button, #review-dashboard-concept .rd-dashboard-grouping span { padding:4px 0; border:0; color:light-dark(#98a2b3,#778397); background:transparent; font-size:11px; font-weight:500; cursor:pointer; }
     #review-dashboard-concept .rd-dashboard-grouping button[aria-pressed="true"] { color:#5965d8; font-weight:650; }
     #review-dashboard-concept .rd-dashboard-card-chart { height:200px; }
-    #review-dashboard-concept .rd-dashboard-card-bars { min-height:200px; padding:14px 16px; display:grid; align-content:center; gap:11px; }
+    #review-dashboard-concept .rd-dashboard-card-bars { height:200px; min-height:0; box-sizing:border-box; padding:14px 16px; display:grid; align-content:center; gap:11px; }
     #review-dashboard-concept .rd-dashboard-bar-row { display:grid; grid-template-columns:90px minmax(0,1fr) 64px; align-items:center; gap:10px; }
     #review-dashboard-concept .rd-dashboard-bar-value { font-size:11px; font-weight:600; text-align:right; }
     #review-dashboard-concept .rd-dashboard-empty { padding:30px; color:light-dark(#98a2b3,#778397); text-align:center; font-size:12px; }
     @media (max-width: 980px) { #review-dashboard-concept .rd-dashboard-top, #review-dashboard-concept .rd-dashboard-cards { grid-template-columns:1fr; } }
     @media (max-width: 980px) { #review-dashboard-concept .rd-team-analytics-body { grid-template-columns:1fr; } #review-dashboard-concept .rd-overall-panel { width:100%; } }
-    @media (max-width: 760px) { #review-dashboard-concept .rd-controls, #review-dashboard-concept .rd-controls.rd-custom-period { width:100%; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row, #review-dashboard-concept .rd-connection-grid, #review-dashboard-concept .rd-volume-grid { grid-template-columns:1fr; } #review-dashboard-concept .rd-volume-custom { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-volume-kpis { grid-template-columns:1fr 1fr; } }
-    @media (max-width: 520px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr; } #review-dashboard-concept .rd-date-row { grid-column:auto; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row:not(.visible) { grid-template-columns:40px; } #review-dashboard-concept .rd-run { grid-column:1 / -1; } #review-dashboard-concept .rd-summary { grid-template-columns:1fr; } #review-dashboard-concept .rd-engagement-head { flex-direction:column; } #review-dashboard-concept .rd-engagement-row { grid-template-columns:120px minmax(100px,1fr) 34px; gap:8px; } #review-dashboard-concept .rd-compare-row { grid-template-columns:1fr; gap:8px; padding-bottom:12px; border-bottom:1px solid light-dark(#edf0f5,#293342); } }
+    @media (max-width: 760px) { #review-dashboard-concept .rd-controls, #review-dashboard-concept .rd-controls.rd-custom-period { width:100%; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row, #review-dashboard-concept .rd-connection-grid, #review-dashboard-concept .rd-volume-grid { grid-template-columns:1fr; } #review-dashboard-concept .rd-analytics-rule-row { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-analytics-options { grid-column:1 / -1; } #review-dashboard-concept .rd-volume-custom { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-volume-kpis { grid-template-columns:1fr 1fr; } }
+    @media (max-width: 520px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr; } #review-dashboard-concept .rd-date-row { grid-column:auto; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row:not(.visible) { grid-template-columns:22px; } #review-dashboard-concept .rd-run { grid-column:1 / -1; } #review-dashboard-concept .rd-summary { grid-template-columns:1fr; } #review-dashboard-concept .rd-engagement-head { flex-direction:column; } #review-dashboard-concept .rd-engagement-row { grid-template-columns:120px minmax(100px,1fr) 34px; gap:8px; } #review-dashboard-concept .rd-compare-row { grid-template-columns:1fr; gap:8px; padding-bottom:12px; border-bottom:1px solid light-dark(#edf0f5,#293342); } }
   </style>
   <section class="rd-window">
     <header class="rd-top">
@@ -304,7 +311,7 @@
           <button class="rd-tab" data-view="settings" aria-selected="false">Настройки</button>
         </nav>
       </div>
-      <button type="button" class="rd-export-all" id="rd-export-all" aria-label="Скачать все показатели в CSV" title="Скачать все показатели в CSV"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3.5v10m-3.5-3.5 3.5 3.5 3.5-3.5M4 17h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="rd-export-all" id="rd-export-all" aria-label="Скачать все показатели в CSV" title="Скачать все показатели в CSV" data-tooltip="Скачать показатели с учётом выбранной команды"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3.5v10m-3.5-3.5 3.5 3.5 3.5-3.5M4 17h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </header>
     <main class="rd-main">
       <div class="rd-controls" id="rd-analytics-controls">
@@ -326,15 +333,15 @@
       <section class="rd-view" data-page="overview">
         <div class="rd-heading"><div><h1>Дашборд</h1></div></div>
         <div class="rd-dashboard-top">
-          <section class="rd-panel rd-chart-shell"><div class="rd-panel-title"><strong>Все показатели</strong><div class="rd-metric-legend rd-dashboard-legend" id="rd-dashboard-overall-legend"></div></div><div class="rd-chart-body"><div class="rd-line-chart" id="rd-dashboard-overall-chart"></div></div></section>
-          <section class="rd-panel"><div class="rd-panel-title"><strong>По периодам</strong><div class="rd-metric-legend rd-dashboard-legend" id="rd-dashboard-period-legend"></div></div><div class="rd-dashboard-periods" id="rd-dashboard-periods"></div></section>
+          <section class="rd-panel rd-chart-shell"><div class="rd-panel-title"><strong class="rd-widget-title">Все показатели</strong><div class="rd-metric-legend rd-dashboard-legend" id="rd-dashboard-overall-legend"></div></div><div class="rd-chart-body"><div class="rd-line-chart" id="rd-dashboard-overall-chart"></div></div></section>
+          <section class="rd-panel"><div class="rd-panel-title"><strong class="rd-widget-title">По периодам</strong><div class="rd-metric-legend rd-dashboard-legend" id="rd-dashboard-period-legend"></div></div><div class="rd-dashboard-periods" id="rd-dashboard-periods"></div></section>
         </div>
-        <div class="rd-dashboard-breakdown-head"><strong>Расшифровка</strong><div class="rd-dashboard-view" aria-label="Представление расшифровки"><button type="button" data-dashboard-view="line" aria-pressed="true">Линейный</button><button type="button" data-dashboard-view="bar" aria-pressed="false">Линейчатый</button></div></div>
+        <div class="rd-dashboard-breakdown-head"><strong>Расшифровка</strong><div class="rd-dashboard-view" aria-label="Представление расшифровки"><button type="button" data-dashboard-view="line" aria-pressed="true">График</button><button type="button" data-dashboard-view="bar" aria-pressed="false">Линейчатая</button></div></div>
         <div class="rd-dashboard-cards" id="rd-dashboard-cards"></div>
       </section>
       <section class="rd-view" data-page="dashboard" hidden>
       <div class="rd-heading">
-        <div><h1>Ревью команды</h1><div class="rd-sub" id="rd-caption">Статистика за последние 7 дней</div></div>
+        <div><h1>Ревью</h1></div>
       </div>
       <div class="rd-summary">
         <div class="rd-kpi"><span>Успешно проведённых ревью</span><strong>12</strong></div>
@@ -344,7 +351,7 @@
       </div>
       <section class="rd-panel rd-engagement" aria-labelledby="rd-engagement-title">
         <div class="rd-engagement-head">
-          <div class="rd-engagement-title"><strong id="rd-engagement-title">Вовлечённость</strong><span>Approvals / 👍 + комментарии + созданные MR</span></div>
+          <div class="rd-engagement-title"><strong class="rd-widget-title" id="rd-engagement-title">Вовлечённость</strong></div>
           <div class="rd-engagement-legend" aria-label="Показатели вовлечённости"><button type="button" data-engagement-metric="approvals" aria-pressed="true"><i class="rd-engagement-approvals"></i>Approvals / 👍</button><button type="button" data-engagement-metric="comments" aria-pressed="true"><i class="rd-engagement-comments"></i>Комментарии</button><button type="button" data-engagement-metric="mrs" aria-pressed="true"><i class="rd-engagement-mrs"></i>Создано MR</button></div>
         </div>
         <div class="rd-engagement-body"><div class="rd-engagement-empty">График появится после загрузки данных</div></div>
@@ -377,7 +384,7 @@
         <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
           <div class="rd-panel-title"><span>Подключение GitLab</span><span class="rd-sub">Хранится только на этом компьютере</span></div>
           <div class="rd-settings">
-            <div class="rd-connection-grid">
+            <div class="rd-analytics-row">
               <div><label for="rd-gitlab-url">Адрес сервера GitLab</label><input id="rd-gitlab-url" type="url" placeholder="https://gitlab.com" autocomplete="url"></div>
               <div><label for="rd-gitlab-token">Personal access token</label><input id="rd-gitlab-token" type="password" placeholder="Токен с правом read_api" autocomplete="new-password"></div>
               <button class="rd-action" id="rd-save-connection">Проверить и сохранить</button>
@@ -389,12 +396,11 @@
         <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
           <div class="rd-panel-title"><span>Настройки аналитики</span><span class="rd-sub">Правила персонального сигнала <span class="rd-info-wrap"><button type="button" class="rd-info" aria-label="Как работает персональный сигнал">?</button><span class="rd-info-popover" role="tooltip">Настройка задаёт допустимое отклонение среднего размера MR от личной медианы и минимальное число влитых MR для расчёта сигнала.</span></span></span></div>
           <div class="rd-settings">
-            <div class="rd-connection-grid">
+            <div class="rd-analytics-rule-row">
               <div><label for="rd-signal-threshold">Допустимое отклонение, %</label><input id="rd-signal-threshold" type="number" min="1" max="100" step="1" value="20"></div>
               <div><label for="rd-signal-minimum">Минимум влитых MR</label><input id="rd-signal-minimum" type="number" min="1" max="100" step="1" value="5"></div>
-              <button class="rd-action" id="rd-save-analytics" type="button">Сохранить</button>
+              <div class="rd-analytics-options"><label class="rd-checkbox-option" for="rd-hide-inactive-days"><input id="rd-hide-inactive-days" type="checkbox" checked>Скрывать дни без активностей</label></div>
             </div>
-            <div class="rd-analytics-options"><label class="rd-checkbox-option" for="rd-hide-inactive-days"><input id="rd-hide-inactive-days" type="checkbox" checked>Скрывать дни без активностей</label></div>
             <p class="rd-connection-note">«В пределах нормы» означает, что средний размер MR отклоняется от личной медианы не больше указанного процента. При меньшей выборке показываем «Недостаточно данных».</p>
             <div class="rd-connection-status" id="rd-analytics-status"></div>
           </div>
@@ -443,7 +449,6 @@
     (() => {
       const root = document.getElementById('review-dashboard-concept');
       const period = root.querySelector('#rd-period');
-      const caption = root.querySelector('#rd-caption');
       const toast = root.querySelector('#rd-toast');
       const settingsToast = root.querySelector('#rd-settings-toast');
       const tabs = [...root.querySelectorAll('.rd-tab')];
@@ -483,11 +488,13 @@
   const connectionStatus = root.querySelector('#rd-connection-status');
   const gitlabURLInput = root.querySelector('#rd-gitlab-url');
   const gitlabTokenInput = root.querySelector('#rd-gitlab-token');
+  const savedTokenMask = '••••••••••••';
+  const showSavedTokenMask = () => { gitlabTokenInput.value=savedTokenMask; gitlabTokenInput.dataset.saved='true'; gitlabTokenInput.placeholder=''; };
+  gitlabTokenInput.addEventListener('beforeinput',()=>{ if(gitlabTokenInput.dataset.saved==='true'){gitlabTokenInput.value='';gitlabTokenInput.dataset.saved='false';} });
   let gitlabConfigured = false;
   const periodSelect = root.querySelector('#rd-period');
   const fromInput = root.querySelector('#rd-from');
   const toInput = root.querySelector('#rd-to');
-  const captionLive = root.querySelector('#rd-caption');
   let lastReport = null;
   let currentEngagementPeople = [];
   let activeReportController = null;
@@ -526,6 +533,7 @@
   let liveOverall = null;
   let liveDailyOverall = null;
   let volumeIsLive = false;
+  let volumeIsPreview = false;
   let configuredRoutes = [];
   const volumeRange = periodSelect;
   const volumeFrom = fromInput;
@@ -565,6 +573,7 @@
   signalThresholdInput.value = volumePolicy.signalThresholdPercent;
   signalMinimumInput.value = volumePolicy.minimumMergedMRs;
   hideInactiveDaysInput.checked = savedAnalyticsRule.hideInactiveDays !== false;
+  let analyticsSavedSnapshot=JSON.stringify({threshold:volumePolicy.signalThresholdPercent,minimum:volumePolicy.minimumMergedMRs,hideInactiveDays:hideInactiveDaysInput.checked});
   const volumeMetricKeys = ['mrs','added','deleted','files'];
   const isDailySeries = series => Boolean(series?.months?.length) && series.months.every(label => /^\d{2}\.\d{2}$/.test(label));
   function filterInactiveDays(series,metrics=volumeMetricKeys) {
@@ -578,9 +587,9 @@
     return result;
   }
   function volumePeriodSlice(data,fine=false) {
-    if (volumeIsLive) return data;
+    if (volumeIsLive && !volumeIsPreview) return data;
     const last = data.months.length;
-    if (fine) {
+    if (fine && volumeRange.value === 'custom') {
       const start=new Date(`${volumeFrom.value}T00:00:00`),end=new Date(`${volumeTo.value}T00:00:00`);
       if (Number.isFinite(start.getTime())&&Number.isFinite(end.getTime())&&start<=end) {
         const dates=[];
@@ -589,8 +598,9 @@
         const monthGroups=new Map();
         dates.forEach((date,index)=>{const key=`${date.getFullYear()}-${date.getMonth()}`;if(!monthGroups.has(key))monthGroups.set(key,[]);monthGroups.get(key).push(index)});
         const fileValues=changedFilesFor(data),endMonth=end.getFullYear()*12+end.getMonth();
+        const previewLastSource=volumeIsPreview&&data.daily ? data.months.reduce((lastActive,_,index)=>volumeMetricKeys.some(metric=>Number(data[metric]?.[index]||0)!==0)?index:lastActive,last-1) : last-1;
         monthGroups.forEach(indices=>{
-          const date=dates[indices[0]],offset=endMonth-(date.getFullYear()*12+date.getMonth()),sourceIndex=Math.max(0,Math.min(last-1,last-1-offset)),daysInMonth=new Date(date.getFullYear(),date.getMonth()+1,0).getDate();
+          const date=dates[indices[0]],offset=endMonth-(date.getFullYear()*12+date.getMonth()),sourceIndex=Math.max(0,Math.min(last-1,previewLastSource-offset)),daysInMonth=new Date(date.getFullYear(),date.getMonth()+1,0).getDate();
           const distribute=total=>{const target=Math.round(Number(total||0)*indices.length/daysInMonth),base=Math.floor(target/indices.length),remainder=target-base*indices.length;return indices.map((_,index)=>base+(index<remainder?1:0));};
           const values={mrs:distribute(data.mrs[sourceIndex]),added:distribute(data.added[sourceIndex]),deleted:distribute(data.deleted[sourceIndex]),files:distribute(fileValues[sourceIndex])};
           indices.forEach((targetIndex,index)=>dashboardMetricOptions.forEach(metric=>result[metric.key][targetIndex]=values[metric.key][index]));
@@ -598,6 +608,7 @@
         return result;
       }
     }
+    if (volumeIsPreview && data.daily && ['week','two_weeks'].includes(volumeRange.value)) return data;
     const presets = {
       current_month:[last-1,last], previous_month:[last-2,last-1], current_quarter:[last-3,last], previous_quarter:[last-6,last-3], half_year:[last-6,last], year:[0,last], custom:[last-6,last]
     };
@@ -669,10 +680,38 @@
     while (ticks.length>maxTicks) { base*=10; ticks=makeTicks(); }
     return ticks;
   }
+  function mixedMagnitudeChartTicks(maximum) {
+    const fixed=[0,1,3,5,7,10];
+    const high=[];
+    for (let decade=10,guard=0;guard<8;decade*=10,guard++) {
+      for (const factor of [2,5,10]) {
+        const candidate=decade*factor;
+        if (candidate>10&&candidate<=maximum) high.push(candidate);
+        if (candidate>=maximum) break;
+      }
+      if (decade*10>=maximum) break;
+    }
+    const ceiling=niceChartStep(maximum);
+    if (!high.includes(ceiling)) high.push(ceiling);
+    const unique=[...new Set(high)].sort((a,b)=>a-b);
+    const selected=unique.length<=6?unique:Array.from({length:6},(_,index)=>unique[Math.round(index*(unique.length-1)/5)]);
+    return [...fixed,...new Set(selected)].sort((a,b)=>a-b);
+  }
   function buildChartScale(lines) {
     const values=lines.flatMap(line=>line.values).filter(value=>Number.isFinite(value)&&value>=0);
     const positive=values.filter(value=>value>0), maximum=Math.max(1,...values), minimum=Math.min(...positive);
+    const mixedMagnitude=positive.some(value=>value>=1&&value<=6)&&maximum>=1000;
     const nonlinear=positive.length>0&&maximum/minimum>=10;
+    if (mixedMagnitude) {
+      const ticks=mixedMagnitudeChartTicks(maximum);
+      return {mode:'nonlinear',ticks,ratio:value=>{
+        if (value<=0) return 0;
+        for (let index=1;index<ticks.length;index++) {
+          if (value<=ticks[index]) return (index-1+(value-ticks[index-1])/(ticks[index]-ticks[index-1]))/(ticks.length-1);
+        }
+        return 1;
+      }};
+    }
     if (!nonlinear) {
       const step=niceChartStep(maximum/4), ceiling=Math.ceil(maximum/step)*step;
       const ticks=Array.from({length:Math.round(ceiling/step)+1},(_,index)=>index*step);
@@ -835,7 +874,14 @@
     return {months:buckets.map(item=>item.label),tooltips:buckets.map(item=>item.label),daily:group==='days'&&daily,...Object.fromEntries(dashboardMetricOptions.map(metric=>[metric.key,buckets.map(item=>item[metric.key])]))};
   }
   function removeZeroDashboardPeriods(series,metrics) {
-    return series.daily ? filterInactiveDays(series,metrics) : series;
+    if (!hideInactiveDaysInput.checked) return series;
+    const keep=series.months.map((_,index)=>metrics.some(metric=>Number(series[metric]?.[index]||0)!==0));
+    const result={...series};
+    ['months','tooltips',...volumeMetricKeys].forEach(key=>{
+      const values=series[key] || (key==='tooltips' ? series.months : null);
+      if (values) result[key]=values.filter((_,index)=>keep[index]);
+    });
+    return result;
   }
   function dashboardLines(series) {
     return dashboardMetricOptions.map(metric=>({key:metric.key,name:metric.name,values:series[metric.key],color:metric.color}));
@@ -846,9 +892,28 @@
     const container=root.querySelector('#rd-dashboard-periods');
     if (!metrics.length || !filtered.months.length) { container.innerHTML='<div class="rd-dashboard-empty">Нет данных за выбранный период</div>'; return; }
     const maxima=Object.fromEntries(metrics.map(metric=>[metric.key,Math.max(1,...filtered[metric.key])]));
-    const rows=filtered.months.map((label,index)=>{const scores=metrics.map(metric=>filtered[metric.key][index]/maxima[metric.key]),sum=scores.reduce((total,value)=>total+value,0);return {label,index,scores,sum};});
-    const maximum=Math.max(1,...rows.map(row=>row.sum));
-    container.innerHTML=rows.map(row=>`<div class="rd-dashboard-period-row"><span class="rd-dashboard-period-label">${escapeHtml(row.label)}</span><span class="rd-dashboard-period-track"><span class="rd-dashboard-period-fill" style="width:${row.sum/maximum*100}%">${metrics.map((metric,index)=>`<i data-tooltip="${escapeHtml(metric.name)}: ${formatNumber(filtered[metric.key][row.index])}" style="width:${row.scores[index]/Math.max(row.sum,.0001)*100}%;background:${metric.color}" title="${escapeHtml(metric.name)}: ${formatNumber(filtered[metric.key][row.index])}"></i>`).join('')}</span></span></div>`).join('');
+    const rows=filtered.months.map((label,index)=>({label,index,changedLines:Number(filtered.added[index]||0)+Number(filtered.deleted[index]||0)}));
+    container.innerHTML=rows.map((row,rowIndex)=>`<div class="rd-dashboard-period-row"><span class="rd-dashboard-period-label">${escapeHtml(row.label)}</span><button type="button" class="rd-dashboard-period-track" data-period-index="${rowIndex}" aria-label="Показать значения за ${escapeHtml(row.label)}; изменено ${formatNumber(row.changedLines)} строк">${metrics.map(metric=>`<span class="rd-dashboard-period-metric" aria-hidden="true"><i style="width:${Number(filtered[metric.key][row.index]||0)/maxima[metric.key]*100}%;background:${metric.color}"></i></span>`).join('')}</button><span class="rd-dashboard-period-total" title="Добавлено и удалено строк">${formatNumber(row.changedLines)} стр.</span></div>`).join('')+'<div class="rd-chart-tooltip" role="tooltip" hidden></div>';
+    const tooltip=container.querySelector('.rd-chart-tooltip');
+    let pinnedIndex=null;
+    const showPeriod=index=>{
+      const row=rows[index],target=container.querySelector(`[data-period-index="${index}"]`);
+      tooltip.innerHTML=`<strong>${escapeHtml(row.label)}</strong>${metrics.map(metric=>`<span><b><i style="background:${metric.color}"></i>${escapeHtml(metric.name)}</b><em>${formatNumber(filtered[metric.key][row.index])}</em></span>`).join('')}<span><b>Добавлено + удалено</b><em>${formatNumber(row.changedLines)} строк</em></span>`;
+      tooltip.hidden=false;
+      const targetBox=target.getBoundingClientRect(),containerBox=container.getBoundingClientRect();
+      tooltip.style.left=`${Math.max(18,Math.min(82,(targetBox.left+targetBox.width/2-containerBox.left)/containerBox.width*100))}%`;
+      tooltip.style.bottom=`${Math.max(12,containerBox.bottom-targetBox.top+7)}px`;
+    };
+    const hidePeriod=()=>{if(pinnedIndex===null) tooltip.hidden=true;};
+    container.querySelectorAll('[data-period-index]').forEach(target=>{
+      const index=Number(target.dataset.periodIndex);
+      target.addEventListener('pointerenter',()=>showPeriod(index));
+      target.addEventListener('focus',()=>showPeriod(index));
+      target.addEventListener('pointerleave',hidePeriod);
+      target.addEventListener('blur',hidePeriod);
+      target.addEventListener('click',()=>{pinnedIndex=pinnedIndex===index?null:index;pinnedIndex===null?hidePeriod():showPeriod(index);});
+      target.addEventListener('keydown',event=>{if(event.key==='Escape'){pinnedIndex=null;hidePeriod();}});
+    });
   }
   function renderDashboardCard(metric,source,groups) {
     if (!groups.includes(dashboardGroups.get(metric.key))) dashboardGroups.set(metric.key,groups[0]);
@@ -964,18 +1029,28 @@
     expandedVolumeChart=null;
     renderVolumeConcept();
   });
-  root.querySelector('#rd-save-analytics').addEventListener('click', () => {
+  function saveAnalyticsRule() {
     const threshold = Math.min(100,Math.max(1,Number(signalThresholdInput.value) || 20));
     const minimum = Math.min(100,Math.max(1,Number(signalMinimumInput.value) || 5));
+    const rule={threshold,minimum,hideInactiveDays:hideInactiveDaysInput.checked};
+    const snapshot=JSON.stringify(rule);
+    if (snapshot===analyticsSavedSnapshot) return false;
     volumePolicy.signalThresholdPercent = threshold;
     volumePolicy.minimumMergedMRs = minimum;
     signalThresholdInput.value = threshold;
     signalMinimumInput.value = minimum;
-    localStorage.setItem('pulse-review-analytics-rule',JSON.stringify({threshold,minimum,hideInactiveDays:hideInactiveDaysInput.checked}));
+    localStorage.setItem('pulse-review-analytics-rule',snapshot);
+    analyticsSavedSnapshot=snapshot;
     analyticsStatus.textContent = 'Настройки сохранены на этом компьютере';
     renderVolumeConcept();
     renderOverviewDashboard();
+    return true;
+  }
+  [signalThresholdInput,signalMinimumInput].forEach(input=>{
+    input.addEventListener('blur',saveAnalyticsRule);
+    input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();saveAnalyticsRule();input.blur();}});
   });
+  hideInactiveDaysInput.addEventListener('change',saveAnalyticsRule);
   [volumeFrom,volumeTo].forEach(input => input.addEventListener('change', renderVolumeConcept));
   renderVolumeConcept();
   renderOverviewDashboard();
@@ -1073,10 +1148,12 @@
     root.classList.toggle('rd-mattermost-enabled', config.mattermostConfigured === true);
     gitlabConfigured = config.gitlabConfigured === true;
     gitlabURLInput.value = config.gitlabUrl || '';
-    gitlabTokenInput.placeholder = config.gitlabTokenConfigured ? 'Сохранён — оставьте пустым, чтобы не менять' : 'Токен с правом read_api';
+    if (config.gitlabTokenConfigured) showSavedTokenMask();
+    else { gitlabTokenInput.value=''; gitlabTokenInput.dataset.saved='false'; gitlabTokenInput.placeholder='Токен с правом read_api'; }
     fillTeams(config.routes || []);
     renderRoutes(config.routes || []);
     if (config.preview) {
+      volumeIsPreview=true;
       const previewPeople = {
         backend:[
           {id:1,name:'Анна Смирнова',username:'anna',approvals:8,comments:14,createdMergeRequests:11,receivedComments:9,openedMergeRequests:2,profileUrl:'#',openMergeRequestsUrl:'#'},
@@ -1087,7 +1164,19 @@
       };
       const previewTeams = (config.routes || []).map((route,index) => ({id:route.id,name:route.name,reviewSignal:route.reviewSignal,reviewers:index === 0 ? previewPeople.backend : previewPeople.mobile}));
       lastReport = {project:'Preview',projects:[],from:fromInput.value,to:toInput.value,reviewers:[...previewPeople.backend,...previewPeople.mobile],teams:previewTeams};
+      const previewDaily={name:'Все команды',months:['23.08','24.08','25.08','26.08','27.08','28.08','29.08'],tooltips:['23.08.26','24.08.26','25.08.26','26.08.26','27.08.26','28.08.26','29.08.26'],mrs:[1,2,3,0,4,5,6],added:[3000,3350,3700,0,4050,4400,5000],deleted:[900,1010,1120,0,1230,1340,1550],files:[38,42,47,0,52,58,68],daily:true};
+      liveDailyOverall=previewDaily;
+      liveOverall=previewDaily;
+      volumeTeams.forEach((team,index)=>{
+        const share=index===0?.56:.44;
+        const scaled={...previewDaily,name:team.name,...Object.fromEntries(volumeMetricKeys.map(metric=>[metric,previewDaily[metric].map(value=>Math.round(value*share))]))};
+        team.daily=scaled;
+        team.series=scaled;
+      });
+      volumeIsLive=true;
       renderSelectedTeam();
+      renderVolumeConcept();
+      renderOverviewDashboard();
     }
     const sourcesBox = root.querySelector('.rd-global-sources');
     sourcesBox.querySelectorAll('.rd-chip').forEach(chip => chip.remove());
@@ -1101,13 +1190,12 @@
   }
   async function saveConnection() {
     connectionStatus.textContent = 'Проверяю подключение…';
-    const response = await fetch('/api/connection', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ gitlabUrl:gitlabURLInput.value.trim(), gitlabToken:gitlabTokenInput.value }) });
+    const response = await fetch('/api/connection', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ gitlabUrl:gitlabURLInput.value.trim(), gitlabToken:gitlabTokenInput.dataset.saved==='true' ? '' : gitlabTokenInput.value }) });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Не удалось сохранить подключение');
     gitlabConfigured = true;
     gitlabURLInput.value = result.gitlabUrl;
-    gitlabTokenInput.value = '';
-    gitlabTokenInput.placeholder = 'Сохранён — оставьте пустым, чтобы не менять';
+    showSavedTokenMask();
     connectionStatus.textContent = `Подключено: ${result.user?.name || result.user?.username || 'GitLab'}`;
     return result;
   }
@@ -1286,13 +1374,12 @@
     sharedDates.classList.toggle('visible', periodSelect.value === 'custom');
     analyticsControls.classList.toggle('rd-custom-period', periodSelect.value === 'custom');
     const range = ranges[periodSelect.value];
-    if (range) { fromInput.value = toIsoDate(range[0]); toInput.value = toIsoDate(range[1]); captionLive.textContent = range[2]; }
-    if (periodSelect.value === 'custom') captionLive.textContent = 'Статистика за выбранный период';
+    if (range) { fromInput.value = toIsoDate(range[0]); toInput.value = toIsoDate(range[1]); }
     renderVolumeConcept();
     renderOverviewDashboard();
     status.textContent = 'Период изменён — нажмите обновить';
   });
-  [fromInput, toInput].forEach(input => input.addEventListener('change', () => { periodSelect.value = 'custom'; sharedDates.classList.add('visible'); analyticsControls.classList.add('rd-custom-period'); captionLive.textContent = 'Статистика за выбранный период'; renderVolumeConcept(); renderOverviewDashboard(); status.textContent = 'Период изменён — нажмите обновить'; }));
+  [fromInput, toInput].forEach(input => input.addEventListener('change', () => { periodSelect.value = 'custom'; sharedDates.classList.add('visible'); analyticsControls.classList.add('rd-custom-period'); renderVolumeConcept(); renderOverviewDashboard(); status.textContent = 'Период изменён — нажмите обновить'; }));
   teamSelect.addEventListener('change', () => { selectedVolumePerson=null; renderSelectedTeam(); renderVolumeConcept(); renderOverviewDashboard(); });
   const csvQuote = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
   function createCsvDownload(rows,filename) {
