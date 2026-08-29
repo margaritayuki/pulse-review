@@ -74,6 +74,8 @@ const contracts = [
   ['global export contains period and employee rows', "createCsvDownload([header,...periodRows,...peopleRows]"],
   ['select arrow has an inset', 'background-position:right 12px center'],
   ['analytics signal help', 'aria-label="Как работает персональный сигнал"'],
+  ['personal signal controls are feature flagged', 'rd-personal-signal-setting'],
+  ['personal signal flag comes from config', "config.personalSignalEnabled === true"],
   ['analytics auto-save', "input.addEventListener('blur',saveAnalyticsRule)"],
   ['inactive days preference', 'id="rd-hide-inactive-days" type="checkbox" checked'],
   ['inactive days default to hidden', 'savedAnalyticsRule.hideInactiveDays !== false'],

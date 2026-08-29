@@ -888,7 +888,16 @@ func (a *application) handleConfig(w http.ResponseWriter, r *http.Request) {
 			errorResponse(w, err)
 			return
 		}
-		jsonResponse(w, http.StatusOK, map[string]any{"routes": routes, "groups": groups, "projects": projects, "mattermostConfigured": os.Getenv("MATTERMOST_WEBHOOK_URL") != "", "gitlabConfigured": connection.GitLabURL != "" && connection.GitLabToken != "", "gitlabUrl": connection.GitLabURL, "gitlabTokenConfigured": connection.GitLabToken != ""})
+		jsonResponse(w, http.StatusOK, map[string]any{
+			"routes":                routes,
+			"groups":                groups,
+			"projects":              projects,
+			"mattermostConfigured":  os.Getenv("MATTERMOST_WEBHOOK_URL") != "",
+			"personalSignalEnabled": strings.EqualFold(os.Getenv("PULSE_REVIEW_PERSONAL_SIGNAL_ENABLED"), "true") || os.Getenv("PULSE_REVIEW_PERSONAL_SIGNAL_ENABLED") == "1",
+			"gitlabConfigured":      connection.GitLabURL != "" && connection.GitLabToken != "",
+			"gitlabUrl":             connection.GitLabURL,
+			"gitlabTokenConfigured": connection.GitLabToken != "",
+		})
 		return
 	}
 	var raw json.RawMessage

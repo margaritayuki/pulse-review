@@ -414,13 +414,19 @@ try {
   assert.ok(edgeSpacing.headerRight>=20);
 
   await cdp.evaluate(`document.querySelector('[data-view="settings"]').click()`);
-  const settingsChrome=await cdp.evaluate(`(()=>{const remove=document.querySelector('.rd-icon-action'),help=document.querySelector('[aria-label="Как работает персональный сигнал"]'),popover=help.nextElementSibling,row=document.querySelector('.rd-analytics-rule-row'),token=document.querySelector('#rd-gitlab-token');help.focus();return {removeBorder:getComputedStyle(remove).borderTopWidth,saveCount:document.querySelectorAll('#rd-save-analytics').length,analyticsColumns:getComputedStyle(row).gridTemplateColumns.split(' ').length,tokenMasked:token.value.length>0&&token.dataset.saved==='true',popoverVisible:getComputedStyle(popover).display!=='none',popoverText:popover.textContent.trim()}})()`);
+  const settingsChrome=await cdp.evaluate(`(()=>{const remove=document.querySelector('.rd-icon-action'),help=document.querySelector('[aria-label="Как работает персональный сигнал"]'),row=document.querySelector('.rd-analytics-rule-row'),token=document.querySelector('#rd-gitlab-token'),checkbox=document.querySelector('#rd-hide-inactive-days');return {removeBorder:getComputedStyle(remove).borderTopWidth,saveCount:document.querySelectorAll('#rd-save-analytics').length,analyticsColumns:getComputedStyle(row).gridTemplateColumns.split(' ').length,tokenMasked:token.value.length>0&&token.dataset.saved==='true',helpVisible:getComputedStyle(help.closest('.rd-personal-signal-setting')).display!=='none',thresholdVisible:getComputedStyle(document.querySelector('#rd-signal-threshold').closest('.rd-personal-signal-setting')).display!=='none',checkboxVisible:getComputedStyle(checkbox).display!=='none'}})()`);
   assert.equal(settingsChrome.removeBorder,'0px',JSON.stringify(settingsChrome));
   assert.equal(settingsChrome.saveCount,0,JSON.stringify(settingsChrome));
-  assert.equal(settingsChrome.analyticsColumns,3,JSON.stringify(settingsChrome));
+  assert.equal(settingsChrome.analyticsColumns,1,JSON.stringify(settingsChrome));
   assert.equal(settingsChrome.tokenMasked,true,JSON.stringify(settingsChrome));
-  assert.equal(settingsChrome.popoverVisible,true,JSON.stringify(settingsChrome));
-  assert.match(settingsChrome.popoverText,/личной медианы/,JSON.stringify(settingsChrome));
+  assert.equal(settingsChrome.helpVisible,false,JSON.stringify(settingsChrome));
+  assert.equal(settingsChrome.thresholdVisible,false,JSON.stringify(settingsChrome));
+  assert.equal(settingsChrome.checkboxVisible,true,JSON.stringify(settingsChrome));
+  const enabledSignalChrome=await cdp.evaluate(`(()=>{const root=document.querySelector('#review-dashboard-concept'),help=document.querySelector('[aria-label="Как работает персональный сигнал"]'),popover=help.nextElementSibling,row=document.querySelector('.rd-analytics-rule-row');root.classList.add('rd-personal-signal-enabled');help.focus();const result={columns:getComputedStyle(row).gridTemplateColumns.split(' ').length,helpVisible:getComputedStyle(help.closest('.rd-personal-signal-setting')).display!=='none',popoverVisible:getComputedStyle(popover).display!=='none',popoverText:popover.textContent.trim()};root.classList.remove('rd-personal-signal-enabled');return result})()`);
+  assert.equal(enabledSignalChrome.columns,3,JSON.stringify(enabledSignalChrome));
+  assert.equal(enabledSignalChrome.helpVisible,true,JSON.stringify(enabledSignalChrome));
+  assert.equal(enabledSignalChrome.popoverVisible,true,JSON.stringify(enabledSignalChrome));
+  assert.match(enabledSignalChrome.popoverText,/личной медианы/,JSON.stringify(enabledSignalChrome));
   const tokenEditing=await cdp.evaluate(`(()=>{const token=document.querySelector('#rd-gitlab-token');token.dispatchEvent(new InputEvent('beforeinput',{bubbles:true,inputType:'insertText',data:'x'}));token.value='secret-value';return {type:token.type,saved:token.dataset.saved,value:token.value}})()`);
   assert.deepEqual(tokenEditing,{type:'password',saved:'false',value:'secret-value'},JSON.stringify(tokenEditing));
   const inactiveDaysDefault=await cdp.evaluate(`(()=>{const input=document.querySelector('#rd-hide-inactive-days'),saved=JSON.parse(localStorage.getItem('pulse-review-analytics-rule')||'{}');return {checked:input.checked,hasSaved:Object.hasOwn(saved,'hideInactiveDays')}})()`);

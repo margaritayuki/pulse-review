@@ -58,6 +58,8 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`data-zero-y="${top+plotHeight}"`,
 		`background-position:right 12px center`,
 		`aria-label="Как работает персональный сигнал"`,
+		`rd-personal-signal-setting`,
+		`config.personalSignalEnabled === true`,
 		`input.addEventListener('blur',saveAnalyticsRule)`,
 		`sumSeries(team.people,team.name)`,
 		`/api/work-volume?from=`,

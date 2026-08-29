@@ -96,7 +96,10 @@
     #review-dashboard-concept .rd-zero { color:light-dark(#98a2b3,#778397); }
     #review-dashboard-concept .rd-settings { padding:16px; }
     #review-dashboard-concept .rd-analytics-row { display:grid; grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) auto; gap:12px; align-items:end; }
-    #review-dashboard-concept .rd-analytics-rule-row { display:grid; grid-template-columns:170px 170px minmax(230px,max-content); gap:12px; align-items:end; }
+    #review-dashboard-concept .rd-analytics-rule-row { display:grid; grid-template-columns:max-content; gap:12px; align-items:end; }
+    #review-dashboard-concept .rd-personal-signal-setting { display:none; }
+    #review-dashboard-concept.rd-personal-signal-enabled .rd-personal-signal-setting { display:block; }
+    #review-dashboard-concept.rd-personal-signal-enabled .rd-analytics-rule-row { grid-template-columns:170px 170px minmax(230px,max-content); }
     #review-dashboard-concept .rd-analytics-options { min-height:40px; display:flex; align-items:center; padding-bottom:2px; }
     #review-dashboard-concept .rd-checkbox-option { display:inline-flex; align-items:center; gap:9px; margin:0; color:inherit; font-size:12px; font-weight:600; text-transform:none; letter-spacing:0; cursor:pointer; }
     #review-dashboard-concept .rd-checkbox-option input { width:16px; height:16px; margin:0; accent-color:#5965d8; cursor:pointer; }
@@ -296,7 +299,7 @@
     #review-dashboard-concept .rd-dashboard-empty { padding:30px; color:light-dark(#98a2b3,#778397); text-align:center; font-size:12px; }
     @media (max-width: 980px) { #review-dashboard-concept .rd-dashboard-top, #review-dashboard-concept .rd-dashboard-cards { grid-template-columns:1fr; } }
     @media (max-width: 980px) { #review-dashboard-concept .rd-team-analytics-body { grid-template-columns:1fr; } #review-dashboard-concept .rd-overall-panel { width:100%; } }
-    @media (max-width: 760px) { #review-dashboard-concept .rd-controls, #review-dashboard-concept .rd-controls.rd-custom-period { width:100%; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row, #review-dashboard-concept .rd-connection-grid, #review-dashboard-concept .rd-volume-grid { grid-template-columns:1fr; } #review-dashboard-concept .rd-analytics-rule-row { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-analytics-options { grid-column:1 / -1; } #review-dashboard-concept .rd-volume-custom { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-volume-kpis { grid-template-columns:1fr 1fr; } }
+    @media (max-width: 760px) { #review-dashboard-concept .rd-controls, #review-dashboard-concept .rd-controls.rd-custom-period { width:100%; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row, #review-dashboard-concept .rd-connection-grid, #review-dashboard-concept .rd-volume-grid { grid-template-columns:1fr; } #review-dashboard-concept.rd-personal-signal-enabled .rd-analytics-rule-row { grid-template-columns:1fr 1fr; } #review-dashboard-concept.rd-personal-signal-enabled .rd-analytics-options { grid-column:1 / -1; } #review-dashboard-concept .rd-volume-custom { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-volume-kpis { grid-template-columns:1fr 1fr; } }
     @media (max-width: 520px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr; } #review-dashboard-concept .rd-date-row { grid-column:auto; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row:not(.visible) { grid-template-columns:22px; } #review-dashboard-concept .rd-run { grid-column:1 / -1; } #review-dashboard-concept .rd-summary { grid-template-columns:1fr; } #review-dashboard-concept .rd-engagement-head { flex-direction:column; } #review-dashboard-concept .rd-engagement-row { grid-template-columns:120px minmax(100px,1fr) 34px; gap:8px; } #review-dashboard-concept .rd-compare-row { grid-template-columns:1fr; gap:8px; padding-bottom:12px; border-bottom:1px solid light-dark(#edf0f5,#293342); } }
   </style>
   <section class="rd-window">
@@ -393,14 +396,14 @@
           </div>
         </section>
         <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
-          <div class="rd-panel-title"><span>Настройки аналитики</span><span class="rd-sub">Правила персонального сигнала <span class="rd-info-wrap"><button type="button" class="rd-info" aria-label="Как работает персональный сигнал">?</button><span class="rd-info-popover" role="tooltip">Настройка задаёт допустимое отклонение среднего размера MR от личной медианы и минимальное число влитых MR для расчёта сигнала.</span></span></span></div>
+          <div class="rd-panel-title"><span>Настройки аналитики</span><span class="rd-sub rd-personal-signal-setting">Правила персонального сигнала <span class="rd-info-wrap"><button type="button" class="rd-info" aria-label="Как работает персональный сигнал">?</button><span class="rd-info-popover" role="tooltip">Настройка задаёт допустимое отклонение среднего размера MR от личной медианы и минимальное число влитых MR для расчёта сигнала.</span></span></span></div>
           <div class="rd-settings">
             <div class="rd-analytics-rule-row">
-              <div><label for="rd-signal-threshold">Допустимое отклонение, %</label><input id="rd-signal-threshold" type="number" min="1" max="100" step="1" value="20"></div>
-              <div><label for="rd-signal-minimum">Минимум влитых MR</label><input id="rd-signal-minimum" type="number" min="1" max="100" step="1" value="5"></div>
+              <div class="rd-personal-signal-setting"><label for="rd-signal-threshold">Допустимое отклонение, %</label><input id="rd-signal-threshold" type="number" min="1" max="100" step="1" value="20"></div>
+              <div class="rd-personal-signal-setting"><label for="rd-signal-minimum">Минимум влитых MR</label><input id="rd-signal-minimum" type="number" min="1" max="100" step="1" value="5"></div>
               <div class="rd-analytics-options"><label class="rd-checkbox-option" for="rd-hide-inactive-days"><input id="rd-hide-inactive-days" type="checkbox" checked>Скрывать дни без активностей</label></div>
             </div>
-            <p class="rd-connection-note">«В пределах нормы» означает, что средний размер MR отклоняется от личной медианы не больше указанного процента. При меньшей выборке показываем «Недостаточно данных».</p>
+            <p class="rd-connection-note rd-personal-signal-setting">«В пределах нормы» означает, что средний размер MR отклоняется от личной медианы не больше указанного процента. При меньшей выборке показываем «Недостаточно данных».</p>
             <div class="rd-connection-status" id="rd-analytics-status"></div>
           </div>
         </section>
@@ -1150,6 +1153,7 @@
       };
     }
     root.classList.toggle('rd-mattermost-enabled', config.mattermostConfigured === true);
+    root.classList.toggle('rd-personal-signal-enabled', config.personalSignalEnabled === true);
     gitlabConfigured = config.gitlabConfigured === true;
     gitlabURLInput.value = config.gitlabUrl || '';
     if (config.gitlabTokenConfigured) showSavedTokenMask();
