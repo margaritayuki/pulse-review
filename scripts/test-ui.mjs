@@ -10,6 +10,7 @@ for (const match of page.matchAll(/<script>([\s\S]*?)<\/script>/g)) {
 const contracts = [
   ['one shared team filter', 'id="live-team"'],
   ['file preview fallback', "location.protocol !== 'file:'"],
+  ['logo works in file preview', 'src="./pulse-review-mark.svg"'],
   ['backend fallback team', "id:'backend',name:'Backend-команда'"],
   ['mobile fallback team', "id:'mobile',name:'Mobile-команда'"],
   ['preview team sections', 'const previewTeams = (config.routes || []).map'],

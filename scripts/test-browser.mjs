@@ -67,6 +67,10 @@ try {
   await cdp.connect();
   await cdp.send('Runtime.enable');
   await waitFor(()=>cdp.evaluate('document.readyState === "complete"'));
+  const logo=await cdp.evaluate(`(()=>{const image=document.querySelector('.rd-logo');return {src:image.getAttribute('src'),complete:image.complete,width:image.naturalWidth,height:image.naturalHeight}})()`);
+  assert.equal(logo.src,'./pulse-review-mark.svg',JSON.stringify(logo));
+  assert.equal(logo.complete,true,JSON.stringify(logo));
+  assert.ok(logo.width>0&&logo.height>0,JSON.stringify(logo));
   const dashboardInitial=await cdp.evaluate(`(()=>({active:document.querySelector('.rd-tab.active')?.dataset.view,overviewVisible:!document.querySelector('[data-page="overview"]').hidden,reviewHidden:document.querySelector('[data-page="dashboard"]').hidden,cards:document.querySelectorAll('#rd-dashboard-cards > .rd-panel').length,overallLines:document.querySelectorAll('#rd-dashboard-overall-chart .rd-line-path').length,periodRows:document.querySelectorAll('#rd-dashboard-periods .rd-dashboard-period-row').length,reviewTitle:document.querySelector('[data-page="dashboard"] h1').textContent}))()`);
   assert.equal(dashboardInitial.active,'overview',JSON.stringify(dashboardInitial));
   assert.equal(dashboardInitial.overviewVisible,true,JSON.stringify(dashboardInitial));

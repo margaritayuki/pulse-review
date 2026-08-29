@@ -22,6 +22,7 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`id:'backend',name:'Backend-команда'`,
 		`id:'mobile',name:'Mobile-команда'`,
 		`const previewTeams = (config.routes || []).map`,
+		`src="./pulse-review-mark.svg"`,
 		`volumeRange.value==='week'?7:14`,
 		`renderSelectedTeam();`,
 		`.rd-controls[hidden] { display:none !important; }`,
