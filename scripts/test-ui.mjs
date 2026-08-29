@@ -105,6 +105,7 @@ const contracts = [
   ['dashboard uses existing loaded source', 'function dashboardSource()'],
   ['metric total inherits title typography', '.rd-dashboard-card-total { color:inherit; font:inherit; }'],
   ['dashboard cards use engagement title style', 'rd-dashboard-card-title rd-widget-title'],
+  ['compact widget header box sizing', '.rd-panel-title { min-height:58px; box-sizing:border-box;'],
 ];
 
 for (const [name, fragment] of contracts) {

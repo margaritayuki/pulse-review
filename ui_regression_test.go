@@ -26,6 +26,7 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`volumeRange.value==='week'?7:14`,
 		`.rd-dashboard-card-bars { min-height:200px;`,
 		`rd-dashboard-card-title rd-widget-title`,
+		`.rd-panel-title { min-height:58px; box-sizing:border-box;`,
 		`renderSelectedTeam();`,
 		`.rd-controls[hidden] { display:none !important; }`,
 		`.rd-info-wrap:hover .rd-info-popover`,

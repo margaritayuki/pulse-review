@@ -93,6 +93,13 @@ try {
   assert.ok(dashboardLegends.overall.every(item=>item.dot&&item.pressed==='true'),JSON.stringify(dashboardLegends));
   const dashboardLegendPlacement=await cdp.evaluate(`(()=>{const panels=[...document.querySelectorAll('.rd-dashboard-top > .rd-panel')];return panels.map(panel=>{const title=panel.querySelector('.rd-panel-title'),legend=panel.querySelector('.rd-dashboard-legend'),titleRect=title.getBoundingClientRect(),legendRect=legend.getBoundingClientRect();return {inHeader:legend.parentElement===title,rightGap:Math.round(titleRect.right-legendRect.right),topGap:Math.round(legendRect.top-titleRect.top)}})})()`);
   assert.ok(dashboardLegendPlacement.every(item=>item.inHeader&&item.rightGap<=18&&item.topGap>=0),JSON.stringify(dashboardLegendPlacement));
+  const widgetHeaderHeights=await cdp.evaluate(`(()=>[...document.querySelectorAll('.rd-dashboard-top .rd-panel-title,#rd-dashboard-cards .rd-dashboard-card-head')].map(node=>Math.round(node.getBoundingClientRect().height)))()`);
+  assert.ok(widgetHeaderHeights.length===6&&widgetHeaderHeights.every(height=>height>=57&&height<=59),JSON.stringify(widgetHeaderHeights));
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:919,height:856,deviceScaleFactor:1,mobile:false});
+  const compactWidgetHeaders=await cdp.evaluate(`(()=>({columns:getComputedStyle(document.querySelector('.rd-dashboard-top')).gridTemplateColumns,heights:[...document.querySelectorAll('.rd-dashboard-top .rd-panel-title,#rd-dashboard-cards .rd-dashboard-card-head')].map(node=>Math.round(node.getBoundingClientRect().height))}))()`);
+  assert.ok(!compactWidgetHeaders.columns.includes(' '),JSON.stringify(compactWidgetHeaders));
+  assert.ok(compactWidgetHeaders.heights.every(height=>height>=57&&height<=59),JSON.stringify(compactWidgetHeaders));
+  await cdp.send('Emulation.clearDeviceMetricsOverride');
   const periodDetails=await cdp.evaluate(`(()=>{const first=document.querySelector('#rd-dashboard-periods [data-period-index="0"]');first.dispatchEvent(new PointerEvent('pointerenter',{bubbles:true}));const tooltip=document.querySelector('#rd-dashboard-periods .rd-chart-tooltip'),row=first.closest('.rd-dashboard-period-row'),segments=[...first.querySelectorAll('.rd-dashboard-period-metric')];return {total:row.querySelector('.rd-dashboard-period-total').textContent.trim(),tooltip:tooltip.textContent.trim(),hidden:tooltip.hidden,aria:first.getAttribute('aria-label'),display:getComputedStyle(first).display,segments:segments.length,width:segments.reduce((sum,item)=>sum+parseFloat(item.style.width||0),0)}})()`);
   assert.match(periodDetails.total,/\d/,JSON.stringify(periodDetails));
   assert.equal(periodDetails.hidden,false,JSON.stringify(periodDetails));
