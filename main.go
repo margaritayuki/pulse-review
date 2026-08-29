@@ -52,6 +52,9 @@ type mergeRequest struct {
 	ProjectID int    `json:"project_id"`
 	IID       int    `json:"iid"`
 	CreatedAt string `json:"created_at"`
+	MergedAt  string `json:"merged_at"`
+	UpdatedAt string `json:"updated_at"`
+	WebURL    string `json:"web_url"`
 	State     string `json:"state"`
 	Author    user   `json:"author"`
 }
@@ -134,10 +137,12 @@ type application struct {
 	httpClient     *http.Client
 	connectionMu   sync.RWMutex
 
-	cacheMu    sync.Mutex
-	cache      map[string]cachedReport
-	progressMu sync.Mutex
-	progress   map[string]progress
+	cacheMu       sync.Mutex
+	cache         map[string]cachedReport
+	volumeCacheMu sync.Mutex
+	volumeCache   map[string]cachedWorkVolume
+	progressMu    sync.Mutex
+	progress      map[string]progress
 }
 
 func main() {
@@ -194,6 +199,7 @@ func directHTTPClient() *http.Client {
 func (a *application) handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/report", a.handleReport)
+	mux.HandleFunc("/api/work-volume", a.handleWorkVolume)
 	mux.HandleFunc("/api/progress", a.handleProgress)
 	mux.HandleFunc("/api/config", a.handleConfig)
 	mux.HandleFunc("/api/connection", a.handleConnection)
@@ -434,6 +440,9 @@ func (a *application) handleConnection(w http.ResponseWriter, r *http.Request) {
 	a.cacheMu.Lock()
 	a.cache = map[string]cachedReport{}
 	a.cacheMu.Unlock()
+	a.volumeCacheMu.Lock()
+	a.volumeCache = map[string]cachedWorkVolume{}
+	a.volumeCacheMu.Unlock()
 	jsonResponse(w, http.StatusOK, map[string]any{"saved": true, "configured": true, "gitlabUrl": gitlabURL, "user": account})
 }
 
@@ -879,7 +888,16 @@ func (a *application) handleConfig(w http.ResponseWriter, r *http.Request) {
 			errorResponse(w, err)
 			return
 		}
-		jsonResponse(w, http.StatusOK, map[string]any{"routes": routes, "groups": groups, "projects": projects, "mattermostConfigured": os.Getenv("MATTERMOST_WEBHOOK_URL") != "", "gitlabConfigured": connection.GitLabURL != "" && connection.GitLabToken != "", "gitlabUrl": connection.GitLabURL, "gitlabTokenConfigured": connection.GitLabToken != ""})
+		jsonResponse(w, http.StatusOK, map[string]any{
+			"routes":                routes,
+			"groups":                groups,
+			"projects":              projects,
+			"mattermostConfigured":  os.Getenv("MATTERMOST_WEBHOOK_URL") != "",
+			"personalSignalEnabled": strings.EqualFold(os.Getenv("PULSE_REVIEW_PERSONAL_SIGNAL_ENABLED"), "true") || os.Getenv("PULSE_REVIEW_PERSONAL_SIGNAL_ENABLED") == "1",
+			"gitlabConfigured":      connection.GitLabURL != "" && connection.GitLabToken != "",
+			"gitlabUrl":             connection.GitLabURL,
+			"gitlabTokenConfigured": connection.GitLabToken != "",
+		})
 		return
 	}
 	var raw json.RawMessage
@@ -946,6 +964,10 @@ func (a *application) handleConfig(w http.ResponseWriter, r *http.Request) {
 		a.cache = map[string]cachedReport{}
 		a.cacheMu.Unlock()
 	}
+	// Team membership changes the aggregation even when GitLab sources stay the same.
+	a.volumeCacheMu.Lock()
+	a.volumeCache = map[string]cachedWorkVolume{}
+	a.volumeCacheMu.Unlock()
 	sources := append(append([]string{}, groups...), projects...)
 	jsonResponse(w, http.StatusOK, map[string]any{"saved": true, "routes": payload.Routes, "groups": groups, "projects": projects, "sources": sources})
 }

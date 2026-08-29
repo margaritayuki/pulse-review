@@ -8,6 +8,7 @@
 <body>
 <div id="review-dashboard-concept">
   <style>
+    html.pulse-review-chart-lock { overflow:hidden; }
     #review-dashboard-concept { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: light-dark(#172033,#eef3ff); }
     #review-dashboard-concept * { box-sizing: border-box; }
     #review-dashboard-concept .rd-window { width: 100%; min-height: 690px; background: light-dark(#f5f7fb,#111722); border: 1px solid light-dark(#dfe4ee,#303a49); border-radius: 18px; overflow: hidden; }
@@ -15,6 +16,13 @@
     #review-dashboard-concept .rd-head-left { display:flex; align-items:center; gap:28px; height:100%; }
     #review-dashboard-concept .rd-brand { display:flex; align-items:center; gap:12px; font-weight:750; letter-spacing:-.02em; }
     #review-dashboard-concept .rd-logo { width:32px; height:32px; display:block; flex:none; }
+    #review-dashboard-concept .rd-export-all { position:relative; width:34px; height:34px; padding:0; display:grid; place-items:center; flex:none; border:0; border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; }
+    #review-dashboard-concept .rd-export-all svg { width:20px; height:20px; display:block; pointer-events:none; }
+    #review-dashboard-concept .rd-export-all:hover { color:#5965d8; }
+    #review-dashboard-concept .rd-export-all:active { color:#4652c7; }
+    #review-dashboard-concept .rd-export-all:focus-visible { outline:2px solid #5965d8; outline-offset:2px; }
+    #review-dashboard-concept .rd-export-all::after { content:attr(data-tooltip); display:none; position:absolute; z-index:30; right:0; top:calc(100% + 8px); width:max-content; max-width:280px; padding:7px 9px; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:7px; color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); box-shadow:0 8px 24px rgba(23,32,51,.16); font-size:11px; font-weight:500; white-space:nowrap; }
+    #review-dashboard-concept .rd-export-all:hover::after, #review-dashboard-concept .rd-export-all:focus-visible::after { display:block; }
     #review-dashboard-concept .rd-tabs { display:flex; align-items:stretch; height:100%; gap:20px; }
     #review-dashboard-concept .rd-tab { position:relative; border:0; padding:0 2px; background:transparent; color:light-dark(#667085,#aab4c4); cursor:pointer; font-weight:650; }
     #review-dashboard-concept .rd-tab.active { color:light-dark(#172033,#eef3ff); }
@@ -26,23 +34,30 @@
     #review-dashboard-concept button, #review-dashboard-concept select, #review-dashboard-concept input { font:inherit; }
     #review-dashboard-concept .rd-action { border:0; background:#5965d8; color:white; border-radius:9px; padding:10px 15px; font-weight:650; cursor:pointer; }
     #review-dashboard-concept .rd-action.secondary { color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); border:1px solid light-dark(#d7dde8,#3a4657); }
-    #review-dashboard-concept .rd-controls { display:grid; grid-template-columns:minmax(150px,1fr) minmax(150px,1fr) minmax(300px,2fr); align-items:end; gap:12px; padding:16px; border:1px solid light-dark(#dfe4ee,#303a49); background:light-dark(#fff,#18202c); border-radius:13px; margin-bottom:20px; }
+    #review-dashboard-concept .rd-controls { width:min(100%,572px); display:grid; grid-template-columns:267px 267px 22px; align-items:end; gap:8px; padding:0; border:0; background:transparent; margin-bottom:20px; transition:width .18s ease; }
+    #review-dashboard-concept .rd-controls.rd-custom-period { width:min(100%,1100px); grid-template-columns:267px 267px minmax(420px,1fr); }
     #review-dashboard-concept .rd-period-row { min-width:0; }
-    #review-dashboard-concept .rd-date-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; align-items:end; gap:12px; }
+    #review-dashboard-concept .rd-date-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; align-items:end; gap:8px; }
+    #review-dashboard-concept .rd-date-row:not(.visible) > div { display:none; }
+    #review-dashboard-concept .rd-date-row:not(.visible) { grid-template-columns:22px; justify-content:start; }
     #review-dashboard-concept .rd-date-row > div { min-width:0; }
     #review-dashboard-concept label { display:block; color:light-dark(#667085,#aab4c4); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
     #review-dashboard-concept select, #review-dashboard-concept input { width:100%; color:inherit; background:light-dark(#f8fafc,#111722); border:1px solid light-dark(#d7dde8,#3a4657); border-radius:8px; padding:9px 10px; }
-    #review-dashboard-concept .rd-run { width:40px; height:40px; align-self:end; justify-self:start; display:grid; place-items:center; padding:0; font-size:21px; line-height:1; }
+    #review-dashboard-concept select { appearance:none; padding-right:36px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23667085' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-size:12px 8px; }
+    #review-dashboard-concept .rd-run { width:22px; height:40px; align-self:end; justify-self:start; display:grid; place-items:center; padding:0; font-size:21px; line-height:1; }
+    #review-dashboard-concept #rd-refresh { border:0; color:#5965d8; background:transparent; box-shadow:none; }
+    #review-dashboard-concept #rd-refresh:hover { color:#4652c7; background:transparent; }
     #review-dashboard-concept .rd-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:18px; }
     #review-dashboard-concept .rd-kpi { padding:13px 16px 19px; background:light-dark(#fff,#18202c); border:1px solid light-dark(#dfe4ee,#303a49); border-radius:13px; }
     #review-dashboard-concept .rd-kpi span { color:light-dark(#667085,#aab4c4); font-size:12px; }
     #review-dashboard-concept .rd-kpi strong { display:block; font-size:28px; margin-top:5px; letter-spacing:-.04em; }
     #review-dashboard-concept .rd-engagement { margin-bottom:20px; overflow:visible; }
     #review-dashboard-concept .rd-engagement-head { padding:15px 17px 12px; display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
-    #review-dashboard-concept .rd-engagement-title strong { display:block; font-size:15px; }
-    #review-dashboard-concept .rd-engagement-title span { display:block; margin-top:4px; color:light-dark(#667085,#aab4c4); font-size:11px; }
+    #review-dashboard-concept .rd-engagement-title strong { display:block; }
     #review-dashboard-concept .rd-engagement-legend { display:flex; align-items:center; flex-wrap:wrap; gap:14px; color:light-dark(#667085,#aab4c4); font-size:11px; }
-    #review-dashboard-concept .rd-engagement-legend span { display:flex; align-items:center; gap:6px; }
+    #review-dashboard-concept .rd-engagement-legend button { display:flex; align-items:center; gap:6px; padding:2px 0; border:0; color:inherit; background:transparent; cursor:pointer; }
+    #review-dashboard-concept .rd-engagement-legend button[aria-pressed="false"] { opacity:.38; }
+    #review-dashboard-concept .rd-engagement-legend button:focus-visible { outline:2px solid #5965d8; outline-offset:3px; border-radius:3px; }
     #review-dashboard-concept .rd-engagement-legend i { width:10px; height:10px; border-radius:3px; }
     #review-dashboard-concept .rd-engagement-body { padding:2px 17px 17px; display:grid; gap:11px; }
     #review-dashboard-concept .rd-engagement-row { display:grid; grid-template-columns:minmax(150px,220px) minmax(160px,1fr) 44px; align-items:center; gap:14px; }
@@ -62,7 +77,7 @@
     #review-dashboard-concept .rd-engagement-empty { padding:8px 0; color:light-dark(#98a2b3,#778397); font-size:12px; }
     #review-dashboard-concept .rd-content { display:grid; gap:20px; }
     #review-dashboard-concept .rd-panel { background:light-dark(#fff,#18202c); border:1px solid light-dark(#dfe4ee,#303a49); border-radius:13px; overflow:hidden; }
-    #review-dashboard-concept .rd-panel-title { min-height:58px; padding:10px 17px; display:flex; align-items:center; justify-content:space-between; gap:16px; font-weight:700; border-bottom:1px solid light-dark(#e7eaf0,#303a49); }
+    #review-dashboard-concept .rd-panel-title { min-height:58px; box-sizing:border-box; padding:10px 17px; display:flex; align-items:center; justify-content:space-between; gap:16px; font-weight:700; border-bottom:1px solid light-dark(#e7eaf0,#303a49); }
     #review-dashboard-concept table { width:100%; border-collapse:collapse; font-size:13px; }
     #review-dashboard-concept th { padding:11px 15px; text-align:left; color:light-dark(#667085,#aab4c4); background:light-dark(#f8fafc,#111722); font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
     #review-dashboard-concept td { padding:14px 15px; border-top:1px solid light-dark(#edf0f5,#293342); }
@@ -71,13 +86,25 @@
     #review-dashboard-concept .rd-person { display:flex; align-items:center; gap:9px; font-weight:650; }
     #review-dashboard-concept .rd-person a, #review-dashboard-concept .rd-number-link { color:inherit; text-decoration:none; border-bottom:1px solid light-dark(#c8cfdd,#596579); }
     #review-dashboard-concept .rd-person a:hover, #review-dashboard-concept .rd-number-link:hover { color:#5965d8; border-bottom-color:#5965d8; }
-    #review-dashboard-concept .rd-export-team { position:relative; width:34px; height:34px; padding:0; border:0; background:transparent; color:light-dark(#667085,#aab4c4); cursor:pointer; }
-    #review-dashboard-concept .rd-export-team::before { content:"↓"; position:absolute; inset:0 0 7px; font-size:25px; line-height:24px; text-align:center; }
-    #review-dashboard-concept .rd-export-team::after { content:""; position:absolute; left:9px; right:9px; bottom:5px; height:6px; border:2px solid currentColor; border-top:0; border-radius:0 0 3px 3px; }
-    #review-dashboard-concept .rd-export-team:hover { color:light-dark(#344054,#e4eaf4); }
+    #review-dashboard-concept .rd-export-team { width:34px; height:34px; padding:0; display:grid; place-items:center; border:0; border-radius:7px; background:transparent; color:light-dark(#667085,#aab4c4); cursor:pointer; }
+    #review-dashboard-concept .rd-export-team svg { width:20px; height:20px; display:block; pointer-events:none; }
+    #review-dashboard-concept .rd-export-team:hover { color:#5965d8; }
+    #review-dashboard-concept .rd-export-team:active { color:#4652c7; }
+    #review-dashboard-concept .rd-export-team:focus-visible { outline:2px solid #5965d8; outline-offset:2px; }
+    #review-dashboard-concept .rd-export-team:disabled { opacity:.38; cursor:default; }
     #review-dashboard-concept .rd-avatar { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; color:white; font-size:11px; background:#7280df; }
     #review-dashboard-concept .rd-zero { color:light-dark(#98a2b3,#778397); }
     #review-dashboard-concept .rd-settings { padding:16px; }
+    #review-dashboard-concept .rd-analytics-row { display:grid; grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) auto; gap:12px; align-items:end; }
+    #review-dashboard-concept .rd-analytics-rule-row { display:grid; grid-template-columns:max-content; gap:12px; align-items:end; }
+    #review-dashboard-concept .rd-personal-signal-setting { display:none; }
+    #review-dashboard-concept.rd-personal-signal-enabled .rd-personal-signal-setting { display:block; }
+    #review-dashboard-concept.rd-personal-signal-enabled .rd-analytics-rule-row { grid-template-columns:170px 170px minmax(230px,max-content); }
+    #review-dashboard-concept:not(.rd-personal-signal-enabled) .rd-analytics-settings { padding-block:14px; }
+    #review-dashboard-concept:not(.rd-personal-signal-enabled) #rd-analytics-status:empty { display:none; }
+    #review-dashboard-concept .rd-analytics-options { min-height:40px; display:flex; align-items:center; padding-bottom:2px; }
+    #review-dashboard-concept .rd-checkbox-option { display:inline-flex; align-items:center; gap:9px; margin:0; color:inherit; font-size:12px; font-weight:600; text-transform:none; letter-spacing:0; cursor:pointer; }
+    #review-dashboard-concept .rd-checkbox-option input { width:16px; height:16px; margin:0; accent-color:#5965d8; cursor:pointer; }
     #review-dashboard-concept .rd-switch-row { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:16px; }
     #review-dashboard-concept .rd-switch-copy strong { font-size:13px; display:block; }
     #review-dashboard-concept .rd-switch-copy small { color:light-dark(#667085,#aab4c4); }
@@ -89,7 +116,21 @@
     #review-dashboard-concept .rd-note { padding:11px; border-radius:8px; background:light-dark(#f0f2ff,#222a4b); color:light-dark(#505aa7,#c5cbff); font-size:12px; line-height:1.45; margin:14px 0; }
     #review-dashboard-concept .rd-full { width:100%; }
     #review-dashboard-concept .rd-toast { margin-top:12px; text-align:center; font-size:12px; color:#3f9d70; min-height:18px; }
+    #review-dashboard-concept .rd-update-progress { width:100%; margin:-6px 0 18px; padding:10px 14px; border:1px solid light-dark(#cfd6f4,#3a4772); border-radius:10px; background:light-dark(#f0f2ff,#1c2445); }
+    #review-dashboard-concept .rd-update-progress[hidden] { display:none; }
+    #review-dashboard-concept .rd-update-progress-top { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+    #review-dashboard-concept .rd-update-progress-title { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; }
+    #review-dashboard-concept .rd-update-progress-count { color:light-dark(#5965d8,#9099ff); font-size:12px; font-weight:700; white-space:nowrap; }
+    #review-dashboard-concept .rd-update-cancel { position:relative; width:24px; height:24px; flex:none; display:grid; place-items:center; padding:0; border:0; border-radius:6px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; font-size:18px; line-height:1; }
+    #review-dashboard-concept .rd-update-cancel:hover { color:light-dark(#344054,#e4eaf4); background:light-dark(#e4e7fb,#2a345d); }
+    #review-dashboard-concept .rd-update-cancel::after { content:attr(data-tooltip); display:none; position:absolute; z-index:20; right:0; top:calc(100% + 7px); width:max-content; max-width:240px; padding:7px 9px; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:7px; color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); box-shadow:0 8px 24px rgba(23,32,51,.16); font-size:11px; font-weight:500; white-space:nowrap; }
+    #review-dashboard-concept .rd-update-cancel:hover::after, #review-dashboard-concept .rd-update-cancel:focus-visible::after { display:block; }
+    #review-dashboard-concept .rd-update-spinner { width:14px; height:14px; flex:none; border:2px solid light-dark(#c8cef8,#49558e); border-top-color:#5965d8; border-radius:50%; animation:rd-update-spin .9s linear infinite; }
+    #review-dashboard-concept .rd-update-track { height:5px; margin-top:8px; overflow:hidden; border-radius:4px; background:light-dark(#dfe3f1,#303954); }
+    #review-dashboard-concept .rd-update-bar { display:block; width:0; height:100%; border-radius:inherit; background:#5965d8; transition:width .2s ease; }
+    @keyframes rd-update-spin { to { transform:rotate(360deg); } }
     #review-dashboard-concept .rd-view[hidden] { display:none; }
+    #review-dashboard-concept .rd-controls[hidden] { display:none !important; }
     #review-dashboard-concept .rd-settings-page { width:100%; max-width:1200px; }
     #review-dashboard-concept .rd-connection-grid { display:grid; grid-template-columns:minmax(260px,1.4fr) minmax(240px,1fr) auto; gap:12px; align-items:end; }
     #review-dashboard-concept .rd-connection-note { margin:12px 0 0; color:light-dark(#667085,#aab4c4); font-size:12px; line-height:1.45; }
@@ -117,34 +158,194 @@
     #review-dashboard-concept .rd-inline-add input { min-width:130px; padding:5px 7px; border:0; background:transparent; }
     #review-dashboard-concept .rd-inline-add button { padding:5px 8px; border:0; border-radius:6px; color:white; background:#5965d8; cursor:pointer; font-size:11px; }
     #review-dashboard-concept .rd-route-actions { display:flex; align-items:center; gap:9px; }
-    #review-dashboard-concept .rd-icon-action { width:30px; height:30px; padding:0; display:grid; place-items:center; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; }
+    #review-dashboard-concept .rd-icon-action { width:30px; height:30px; padding:0; display:grid; place-items:center; border:0; border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; }
     #review-dashboard-concept .rd-settings-footer { margin-top:15px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
     #review-dashboard-concept .rd-add-route { border-style:dashed !important; }
-    @media (max-width: 760px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row, #review-dashboard-concept .rd-connection-grid { grid-template-columns:1fr; } }
-    @media (max-width: 520px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr; } #review-dashboard-concept .rd-date-row { grid-column:auto; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-run { grid-column:1 / -1; } #review-dashboard-concept .rd-summary { grid-template-columns:1fr; } #review-dashboard-concept .rd-engagement-head { flex-direction:column; } #review-dashboard-concept .rd-engagement-row { grid-template-columns:120px minmax(100px,1fr) 34px; gap:8px; } }
+    #review-dashboard-concept .rd-volume-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:20px; }
+    #review-dashboard-concept .rd-volume-kpi { padding:16px; border:1px solid light-dark(#dfe4ee,#303a49); border-radius:13px; background:light-dark(#fff,#18202c); }
+    #review-dashboard-concept .rd-volume-kpi span { color:light-dark(#667085,#aab4c4); font-size:12px; }
+    #review-dashboard-concept .rd-volume-kpi strong { display:block; margin-top:5px; font-size:27px; letter-spacing:-.04em; }
+    #review-dashboard-concept .rd-volume-kpi small { display:block; margin-top:4px; color:#3f9d70; font-size:11px; }
+    #review-dashboard-concept .rd-volume-kpi small.down { color:#d86b68; }
+    #review-dashboard-concept .rd-volume-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin-bottom:20px; }
+    #review-dashboard-concept .rd-chart-body { height:300px; padding:12px 14px 6px; display:flex; align-items:stretch; }
+    #review-dashboard-concept .rd-line-chart { position:relative; width:100%; min-width:0; }
+    #review-dashboard-concept .rd-line-chart.compact { max-width:720px; margin-inline:auto; }
+    #review-dashboard-concept .rd-line-chart.semi-compact { max-width:900px; margin-inline:auto; }
+    #review-dashboard-concept .rd-line-chart svg { width:100%; height:100%; display:block; overflow:visible; }
+    #review-dashboard-concept .rd-line-grid { stroke:light-dark(#e5e9f1,#303a49); stroke-width:1; stroke-dasharray:4 5; }
+    #review-dashboard-concept .rd-line-axis { fill:light-dark(#667085,#aab4c4); font-size:10px; }
+    #review-dashboard-concept .rd-line-axis-title { fill:light-dark(#667085,#aab4c4); font-size:9px; font-weight:700; }
+    #review-dashboard-concept .rd-line-axis-date { fill:#5965d8; dominant-baseline:middle; }
+    #review-dashboard-concept .rd-line-axis-weekend { fill:light-dark(#8a93a5,#828da0); }
+    #review-dashboard-concept .rd-line-path { fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+    #review-dashboard-concept .rd-line-area { opacity:.16; }
+    #review-dashboard-concept .rd-line-point { stroke:light-dark(#fff,#18202c); stroke-width:2; }
+    #review-dashboard-concept .rd-line-hit { fill:transparent; cursor:pointer; outline:none; }
+    #review-dashboard-concept .rd-line-hit:hover, #review-dashboard-concept .rd-line-hit:focus { fill:rgba(89,101,216,.055); }
+    #review-dashboard-concept .rd-chart-guide { stroke:#98a2b3; stroke-width:1; stroke-dasharray:4 4; pointer-events:none; }
+    #review-dashboard-concept .rd-chart-tooltip { position:absolute; z-index:8; top:16px; min-width:190px; padding:9px 10px; transform:translateX(-50%); border:1px solid light-dark(#d7dde8,#3a4657); border-radius:8px; color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); box-shadow:0 8px 24px rgba(23,32,51,.16); font-size:10px; line-height:1.45; pointer-events:none; }
+    #review-dashboard-concept .rd-chart-tooltip strong { display:block; margin-bottom:4px; font-size:11px; }
+    #review-dashboard-concept .rd-chart-tooltip span { display:flex; justify-content:space-between; gap:16px; white-space:nowrap; }
+    #review-dashboard-concept .rd-chart-tooltip i { width:7px; height:7px; margin-right:5px; display:inline-block; border-radius:50%; }
+    #review-dashboard-concept .rd-bars { width:100%; display:flex; align-items:flex-end; justify-content:space-around; gap:10px; border-bottom:1px solid light-dark(#dfe4ee,#303a49); }
+    #review-dashboard-concept .rd-bars.daily { justify-content:flex-start; gap:4px; overflow-x:auto; overflow-y:hidden; }
+    #review-dashboard-concept .rd-bars.daily .rd-bar-item { min-width:14px; }
+    #review-dashboard-concept .rd-bars.daily .rd-bar, #review-dashboard-concept .rd-bars.daily .rd-stack { width:10px; }
+    #review-dashboard-concept .rd-bar-item { height:100%; flex:1; min-width:34px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:8px; }
+    #review-dashboard-concept .rd-bar-value { font-size:11px; font-weight:700; }
+    #review-dashboard-concept .rd-bar { width:min(42px,80%); min-height:3px; border-radius:7px 7px 2px 2px; background:#6976df; transition:height .25s; }
+    #review-dashboard-concept .rd-bar-label { color:light-dark(#667085,#aab4c4); font-size:10px; white-space:nowrap; }
+    #review-dashboard-concept .rd-stack { width:min(48px,82%); min-height:3px; display:flex; flex-direction:column; justify-content:flex-end; border-radius:7px 7px 2px 2px; overflow:hidden; transition:height .25s; }
+    #review-dashboard-concept .rd-stack-added { background:#5965d8; }
+    #review-dashboard-concept .rd-stack-deleted { background:#d6a13d; }
+    #review-dashboard-concept .rd-volume-legend { display:flex; align-items:center; gap:14px; color:light-dark(#667085,#aab4c4); font-size:11px; }
+    #review-dashboard-concept .rd-volume-legend i { display:inline-block; width:9px; height:9px; margin-right:5px; border-radius:3px; }
+    #review-dashboard-concept .rd-volume-legend .added { background:#5965d8; }
+    #review-dashboard-concept .rd-volume-legend .deleted { background:#d6a13d; }
+    #review-dashboard-concept .rd-volume-legend .files { background:#36a86f; }
+    #review-dashboard-concept .rd-signal { display:inline-flex; align-items:center; gap:6px; padding:4px 7px; border-radius:6px; font-size:11px; font-weight:700; background:light-dark(#eef7f2,#18382b); color:#31855d; }
+    #review-dashboard-concept .rd-signal.watch { background:light-dark(#fff5e5,#3b2e18); color:#a56c12; }
+    #review-dashboard-concept .rd-info-wrap { position:relative; display:inline-flex; vertical-align:middle; }
+    #review-dashboard-concept .rd-info { width:20px; height:20px; padding:0; border:1px solid light-dark(#cfd6e2,#465263); border-radius:50%; color:light-dark(#667085,#aab4c4); background:transparent; font-size:12px; font-weight:750; cursor:default; }
+    #review-dashboard-concept .rd-info-popover { display:none; position:absolute; z-index:20; right:0; top:calc(100% + 8px); width:280px; padding:10px 12px; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:9px; color:light-dark(#344054,#e4eaf4); background:light-dark(#fff,#202a38); box-shadow:0 10px 28px rgba(23,32,51,.18); font-size:12px; font-weight:500; line-height:1.45; text-align:left; }
+    #review-dashboard-concept .rd-info-wrap:hover .rd-info-popover, #review-dashboard-concept .rd-info-wrap:focus-within .rd-info-popover { display:block; }
+    #review-dashboard-concept .rd-sort { display:flex; align-items:center; gap:4px; }
+    #review-dashboard-concept .rd-sort button { width:auto; height:28px; padding:0 7px; border:1px solid transparent; border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; font-size:10px; white-space:nowrap; }
+    #review-dashboard-concept .rd-sort button:hover, #review-dashboard-concept .rd-sort button.active { color:#5965d8; border-color:light-dark(#d7dde8,#3a4657); background:light-dark(#f6f7ff,#222a4b); }
+    #review-dashboard-concept .rd-people-compare { padding:10px 18px 18px; display:grid; gap:18px; }
+    #review-dashboard-concept .rd-team-group { display:grid; gap:10px; }
+    #review-dashboard-concept .rd-team-group-title { padding:8px 0 6px; border-bottom:1px solid light-dark(#e7eaf0,#303a49); font-size:12px; font-weight:750; }
+    #review-dashboard-concept .rd-compare-row { display:grid; grid-template-columns:minmax(150px,220px) minmax(0,1fr); gap:16px; align-items:center; }
+    #review-dashboard-concept .rd-compare-name { display:flex; align-items:center; gap:8px; min-width:0; font-size:12px; font-weight:700; }
+    #review-dashboard-concept .rd-person-bars { display:grid; gap:7px; }
+    #review-dashboard-concept .rd-compare-metric { display:grid; grid-template-columns:58px minmax(80px,1fr) 76px; align-items:center; gap:8px; }
+    #review-dashboard-concept .rd-metric-label { color:light-dark(#667085,#aab4c4); font-size:10px; font-weight:700; text-transform:uppercase; }
+    #review-dashboard-concept .rd-compare-track { height:10px; overflow:hidden; border-radius:6px; background:light-dark(#edf0f5,#293342); }
+    #review-dashboard-concept .rd-compare-fill { display:block; height:100%; min-width:3px; border-radius:6px; background:#6976df; }
+    #review-dashboard-concept .rd-compare-fill.lines { background:#d6a13d; }
+    #review-dashboard-concept .rd-compare-value { color:light-dark(#667085,#aab4c4); font-size:11px; text-align:right; white-space:nowrap; }
+    #review-dashboard-concept .rd-volume-disclaimer { padding:13px 15px; margin-top:20px; border:1px solid light-dark(#e8dcbf,#4c422b); border-radius:11px; background:light-dark(#fffaf0,#29251b); color:light-dark(#705b2d,#dcc68e); font-size:12px; line-height:1.5; }
+    #review-dashboard-concept .rd-overall-panel { width:calc((100% - 42px) * .525); margin:0 0 18px; }
+    #review-dashboard-concept .rd-overall-panel .rd-line-chart { max-width:none; margin-inline:0; }
+    #review-dashboard-concept .rd-metric-legend { display:flex; align-items:center; flex-wrap:wrap; gap:13px; color:light-dark(#667085,#aab4c4); font-size:10px; font-weight:600; }
+    #review-dashboard-concept .rd-chart-title-actions { display:flex; align-items:center; justify-content:flex-end; gap:9px; }
+    #review-dashboard-concept .rd-metric-toggle { padding:3px 2px; display:inline-flex; align-items:center; gap:5px; border:0; color:inherit; background:transparent; cursor:pointer; font:inherit; font-weight:inherit; }
+    #review-dashboard-concept .rd-metric-toggle[aria-pressed="false"] { opacity:.38; }
+    #review-dashboard-concept .rd-metric-legend i { width:8px; height:8px; border-radius:50%; }
+    #review-dashboard-concept .rd-chart-expand { width:38px; height:38px; padding:0; display:grid; place-items:center; flex:0 0 auto; border:0; border-radius:7px; color:light-dark(#667085,#aab4c4); background:transparent; cursor:pointer; line-height:1; }
+    #review-dashboard-concept .rd-chart-expand svg { width:22px; height:22px; display:block; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    #review-dashboard-concept .rd-chart-expand:hover { color:#5965d8; }
+    #review-dashboard-concept .rd-chart-expand:focus { outline:none; }
+    #review-dashboard-concept .rd-chart-expand:focus-visible { outline:2px solid #8b93ea; outline-offset:2px; }
+    #review-dashboard-concept .rd-chart-empty { height:100%; display:grid; place-items:center; color:light-dark(#98a2b3,#778397); font-size:12px; }
+    #review-dashboard-concept .rd-chart-expanded { position:fixed !important; z-index:1000; top:50%; left:50%; width:min(1902px,calc(100vw - 48px)) !important; height:min(1080px,calc(100vh - 48px)) !important; margin:0 !important; display:flex; flex-direction:column; transform:translate(-50%,-50%); overflow:hidden; border-radius:14px; background:light-dark(#fff,#18202c); box-shadow:0 0 0 100vmax rgba(15,23,42,.46),0 20px 60px rgba(15,23,42,.28); }
+    #review-dashboard-concept .rd-chart-expanded .rd-chart-body { height:auto; min-height:0; flex:1; }
+    #review-dashboard-concept.rd-chart-lock { position:relative; z-index:999; }
+    #review-dashboard-concept .rd-team-analytics { display:grid; gap:18px; }
+    #review-dashboard-concept .rd-team-analytics-card { overflow:hidden; }
+    #review-dashboard-concept .rd-team-card-title { min-height:54px; padding:13px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid light-dark(#e7eaf0,#303a49); font-size:16px; font-weight:750; }
+    #review-dashboard-concept .rd-team-analytics-body { padding:14px; display:grid; grid-template-columns:minmax(0,1.05fr) minmax(480px,.95fr); gap:14px; background:light-dark(#f1f4f9,#111722); }
+    #review-dashboard-concept .rd-team-chart, #review-dashboard-concept .rd-team-table { min-width:0; overflow:hidden; border:1px solid light-dark(#dfe4ee,#303a49); border-radius:10px; background:light-dark(#fff,#18202c); }
+    #review-dashboard-concept .rd-team-table { display:flex; flex-direction:column; }
+    #review-dashboard-concept .rd-team-table-head { min-height:58px; box-sizing:border-box; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid light-dark(#e7eaf0,#303a49); }
+    #review-dashboard-concept .rd-team-table-head strong { display:block; font-size:14px; }
+    #review-dashboard-concept .rd-team-table-head small { display:block; margin-top:3px; color:light-dark(#667085,#aab4c4); font-size:10px; }
+    #review-dashboard-concept .rd-team-table-scroll { height:310px; overflow:auto; }
+    #review-dashboard-concept .rd-team-table-scroll thead { position:sticky; top:0; z-index:2; }
+    #review-dashboard-concept .rd-team-table-scroll table { table-layout:fixed; }
+    #review-dashboard-concept .rd-team-table-scroll th { padding:9px 5px; font-size:9px; cursor:pointer; white-space:nowrap; }
+    #review-dashboard-concept .rd-team-table-scroll td { padding:9px 5px; font-size:11px; }
+    #review-dashboard-concept .rd-team-table-scroll th:first-child { width:42%; }
+    #review-dashboard-concept .rd-team-table-scroll th:nth-child(2) { width:10%; }
+    #review-dashboard-concept .rd-team-table-scroll th:nth-child(n+3) { width:16%; }
+    #review-dashboard-concept .rd-team-table-scroll th:first-child, #review-dashboard-concept .rd-team-table-scroll td:first-child { padding-left:14px; }
+    #review-dashboard-concept .rd-team-table-scroll th:last-child, #review-dashboard-concept .rd-team-table-scroll td:last-child { padding-right:20px; }
+    #review-dashboard-concept .rd-team-table-scroll td:first-child span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    #review-dashboard-concept .rd-team-table-scroll .rd-person { gap:7px; }
+    #review-dashboard-concept .rd-person-filter { min-width:0; padding:0; overflow:hidden; border:0; color:inherit; background:transparent; cursor:pointer; font:inherit; font-weight:inherit; text-align:left; text-overflow:ellipsis; white-space:nowrap; }
+    #review-dashboard-concept .rd-person-filter:hover { color:#5965d8; }
+    #review-dashboard-concept .rd-person-filter[aria-pressed="true"] { color:#5965d8; }
+    #review-dashboard-concept .rd-person-filtered { background:light-dark(#f2f3ff,#222a4b); }
+    #review-dashboard-concept .rd-team-table-scroll .rd-avatar { width:25px; height:25px; font-size:9px; }
+    #review-dashboard-concept .rd-chart-scale-note { color:light-dark(#98a2b3,#778397); font-size:9px; font-weight:500; }
+    #review-dashboard-concept .rd-dashboard-top { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:18px; }
+    #review-dashboard-concept .rd-dashboard-top .rd-chart-body { height:300px; }
+    #review-dashboard-concept .rd-widget-title { color:light-dark(#475467,#cbd5e1); font-family:inherit; font-size:15px; font-weight:650; line-height:1.3; letter-spacing:-.01em; }
+    #review-dashboard-concept .rd-dashboard-periods { position:relative; padding:16px; display:grid; align-content:center; gap:13px; min-height:300px; }
+    #review-dashboard-concept .rd-dashboard-period-row { display:grid; grid-template-columns:80px minmax(0,1fr) 92px; align-items:center; gap:12px; }
+    #review-dashboard-concept .rd-dashboard-period-label { color:light-dark(#667085,#aab4c4); font-size:11px; white-space:nowrap; }
+    #review-dashboard-concept .rd-dashboard-period-track { width:100%; height:12px; padding:0; display:flex; overflow:hidden; border:0; border-radius:7px; background:light-dark(#edf0f5,#293342); cursor:pointer; }
+    #review-dashboard-concept .rd-dashboard-period-track:focus-visible { outline:2px solid #5965d8; outline-offset:3px; }
+    #review-dashboard-concept .rd-dashboard-period-metric { display:block; height:100%; min-width:1px; }
+    #review-dashboard-concept .rd-dashboard-period-total { color:light-dark(#344054,#d9e0eb); font-size:11px; font-weight:650; text-align:right; white-space:nowrap; }
+    #review-dashboard-concept .rd-dashboard-periods .rd-chart-tooltip { top:auto; bottom:18px; }
+    #review-dashboard-concept .rd-dashboard-legend { justify-content:flex-end; padding:0; }
+    #review-dashboard-concept .rd-dashboard-top .rd-panel-title { min-height:50px; padding-block:8px; align-items:center; }
+    #review-dashboard-concept .rd-dashboard-breakdown-head { display:flex; align-items:center; justify-content:flex-start; gap:12px; margin:0 0 10px; }
+    #review-dashboard-concept .rd-dashboard-breakdown-head strong { font-size:14px; }
+    #review-dashboard-concept .rd-dashboard-view { display:flex; gap:4px; padding:2px; border:1px solid light-dark(#d7dde8,#3a4657); border-radius:8px; background:light-dark(#f8fafc,#111722); }
+    #review-dashboard-concept .rd-dashboard-view button { padding:5px 8px; border:0; border-radius:6px; color:light-dark(#667085,#aab4c4); background:transparent; font-size:11px; cursor:pointer; }
+    #review-dashboard-concept .rd-dashboard-view button[aria-pressed="true"] { color:#5965d8; background:light-dark(#fff,#222a4b); box-shadow:0 1px 3px rgba(23,32,51,.1); }
+    #review-dashboard-concept .rd-dashboard-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    #review-dashboard-concept .rd-dashboard-card-head { min-height:50px; box-sizing:border-box; padding:8px 15px; display:flex; align-items:center; justify-content:space-between; gap:14px; border-bottom:1px solid light-dark(#e7eaf0,#303a49); }
+    #review-dashboard-concept .rd-dashboard-card-title { display:flex; align-items:center; gap:6px; }
+    #review-dashboard-concept .rd-dashboard-card-total { color:inherit; font:inherit; }
+    #review-dashboard-concept .rd-dashboard-grouping { display:flex; align-items:center; gap:12px; }
+    #review-dashboard-concept .rd-dashboard-grouping button, #review-dashboard-concept .rd-dashboard-grouping span { padding:4px 0; border:0; color:light-dark(#98a2b3,#778397); background:transparent; font-size:11px; font-weight:500; cursor:pointer; }
+    #review-dashboard-concept .rd-dashboard-grouping button[aria-pressed="true"] { color:#5965d8; font-weight:650; }
+    #review-dashboard-concept .rd-dashboard-card-chart { height:200px; }
+    #review-dashboard-concept .rd-dashboard-card-bars { min-height:200px; box-sizing:border-box; padding:14px 16px; display:grid; align-content:center; gap:11px; }
+    #review-dashboard-concept .rd-dashboard-bar-row { display:grid; grid-template-columns:90px minmax(0,1fr) 64px; align-items:center; gap:10px; }
+    #review-dashboard-concept .rd-dashboard-bar-value { font-size:11px; font-weight:600; text-align:right; }
+    #review-dashboard-concept .rd-dashboard-empty { padding:30px; color:light-dark(#98a2b3,#778397); text-align:center; font-size:12px; }
+    @media (max-width: 980px) { #review-dashboard-concept .rd-dashboard-top, #review-dashboard-concept .rd-dashboard-cards { grid-template-columns:1fr; } }
+    @media (max-width: 980px) { #review-dashboard-concept .rd-team-analytics-body { grid-template-columns:1fr; } #review-dashboard-concept .rd-overall-panel { width:100%; } }
+    @media (max-width: 760px) { #review-dashboard-concept .rd-controls, #review-dashboard-concept .rd-controls.rd-custom-period { width:100%; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row { grid-column:1 / -1; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; } #review-dashboard-concept .rd-heading { flex-direction:column; } #review-dashboard-concept .rd-project { display:none; } #review-dashboard-concept .rd-head-left { gap:16px; } #review-dashboard-concept .rd-tabs { gap:12px; } #review-dashboard-concept .rd-route-grid { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-route-grid .rd-channel-field { grid-column:1 / -1; } #review-dashboard-concept .rd-team-review-row, #review-dashboard-concept .rd-connection-grid, #review-dashboard-concept .rd-volume-grid { grid-template-columns:1fr; } #review-dashboard-concept.rd-personal-signal-enabled .rd-analytics-rule-row { grid-template-columns:1fr 1fr; } #review-dashboard-concept.rd-personal-signal-enabled .rd-analytics-options { grid-column:1 / -1; } #review-dashboard-concept .rd-volume-custom { grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-volume-kpis { grid-template-columns:1fr 1fr; } }
+    @media (max-width: 520px) { #review-dashboard-concept .rd-controls { grid-template-columns:1fr; } #review-dashboard-concept .rd-date-row { grid-column:auto; grid-template-columns:1fr 1fr; } #review-dashboard-concept .rd-date-row:not(.visible) { grid-template-columns:22px; } #review-dashboard-concept .rd-run { grid-column:1 / -1; } #review-dashboard-concept .rd-summary { grid-template-columns:1fr; } #review-dashboard-concept .rd-engagement-head { flex-direction:column; } #review-dashboard-concept .rd-engagement-row { grid-template-columns:120px minmax(100px,1fr) 34px; gap:8px; } #review-dashboard-concept .rd-compare-row { grid-template-columns:1fr; gap:8px; padding-bottom:12px; border-bottom:1px solid light-dark(#edf0f5,#293342); } }
   </style>
   <section class="rd-window">
     <header class="rd-top">
       <div class="rd-head-left">
-        <div class="rd-brand"><img class="rd-logo" src="/pulse-review-mark.svg" alt=""><span>Pulse Review</span></div>
+        <div class="rd-brand"><img class="rd-logo" src="./pulse-review-mark.svg" alt=""><span>Pulse Review</span></div>
         <nav class="rd-tabs" aria-label="Разделы">
-          <button class="rd-tab active" data-view="dashboard" aria-selected="true">Статистика</button>
+          <button class="rd-tab active" data-view="overview" aria-selected="true">Дашборд</button>
+          <button class="rd-tab" data-view="dashboard" aria-selected="false">Ревью</button>
+          <button class="rd-tab" data-view="volume" aria-selected="false">Динамика</button>
           <button class="rd-tab" data-view="settings" aria-selected="false">Настройки</button>
         </nav>
       </div>
+      <button type="button" class="rd-export-all" id="rd-export-all" aria-label="Скачать все показатели в CSV" title="Скачать все показатели в CSV" data-tooltip="Скачать показатели с учётом выбранной команды"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3.5v10m-3.5-3.5 3.5 3.5 3.5-3.5M4 17h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </header>
     <main class="rd-main">
-      <section class="rd-view" data-page="dashboard">
-      <div class="rd-controls">
-        <div class="rd-period-row"><label for="rd-period">Период</label><select id="rd-period"><option value="yesterday">Вчера</option><option value="week" selected>Последние 7 дней</option><option value="month">Предыдущий месяц</option><option value="current_quarter">Текущий квартал</option><option value="previous_quarter">Предыдущий квартал</option><option value="custom">Свои даты</option></select></div>
-        <div class="rd-date-row">
+      <div class="rd-controls" id="rd-analytics-controls">
+        <div class="rd-period-row"><label for="live-team">Команда</label><select id="live-team"><option value="all">Все команды</option></select></div>
+        <div class="rd-period-row"><label for="rd-period">Период</label><select id="rd-period"><option value="week" selected>Последняя неделя</option><option value="two_weeks">Последние 2 недели</option><option value="current_month">Текущий месяц</option><option value="previous_month">Прошлый месяц</option><option value="current_quarter">Текущий квартал</option><option value="previous_quarter">Прошлый квартал</option><option value="half_year">Последние полгода</option><option value="year">Последний год</option><option value="custom">Свои даты</option></select></div>
+        <div class="rd-date-row" id="rd-shared-dates">
           <div><label for="rd-from">С</label><input id="rd-from" type="date"></div>
           <div><label for="rd-to">По</label><input id="rd-to" type="date"></div>
           <button class="rd-action rd-run" id="rd-refresh" aria-label="Обновить данные" title="Обновить данные">↻</button>
         </div>
       </div>
+      <section class="rd-update-progress" id="rd-update-progress" aria-live="polite" aria-label="Обновление данных" hidden>
+        <div class="rd-update-progress-top">
+          <div class="rd-update-progress-title"><span class="rd-update-spinner" aria-hidden="true"></span><span class="rd-update-progress-count" id="rd-update-progress-count">Подключаюсь к GitLab…</span></div>
+          <button type="button" class="rd-update-cancel" id="rd-update-cancel" aria-label="Отменить обновление данных" data-tooltip="Обновление данных будет отменено">×</button>
+        </div>
+        <div class="rd-update-track" role="progressbar" aria-label="Обработано merge requests" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="rd-update-bar"></span></div>
+      </section>
+      <section class="rd-view" data-page="overview">
+        <div class="rd-heading"><div><h1>Дашборд</h1></div></div>
+        <div class="rd-dashboard-top">
+          <section class="rd-panel rd-chart-shell"><div class="rd-panel-title"><strong class="rd-widget-title">Все показатели</strong><div class="rd-metric-legend rd-dashboard-legend" id="rd-dashboard-overall-legend"></div></div><div class="rd-chart-body"><div class="rd-line-chart" id="rd-dashboard-overall-chart"></div></div></section>
+          <section class="rd-panel"><div class="rd-panel-title"><strong class="rd-widget-title">По периодам</strong><div class="rd-metric-legend rd-dashboard-legend" id="rd-dashboard-period-legend"></div></div><div class="rd-dashboard-periods" id="rd-dashboard-periods"></div></section>
+        </div>
+        <div class="rd-dashboard-breakdown-head"><strong>Расшифровка</strong><div class="rd-dashboard-view" aria-label="Представление расшифровки"><button type="button" data-dashboard-view="line" aria-pressed="true">График</button><button type="button" data-dashboard-view="bar" aria-pressed="false">Линейчатая</button></div></div>
+        <div class="rd-dashboard-cards" id="rd-dashboard-cards"></div>
+      </section>
+      <section class="rd-view" data-page="dashboard" hidden>
       <div class="rd-heading">
-        <div><h1>Ревью команды</h1><div class="rd-sub" id="rd-caption">Статистика за последние 7 дней</div></div>
+        <div><h1>Ревью</h1></div>
       </div>
       <div class="rd-summary">
         <div class="rd-kpi"><span>Успешно проведённых ревью</span><strong>12</strong></div>
@@ -154,8 +355,8 @@
       </div>
       <section class="rd-panel rd-engagement" aria-labelledby="rd-engagement-title">
         <div class="rd-engagement-head">
-          <div class="rd-engagement-title"><strong id="rd-engagement-title">Вовлечённость</strong><span>Approvals / 👍 + комментарии + созданные MR</span></div>
-          <div class="rd-engagement-legend" aria-label="Обозначения графика"><span><i class="rd-engagement-approvals"></i>Approvals / 👍</span><span><i class="rd-engagement-comments"></i>Комментарии</span><span><i class="rd-engagement-mrs"></i>Создано MR</span></div>
+          <div class="rd-engagement-title"><strong class="rd-widget-title" id="rd-engagement-title">Вовлечённость</strong></div>
+          <div class="rd-engagement-legend" aria-label="Показатели вовлечённости"><button type="button" data-engagement-metric="approvals" aria-pressed="true"><i class="rd-engagement-approvals"></i>Approvals / 👍</button><button type="button" data-engagement-metric="comments" aria-pressed="true"><i class="rd-engagement-comments"></i>Комментарии</button><button type="button" data-engagement-metric="mrs" aria-pressed="true"><i class="rd-engagement-mrs"></i>Создано MR</button></div>
         </div>
         <div class="rd-engagement-body"><div class="rd-engagement-empty">График появится после загрузки данных</div></div>
       </section>
@@ -174,17 +375,38 @@
       </div>
       <div class="rd-toast" id="rd-toast"></div>
       </section>
+      <section class="rd-view" data-page="volume" hidden>
+        <div class="rd-heading"><div><h1>Динамика</h1><div class="rd-sub">Общие показатели и расшифровка по сотрудникам</div></div></div>
+        <section class="rd-panel rd-overall-panel rd-chart-shell" data-chart-key="overall">
+          <div class="rd-panel-title"><strong class="rd-widget-title" id="rd-overall-title">Все команды</strong><div class="rd-chart-title-actions"><div class="rd-metric-legend" id="rd-overall-legend"></div><button type="button" class="rd-chart-expand" data-chart-key="overall" aria-label="Развернуть график на весь экран" title="Развернуть график на весь экран"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 10l6-6m0 0v5m0-5h-5M10 14l-6 6m0 0v-5m0 5h5"/></svg></button></div></div>
+          <div class="rd-chart-body"><div class="rd-line-chart" id="rd-overall-chart"></div></div>
+        </section>
+        <div class="rd-team-analytics" id="rd-team-analytics"></div>
+        <div class="rd-volume-disclaimer">Объём изменений не равен продуктивности: крупный рефакторинг, автогенерация и тип задачи сильно влияют на строки кода. Используйте динамику как повод разобраться в контексте, а не для рейтинга сотрудников или вывода о выгорании.</div>
+      </section>
       <section class="rd-view" data-page="settings" hidden>
         <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
           <div class="rd-panel-title"><span>Подключение GitLab</span><span class="rd-sub">Хранится только на этом компьютере</span></div>
           <div class="rd-settings">
-            <div class="rd-connection-grid">
+            <div class="rd-analytics-row">
               <div><label for="rd-gitlab-url">Адрес сервера GitLab</label><input id="rd-gitlab-url" type="url" placeholder="https://gitlab.com" autocomplete="url"></div>
               <div><label for="rd-gitlab-token">Personal access token</label><input id="rd-gitlab-token" type="password" placeholder="Токен с правом read_api" autocomplete="new-password"></div>
               <button class="rd-action" id="rd-save-connection">Проверить и сохранить</button>
             </div>
             <p class="rd-connection-note">Здесь нужен адрес самого сервера, без группы или проекта. Токен сохраняется локально и никогда не показывается в интерфейсе повторно.</p>
             <div class="rd-connection-status" id="rd-connection-status"></div>
+          </div>
+        </section>
+        <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
+          <div class="rd-panel-title"><span>Настройки аналитики</span><span class="rd-sub rd-personal-signal-setting">Правила персонального сигнала <span class="rd-info-wrap"><button type="button" class="rd-info" aria-label="Как работает персональный сигнал">?</button><span class="rd-info-popover" role="tooltip">Настройка задаёт допустимое отклонение среднего размера MR от личной медианы и минимальное число влитых MR для расчёта сигнала.</span></span></span></div>
+          <div class="rd-settings rd-analytics-settings">
+            <div class="rd-analytics-rule-row">
+              <div class="rd-personal-signal-setting"><label for="rd-signal-threshold">Допустимое отклонение, %</label><input id="rd-signal-threshold" type="number" min="1" max="100" step="1" value="20"></div>
+              <div class="rd-personal-signal-setting"><label for="rd-signal-minimum">Минимум влитых MR</label><input id="rd-signal-minimum" type="number" min="1" max="100" step="1" value="5"></div>
+              <div class="rd-analytics-options"><label class="rd-checkbox-option" for="rd-hide-inactive-days"><input id="rd-hide-inactive-days" type="checkbox" checked>Скрывать дни без активностей</label></div>
+            </div>
+            <p class="rd-connection-note rd-personal-signal-setting">«В пределах нормы» означает, что средний размер MR отклоняется от личной медианы не больше указанного процента. При меньшей выборке показываем «Недостаточно данных».</p>
+            <div class="rd-connection-status" id="rd-analytics-status"></div>
           </div>
         </section>
         <section class="rd-panel rd-settings-page" style="margin-bottom:24px">
@@ -231,7 +453,6 @@
     (() => {
       const root = document.getElementById('review-dashboard-concept');
       const period = root.querySelector('#rd-period');
-      const caption = root.querySelector('#rd-caption');
       const toast = root.querySelector('#rd-toast');
       const settingsToast = root.querySelector('#rd-settings-toast');
       const tabs = [...root.querySelectorAll('.rd-tab')];
@@ -239,12 +460,9 @@
       tabs.forEach(tab => tab.addEventListener('click', () => {
         tabs.forEach(item => { const active = item === tab; item.classList.toggle('active', active); item.setAttribute('aria-selected', String(active)); });
         pages.forEach(page => { page.hidden = page.dataset.page !== tab.dataset.view; });
+        const controls = root.querySelector('#rd-analytics-controls');
+        controls.hidden = tab.dataset.view === 'settings';
       }));
-      period.addEventListener('change', () => {
-        const labels = { yesterday:'Статистика за вчера, 13 августа 2026', week:'Статистика за последние 7 дней', month:'Статистика за июль 2026', custom:'Статистика за выбранный период' };
-        caption.textContent = labels[period.value];
-      });
-      root.querySelector('#rd-refresh').addEventListener('click', () => { toast.textContent = 'Данные обновлены'; setTimeout(() => toast.textContent = '', 1800); });
       root.querySelector('#rd-save-routes').addEventListener('click', () => { settingsToast.textContent = 'Настройки сохранены'; });
       root.querySelector('#rd-add-route').addEventListener('click', () => { settingsToast.textContent = 'Добавлен новый маршрут'; });
       root.querySelector('#rd-export').addEventListener('click', () => { toast.textContent = 'CSV подготовлен'; });
@@ -255,18 +473,18 @@
 <script>
 (() => {
   const root = document.getElementById('review-dashboard-concept');
-  const controls = root.querySelector('.rd-controls');
-  const teamRow = document.createElement('div');
-  teamRow.className = 'rd-period-row';
-  teamRow.innerHTML = '<label for="live-team">Команда</label><select id="live-team"><option value="all">Все команды</option></select>';
-  controls.prepend(teamRow);
-  const teamSelect = teamRow.querySelector('select');
+  const teamSelect = root.querySelector('#live-team');
   const kpis = root.querySelectorAll('.rd-kpi strong');
   const tbody = root.querySelector('tbody');
   const reportContent = root.querySelector('.rd-content');
   const engagementBody = root.querySelector('.rd-engagement-body');
   const refreshButton = root.querySelector('#rd-refresh');
   const status = root.querySelector('#rd-toast');
+  const updateProgress = root.querySelector('#rd-update-progress');
+  const updateProgressCount = root.querySelector('#rd-update-progress-count');
+  const updateCancel = root.querySelector('#rd-update-cancel');
+  const updateProgressTrack = updateProgress.querySelector('[role="progressbar"]');
+  const updateProgressBar = updateProgress.querySelector('.rd-update-bar');
   const routesContainer = root.querySelector('#rd-routes');
   const routeTemplate = routesContainer.querySelector('.rd-route').cloneNode(true);
   const routeCount = root.querySelector('#rd-route-count');
@@ -274,17 +492,615 @@
   const connectionStatus = root.querySelector('#rd-connection-status');
   const gitlabURLInput = root.querySelector('#rd-gitlab-url');
   const gitlabTokenInput = root.querySelector('#rd-gitlab-token');
+  const savedTokenMask = '••••••••••••';
+  const showSavedTokenMask = () => { gitlabTokenInput.value=savedTokenMask; gitlabTokenInput.dataset.saved='true'; gitlabTokenInput.placeholder=''; };
+  gitlabTokenInput.addEventListener('beforeinput',()=>{ if(gitlabTokenInput.dataset.saved==='true'){gitlabTokenInput.value='';gitlabTokenInput.dataset.saved='false';} });
   let gitlabConfigured = false;
   const periodSelect = root.querySelector('#rd-period');
   const fromInput = root.querySelector('#rd-from');
   const toInput = root.querySelector('#rd-to');
-  const captionLive = root.querySelector('#rd-caption');
   let lastReport = null;
+  let currentEngagementPeople = [];
+  let activeReportController = null;
   tbody.innerHTML = '<tr><td colspan="4" class="rd-zero">Выберите команду и период, затем нажмите «Обновить»</td></tr>';
   const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 
+  const volumeMonths = ["08'25","09'25","10'25","11'25","12'25","01'26","02'26","03'26","04'26","05'26","06'26","07'26"];
+  const mockPeople = [
+    ['backend','anna','Анна Смирнова',5,1280], ['backend','ivan','Иван Петров',4,1120], ['backend','alex','Алексей Денисов',3,940],
+    ['mobile','maria','Мария Ким',5,1010], ['mobile','pavel','Павел Морозов',4,890], ['mobile','irina','Ирина Белова',4,820],
+    ['mobile','sergey','Сергей Новиков',3,760], ['mobile','elena','Елена Орлова',3,710], ['mobile','dmitry','Дмитрий Соколов',3,680],
+    ['mobile','olga','Ольга Васильева',2,640], ['mobile','andrey','Андрей Фёдоров',3,610], ['mobile','natalia','Наталья Попова',2,570],
+    ['mobile','roman','Роман Волков',2,540], ['mobile','ekaterina','Екатерина Лебедева',2,510], ['mobile','maksim','Максим Кузнецов',2,480],
+    ['mobile','yulia','Юлия Павлова',1,440], ['mobile','artem','Артём Семёнов',2,420], ['mobile','victoria','Виктория Зайцева',1,390]
+  ];
+  const makePersonData = ([team,key,name,baseMR,baseAdded], personIndex) => {
+    const mrShape = [.78,.94,.87,1.08,.96,1.14,1.02,1.26,1.12,1.38,1.27,1.48];
+    const addedShape = [.72,1.02,.84,1.17,.9,1.31,1.06,1.46,1.18,1.59,1.29,1.71];
+    const deletedShape = [.94,.76,1.09,.81,1.24,.86,1.16,.91,1.37,1.02,1.3,1.14];
+    const filesShape = [.7,.88,1.03,.79,1.12,1.24,.93,1.34,1.08,1.26,1.47,1.36];
+    const mrs = mrShape.map((factor,index) => Math.max(0,Math.round(baseMR*factor)+((personIndex+index)%5===0 ? 1 : 0)));
+    const added = addedShape.map((factor,index) => Math.round(baseAdded*factor*(.94+((personIndex+index)%4)*.025)));
+    const deleted = deletedShape.map((factor,index) => Math.round(baseAdded*.31*factor*(.95+((personIndex+index)%3)*.03)));
+    const files = filesShape.map((factor,index) => Math.max(1,Math.round((baseMR*3.2+personIndex%4+2)*factor)));
+    return {team,key,name,months:volumeMonths,mrs,added,deleted,files};
+  };
+  let volumePeople = mockPeople.map(makePersonData);
+  const sumSeries = (people,name) => ({
+    name, months:volumeMonths,
+    ...['mrs','added','deleted','files'].reduce((result,metric) => ({...result,[metric]:volumeMonths.map((_,index)=>people.reduce((sum,person)=>sum+person[metric][index],0))}),{})
+  });
+  let volumeTeams = [
+    {key:'backend',name:'Backend',people:volumePeople.filter(person=>person.team==='backend')},
+    {key:'mobile',name:'Mobile',people:volumePeople.filter(person=>person.team==='mobile')}
+  ];
+  let liveOverall = null;
+  let liveDailyOverall = null;
+  let volumeIsLive = false;
+  let volumeIsPreview = false;
+  let configuredRoutes = [];
+  const volumeRange = periodSelect;
+  const volumeFrom = fromInput;
+  const volumeTo = toInput;
+  const sharedDates = root.querySelector('#rd-shared-dates');
+  const analyticsControls = root.querySelector('#rd-analytics-controls');
+  const volumeSort = new Map(volumeTeams.map(team=>[team.key,{key:'mrs',direction:'desc'}]));
+  let selectedVolumePerson = null;
+  const visibleVolumeMetrics = new Set(['mrs','added','deleted','files']);
+  const visibleDashboardMetrics = new Set(['mrs','added','deleted','files']);
+  const visibleEngagementMetrics = new Set(['approvals','comments','mrs']);
+  const dashboardGroups = new Map([['mrs','days'],['added','days'],['deleted','days'],['files','days']]);
+  let dashboardView = 'line';
+  let expandedVolumeChart = null;
+  const formatNumber = value => new Intl.NumberFormat('ru-RU').format(value);
+  const formatDelta = (current, previous) => `${current >= previous ? '+' : ''}${Math.round((current - previous) / Math.max(1, previous) * 100)}% к предыдущему такому же периоду`;
+  const changedFilesFor = data => data.files || data.mrs.map((count,index) => Math.max(1,Math.round(count*2.4+(index%3)*3)));
+  class VolumeCalculationPolicy {
+    constructor(signalThresholdPercent = 20, minimumMergedMRs = 5) { this.signalThresholdPercent = signalThresholdPercent; this.minimumMergedMRs = minimumMergedMRs; }
+    median(values) {
+      if (!values.length) return 0;
+      const sorted = [...values].sort((a,b) => a-b), middle = Math.floor(sorted.length / 2);
+      return sorted.length % 2 ? sorted[middle] : Math.round((sorted[middle - 1] + sorted[middle]) / 2);
+    }
+    signal(currentPerMR, baselinePerMR, mergedMRs) {
+      if (mergedMRs < this.minimumMergedMRs) return { delta:0, watch:false, insufficient:true };
+      const delta = Math.round((currentPerMR - baselinePerMR) / Math.max(1, baselinePerMR) * 100);
+      return { delta, watch: Math.abs(delta) > this.signalThresholdPercent, insufficient:false };
+    }
+  }
+  const savedAnalyticsRule = (() => { try { return JSON.parse(localStorage.getItem('pulse-review-analytics-rule') || '{}'); } catch { return {}; } })();
+  const volumePolicy = new VolumeCalculationPolicy(Number(savedAnalyticsRule.threshold) || 20, Number(savedAnalyticsRule.minimum) || 5);
+  const signalThresholdInput = root.querySelector('#rd-signal-threshold');
+  const signalMinimumInput = root.querySelector('#rd-signal-minimum');
+  const hideInactiveDaysInput = root.querySelector('#rd-hide-inactive-days');
+  const analyticsStatus = root.querySelector('#rd-analytics-status');
+  signalThresholdInput.value = volumePolicy.signalThresholdPercent;
+  signalMinimumInput.value = volumePolicy.minimumMergedMRs;
+  hideInactiveDaysInput.checked = savedAnalyticsRule.hideInactiveDays !== false;
+  let analyticsSavedSnapshot=JSON.stringify({threshold:volumePolicy.signalThresholdPercent,minimum:volumePolicy.minimumMergedMRs,hideInactiveDays:hideInactiveDaysInput.checked});
+  const volumeMetricKeys = ['mrs','added','deleted','files'];
+  const isDailySeries = series => Boolean(series?.months?.length) && series.months.every(label => /^\d{2}\.\d{2}$/.test(label));
+  function filterInactiveDays(series,metrics=volumeMetricKeys) {
+    if (!hideInactiveDaysInput.checked || !isDailySeries(series)) return series;
+    const keep=series.months.map((_,index)=>metrics.some(metric=>Number(series[metric]?.[index]||0)!==0));
+    const result={...series};
+    ['months','tooltips',...volumeMetricKeys].forEach(key=>{
+      const values=series[key] || (key==='tooltips' ? series.months : null);
+      if (values) result[key]=values.filter((_,index)=>keep[index]);
+    });
+    return result;
+  }
+  function volumePeriodSlice(data,fine=false) {
+    if (volumeIsLive && !volumeIsPreview) return data;
+    const last = data.months.length;
+    if (fine && volumeRange.value === 'custom') {
+      const start=new Date(`${volumeFrom.value}T00:00:00`),end=new Date(`${volumeTo.value}T00:00:00`);
+      if (Number.isFinite(start.getTime())&&Number.isFinite(end.getTime())&&start<=end) {
+        const dates=[];
+        for(let cursor=new Date(start);cursor<=end;cursor.setDate(cursor.getDate()+1)) dates.push(new Date(cursor));
+        const result={months:dates.map(date=>`${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}`),tooltips:dates.map(date=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`),mrs:Array(dates.length).fill(0),added:Array(dates.length).fill(0),deleted:Array(dates.length).fill(0),files:Array(dates.length).fill(0),daily:true};
+        const monthGroups=new Map();
+        dates.forEach((date,index)=>{const key=`${date.getFullYear()}-${date.getMonth()}`;if(!monthGroups.has(key))monthGroups.set(key,[]);monthGroups.get(key).push(index)});
+        const fileValues=changedFilesFor(data),endMonth=end.getFullYear()*12+end.getMonth();
+        const previewLastSource=volumeIsPreview&&data.daily ? data.months.reduce((lastActive,_,index)=>volumeMetricKeys.some(metric=>Number(data[metric]?.[index]||0)!==0)?index:lastActive,last-1) : last-1;
+        monthGroups.forEach(indices=>{
+          const date=dates[indices[0]],offset=endMonth-(date.getFullYear()*12+date.getMonth()),sourceIndex=Math.max(0,Math.min(last-1,previewLastSource-offset)),daysInMonth=new Date(date.getFullYear(),date.getMonth()+1,0).getDate();
+          const distribute=total=>{const target=Math.round(Number(total||0)*indices.length/daysInMonth),base=Math.floor(target/indices.length),remainder=target-base*indices.length;return indices.map((_,index)=>base+(index<remainder?1:0));};
+          const values={mrs:distribute(data.mrs[sourceIndex]),added:distribute(data.added[sourceIndex]),deleted:distribute(data.deleted[sourceIndex]),files:distribute(fileValues[sourceIndex])};
+          indices.forEach((targetIndex,index)=>dashboardMetricOptions.forEach(metric=>result[metric.key][targetIndex]=values[metric.key][index]));
+        });
+        return result;
+      }
+    }
+    if (volumeIsPreview && data.daily && ['week','two_weeks'].includes(volumeRange.value)) {
+      const length=volumeRange.value==='week'?7:14,start=Math.max(0,data.months.length-length),result={...data};
+      ['months','tooltips',...volumeMetricKeys].forEach(key=>{if(data[key])result[key]=data[key].slice(start);});
+      return result;
+    }
+    const presets = {
+      current_month:[last-1,last], previous_month:[last-2,last-1], current_quarter:[last-3,last], previous_quarter:[last-6,last-3], half_year:[last-6,last], year:[0,last], custom:[last-6,last]
+    };
+    if (['week','two_weeks','current_month','previous_month'].includes(volumeRange.value)) {
+      const today = new Date(), previousMonth = volumeRange.value === 'previous_month';
+      const end = previousMonth ? new Date(today.getFullYear(),today.getMonth(),0) : new Date(today.getFullYear(),today.getMonth(),today.getDate());
+      const start = volumeRange.value === 'week' ? new Date(end.getFullYear(),end.getMonth(),end.getDate()-6)
+        : volumeRange.value === 'two_weeks' ? new Date(end.getFullYear(),end.getMonth(),end.getDate()-13)
+        : new Date(end.getFullYear(),end.getMonth(),1);
+      const days = Math.round((end-start)/86400000)+1, sourceIndex = previousMonth ? last-2 : last-1;
+      const scale = ['week','two_weeks'].includes(volumeRange.value) ? days / 30 : 1;
+      const dates = Array.from({length:days},(_,index) => new Date(start.getFullYear(),start.getMonth(),start.getDate()+index));
+      const distribute = total => {
+        const target = Math.max(0,Math.round(total*scale));
+        // Preview data includes one genuinely inactive day so the local display
+        // preference can be exercised without changing the interval total.
+        const weights = Array.from({length:days},(_,index)=>index===1 ? 0 : .76+((index*3+sourceIndex)%7)*.08);
+        const weightTotal = weights.reduce((sum,value)=>sum+value,0);
+        const exact = weights.map(value=>target*value/weightTotal), result = exact.map(Math.floor);
+        let remainder = target-result.reduce((sum,value)=>sum+value,0);
+        exact.map((value,index)=>({index,fraction:value-result[index]})).sort((a,b)=>b.fraction-a.fraction).slice(0,remainder).forEach(item=>result[item.index]++);
+        return result;
+      };
+      return {
+        months:dates.map(date => `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}`),
+        tooltips:dates.map(date => `${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getFullYear()).slice(-2)}`),
+        mrs:distribute(data.mrs[sourceIndex]), added:distribute(data.added[sourceIndex]), deleted:distribute(data.deleted[sourceIndex]), files:distribute(changedFilesFor(data)[sourceIndex]), daily:true
+      };
+    }
+    const [start,end] = presets[volumeRange.value] || presets.half_year;
+    return { months:data.months.slice(start,end), mrs:data.mrs.slice(start,end), added:data.added.slice(start,end), deleted:data.deleted.slice(start,end), files:changedFilesFor(data).slice(start,end) };
+  }
+  function volumeComparisonTotals(data) {
+    const end = data.months.length;
+    const ranges = {
+      current_month:[[end-1,end],[end-2,end-1]],
+      previous_month:[[end-2,end-1],[end-3,end-2]],
+      current_quarter:[[end-3,end],[end-6,end-3]],
+      previous_quarter:[[end-6,end-3],[end-9,end-6]],
+      half_year:[[end-6,end],[end-12,end-6]]
+    };
+    const range = ranges[volumeRange.value];
+    if (!range || range.flat().some(index => index < 0)) return null;
+    const sum = (values,[from,to]) => values.slice(from,to).reduce((total,value)=>total+value,0);
+    return {
+      current:{mrs:sum(data.mrs,range[0]),added:sum(data.added,range[0]),deleted:sum(data.deleted,range[0])},
+      previous:{mrs:sum(data.mrs,range[1]),added:sum(data.added,range[1]),deleted:sum(data.deleted,range[1])}
+    };
+  }
+  function niceChartStep(value) {
+    const power = 10 ** Math.floor(Math.log10(Math.max(1,value)));
+    const normalized = value/power;
+    return (normalized<=1 ? 1 : normalized<=2 ? 2 : normalized<=5 ? 5 : 10)*power;
+  }
+  function nonlinearChartTicks(minimum,maximum,maxTicks=12) {
+    let base = niceChartStep(minimum);
+    const makeTicks = () => {
+      const result=[0];
+      for (let decade=base,guard=0;guard<12;decade*=10,guard++) {
+        for (const factor of [1,2,3,5]) {
+          const candidate=decade*factor;
+          if (candidate>result[result.length-1]) result.push(candidate);
+          if (candidate>=maximum) return result;
+        }
+      }
+      return result;
+    };
+    let ticks=makeTicks();
+    while (ticks.length>maxTicks) { base*=10; ticks=makeTicks(); }
+    return ticks;
+  }
+  function mixedMagnitudeChartTicks(maximum) {
+    const fixed=[0,1,3,5,7,10];
+    const high=[];
+    for (let decade=10,guard=0;guard<8;decade*=10,guard++) {
+      for (const factor of [2,5,10]) {
+        const candidate=decade*factor;
+        if (candidate>10&&candidate<=maximum) high.push(candidate);
+        if (candidate>=maximum) break;
+      }
+      if (decade*10>=maximum) break;
+    }
+    const ceiling=niceChartStep(maximum);
+    if (!high.includes(ceiling)) high.push(ceiling);
+    const unique=[...new Set(high)].sort((a,b)=>a-b);
+    const selected=unique.length<=6?unique:Array.from({length:6},(_,index)=>unique[Math.round(index*(unique.length-1)/5)]);
+    return [...fixed,...new Set(selected)].sort((a,b)=>a-b);
+  }
+  function buildChartScale(lines) {
+    const values=lines.flatMap(line=>line.values).filter(value=>Number.isFinite(value)&&value>=0);
+    const positive=values.filter(value=>value>0), maximum=Math.max(1,...values), minimum=Math.min(...positive);
+    const mixedMagnitude=positive.some(value=>value>=1&&value<=6)&&maximum>=1000;
+    const nonlinear=positive.length>0&&maximum/minimum>=10;
+    if (mixedMagnitude) {
+      const ticks=mixedMagnitudeChartTicks(maximum);
+      return {mode:'nonlinear',ticks,ratio:value=>{
+        if (value<=0) return 0;
+        for (let index=1;index<ticks.length;index++) {
+          if (value<=ticks[index]) return (index-1+(value-ticks[index-1])/(ticks[index]-ticks[index-1]))/(ticks.length-1);
+        }
+        return 1;
+      }};
+    }
+    if (!nonlinear) {
+      const step=niceChartStep(maximum/4), ceiling=Math.ceil(maximum/step)*step;
+      const ticks=Array.from({length:Math.round(ceiling/step)+1},(_,index)=>index*step);
+      return {mode:'linear',ticks,ratio:value=>Math.max(0,Math.min(1,value/ceiling))};
+    }
+    const ticks=nonlinearChartTicks(minimum,maximum);
+    return {mode:'nonlinear',ticks,ratio:value=>{
+      if (value<=0) return 0;
+      for (let index=1;index<ticks.length;index++) {
+        if (value<=ticks[index]) return (index-1+(value-ticks[index-1])/(ticks[index]-ticks[index-1]))/(ticks.length-1);
+      }
+      return 1;
+    }};
+  }
+  function renderLineChart(container,labels,tooltipLabels,lines,metricVisibility=visibleVolumeMetrics) {
+    container.classList.toggle('compact',labels.length <= 7);
+    container.classList.toggle('semi-compact',labels.length > 7 && labels.length <= 14);
+    const visibleLines=lines.filter(line=>metricVisibility.has(line.key));
+    if (!visibleLines.length) { container.innerHTML='<div class="rd-chart-empty">Выберите хотя бы один показатель</div>'; return; }
+    const dailyLabels = labels.length > 0 && labels.every(label => /^\d{2}\.\d{2}$/.test(label));
+    const width = Math.max(320,Math.round(container.clientWidth || 640));
+    const height = Math.max(220,Math.round(container.clientHeight || 250));
+    // Reserve enough room for compact Y-axis values and give the reclaimed space
+    // on the right back to the plot instead of leaving an uneven empty margin.
+    const left = 68, right = 28, top = 16, bottom = dailyLabels ? 54 : 28;
+    const plotWidth = width-left-right, plotHeight = height-top-bottom, scale=buildChartScale(visibleLines);
+    const pointSets = visibleLines.map(line => line.values.map((value,index) => ({
+      x:left+(line.values.length === 1 ? plotWidth/2 : index/(line.values.length-1)*plotWidth),
+      y:top+plotHeight-scale.ratio(value)*plotHeight, value
+    })));
+    const smoothPath = points => {
+      if (!points.length) return '';
+      if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+      let path = `M ${points[0].x} ${points[0].y}`;
+      for (let index=0; index<points.length-1; index++) {
+        const previous = points[Math.max(0,index-1)], current = points[index], next = points[index+1], after = points[Math.min(points.length-1,index+2)];
+        const minimumY = Math.min(current.y,next.y), maximumY = Math.max(current.y,next.y);
+        const firstX = current.x+(next.x-previous.x)/6;
+        const firstY = Math.max(minimumY,Math.min(maximumY,current.y+(next.y-previous.y)/6));
+        const secondX = next.x-(after.x-current.x)/6;
+        const secondY = Math.max(minimumY,Math.min(maximumY,next.y-(after.y-current.y)/6));
+        path += ` C ${firstX} ${firstY}, ${secondX} ${secondY}, ${next.x} ${next.y}`;
+      }
+      return path;
+    };
+    const compact = value => new Intl.NumberFormat('ru-RU',{notation:'compact',maximumFractionDigits:1}).format(Math.round(value));
+    const parseDailyDate = value => {
+      const iso = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (iso) return new Date(Number(iso[1]),Number(iso[2])-1,Number(iso[3]));
+      const russian = String(value || '').match(/^(\d{2})\.(\d{2})(?:\.(\d{2}|\d{4}))?$/);
+      if (!russian) return null;
+      const year = russian[3] ? (russian[3].length === 2 ? 2000+Number(russian[3]) : Number(russian[3])) : new Date().getFullYear();
+      return new Date(year,Number(russian[2])-1,Number(russian[1]));
+    };
+    const chartDates = dailyLabels ? tooltipLabels.map(parseDailyDate) : [];
+    const grid = scale.ticks.map(value => {
+      const y=top+(1-scale.ratio(value))*plotHeight;
+      return `<line class="rd-line-grid" x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"></line><text class="rd-line-axis rd-y-axis-tick" x="${left-9}" y="${y+3}" text-anchor="end">${compact(value)}</text>`;
+    }).join('');
+    const labelY = height-30;
+    const xLabels = labels.map((label,index) => label ? dailyLabels
+      ? (() => { const date = chartDates[index], weekend = date && (date.getDay() === 0 || date.getDay() === 6); return `<text class="rd-line-axis rd-line-axis-date${weekend ? ' rd-line-axis-weekend' : ''}" x="${pointSets[0][index].x}" y="${labelY}" text-anchor="end" transform="rotate(-45 ${pointSets[0][index].x} ${labelY})">${escapeHtml(label)}</text>`; })()
+      : `<text class="rd-line-axis" x="${pointSets[0][index].x}" y="${height-8}" text-anchor="middle">${escapeHtml(label)}</text>` : '').join('');
+    const definitions = visibleLines.map((line,index) => `<linearGradient id="${container.id}-area-${index}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${line.color}" stop-opacity=".7"></stop><stop offset="100%" stop-color="${line.color}" stop-opacity="0"></stop></linearGradient>`).join('');
+    const renderedLines = visibleLines.map((line,lineIndex) => {
+      const points = pointSets[lineIndex], path = smoothPath(points);
+      const area = points.length > 1 ? `<path class="rd-line-area" fill="url(#${container.id}-area-${lineIndex})" d="${path} L ${points[points.length-1].x} ${top+plotHeight} L ${points[0].x} ${top+plotHeight} Z"></path>` : '';
+      const dots = points.map(point => `<circle class="rd-line-point" cx="${point.x}" cy="${point.y}" r="3" fill="${line.color}"></circle>`).join('');
+      return `${area}<path class="rd-line-path" stroke="${line.color}" d="${path}"></path>${dots}`;
+    }).join('');
+    const hitWidth = Math.max(28,plotWidth/Math.max(1,labels.length));
+    const hits = labels.map((_,index) => `<rect class="rd-line-hit" data-point-index="${index}" tabindex="0" role="button" aria-label="Показать значения за ${escapeHtml(tooltipLabels[index])}" x="${Math.max(left,pointSets[0][index].x-hitWidth/2)}" y="${top}" width="${Math.min(hitWidth,width-right-Math.max(left,pointSets[0][index].x-hitWidth/2))}" height="${plotHeight}"></rect>`).join('');
+    container.innerHTML = `<svg viewBox="0 0 ${width} ${height}" data-scale-mode="${scale.mode}" data-zero-y="${top+plotHeight}" role="img" aria-label="Динамика: ${escapeHtml(visibleLines.map(line=>line.name).join(', '))}"><defs>${definitions}</defs>${grid}<line class="rd-chart-guide" x1="0" x2="0" y1="${top}" y2="${top+plotHeight}" hidden></line>${xLabels}${renderedLines}${hits}</svg><div class="rd-chart-tooltip" role="tooltip" hidden></div>`;
+    const tooltip = container.querySelector('.rd-chart-tooltip'), guide = container.querySelector('.rd-chart-guide');
+    let pinnedIndex = null;
+    const showPoint = index => {
+      const point = pointSets[0][index];
+      const date = chartDates[index];
+      const weekday = date ? `${new Intl.DateTimeFormat('ru-RU',{weekday:'long'}).format(date)}, ` : '';
+      tooltip.innerHTML = `<strong>${escapeHtml(weekday+tooltipLabels[index])}</strong>${visibleLines.map(line=>`<span><b><i style="background:${line.color}"></i>${escapeHtml(line.name)}</b><em>${formatNumber(line.values[index])}</em></span>`).join('')}`;
+      tooltip.hidden = false;
+      tooltip.style.left = `${Math.max(13,Math.min(87,point.x/width*100))}%`;
+      guide.hidden = false; guide.setAttribute('x1',point.x); guide.setAttribute('x2',point.x);
+    };
+    const hidePoint = () => { if (pinnedIndex !== null) return; tooltip.hidden = true; guide.hidden = true; };
+    container.querySelectorAll('.rd-line-hit').forEach(hit => {
+      const index = Number(hit.dataset.pointIndex);
+      hit.addEventListener('pointerenter',()=>showPoint(index));
+      hit.addEventListener('focus',()=>showPoint(index));
+      hit.addEventListener('pointerleave',hidePoint);
+      hit.addEventListener('blur',hidePoint);
+      hit.addEventListener('click',()=>{ pinnedIndex = pinnedIndex===index ? null : index; pinnedIndex===null ? hidePoint() : showPoint(index); });
+      hit.addEventListener('keydown',event=>{ if (event.key==='Enter'||event.key===' ') { event.preventDefault(); hit.dispatchEvent(new MouseEvent('click',{bubbles:true})); } if (event.key==='Escape') { pinnedIndex=null; hidePoint(); } });
+    });
+  }
+  const dashboardMetricOptions=[
+    {key:'mrs',name:'Влито MR',color:'#5965d8'}, {key:'added',name:'Добавлено строк',color:'#2f7ae5'},
+    {key:'deleted',name:'Удалено строк',color:'#e58b19'}, {key:'files',name:'Изменено файлов',color:'#2f8f5b'}
+  ];
+  const dashboardGroupNames={days:'Дни',weeks:'Недели',months:'Месяцы',quarters:'Кварталы'};
+  function dashboardAvailableGroups() {
+    if (periodSelect.value==='custom') {
+      const from=new Date(`${volumeFrom.value}T00:00:00`),to=new Date(`${volumeTo.value}T00:00:00`),days=Math.round((to-from)/86400000)+1;
+      if (Number.isFinite(days)&&days<=31) return ['days','weeks'];
+      if (Number.isFinite(days)&&days<=93) return ['weeks','months'];
+      return ['months','quarters'];
+    }
+    return ({week:['days'],two_weeks:['days','weeks'],current_month:['days','weeks'],previous_month:['days','weeks'],current_quarter:['weeks','months'],previous_quarter:['weeks','months'],half_year:['months','quarters'],year:['months','quarters']})[periodSelect.value] || ['weeks'];
+  }
+  function dashboardSource() {
+    if (teamSelect.value !== 'all') {
+      const team=volumeTeams.find(item=>String(item.key)===teamSelect.value);
+      if (team) return volumeIsLive && (team.daily||team.series) ? (team.daily||team.series) : sumSeries(team.people,team.name);
+    }
+    return volumeIsLive && (liveDailyOverall||liveOverall) ? (liveDailyOverall||liveOverall) : sumSeries(volumePeople,'Все команды');
+  }
+  function dashboardBucketKey(value,index,group,daily) {
+    const iso=String(value||'').match(/^(\d{4})-(\d{2})(?:-(\d{2}))?/), short=String(value||'').match(/^(\d{2})'(\d{2})$/);
+    if (group==='days') return {key:`d-${index}`,label:String(value||'')};
+    if (group==='weeks') return daily ? {key:`w-${Math.floor(index/7)}`,label:''} : {key:`w-${index}`,label:String(value||'')};
+    const year=iso?Number(iso[1]):short?2000+Number(short[2]):new Date().getFullYear(), month=iso?Number(iso[2]):short?Number(short[1]):1;
+    if (group==='quarters') return {key:`${year}-q${Math.ceil(month/3)}`,label:`${Math.ceil(month/3)}q'${String(year).slice(-2)}`};
+    return {key:`${year}-${month}`,label:`${String(month).padStart(2,'0')}'${String(year).slice(-2)}`};
+  }
+  function regroupDashboardSeries(source,group) {
+    const sliced=volumePeriodSlice(source,true), periods=sliced.tooltips||sliced.months, daily=sliced.months.every(label=>/^\d{2}\.\d{2}$/.test(label)), buckets=[];
+    const monthlyMock=!volumeIsLive&&sliced.months.every(label=>/^\d{2}'\d{2}$/.test(label));
+    if (group==='weeks'&&monthlyMock) {
+      const result={months:[],tooltips:[],mrs:[],added:[],deleted:[],files:[],daily:false};
+      sliced.months.forEach((label,monthIndex)=>{
+        const match=label.match(/^(\d{2})'(\d{2})$/),month=Number(match[1]),year=2000+Number(match[2]);
+        const daysInMonth=new Date(year,month,0).getDate(),lengths=[];
+        for(let day=1;day<=daysInMonth;day+=7) lengths.push(Math.min(7,daysInMonth-day+1));
+        const distribute=total=>{
+          const exact=lengths.map(length=>Number(total||0)*length/daysInMonth),values=exact.map(Math.floor);
+          let remainder=Math.round(Number(total||0))-values.reduce((sum,value)=>sum+value,0);
+          exact.map((value,index)=>({index,fraction:value-values[index]})).sort((a,b)=>b.fraction-a.fraction).slice(0,remainder).forEach(item=>values[item.index]++);
+          return values;
+        };
+        const values=Object.fromEntries(dashboardMetricOptions.map(metric=>[metric.key,distribute(sliced[metric.key][monthIndex])]));
+        lengths.forEach((length,weekIndex)=>{
+          const start=weekIndex*7+1,end=start+length-1;
+          result.months.push(`${String(start).padStart(2,'0')}–${String(end).padStart(2,'0')}.${String(month).padStart(2,'0')}`);
+          result.tooltips.push(`${year}-${String(month).padStart(2,'0')}-${String(start).padStart(2,'0')}`);
+          dashboardMetricOptions.forEach(metric=>result[metric.key].push(values[metric.key][weekIndex]));
+        });
+      });
+      return result;
+    }
+    periods.forEach((period,index)=>{
+      const descriptor=dashboardBucketKey(period,index,group,daily);
+      if (group==='days') descriptor.label=sliced.months[index];
+      if (group==='weeks'&&!daily) descriptor.label=sliced.months[index];
+      let bucket=buckets.find(item=>item.key===descriptor.key);
+      if (!bucket) { bucket={key:descriptor.key,label:descriptor.label,mrs:0,added:0,deleted:0,files:0,first:index,last:index}; buckets.push(bucket); }
+      bucket.last=index;
+      dashboardMetricOptions.forEach(metric=>bucket[metric.key]+=Number(sliced[metric.key][index]||0));
+    });
+    buckets.forEach(bucket=>{ if(group==='weeks'&&daily) bucket.label=`${sliced.months[bucket.first]}–${sliced.months[bucket.last]}`; });
+    return {months:buckets.map(item=>item.label),tooltips:buckets.map(item=>item.label),daily:group==='days'&&daily,...Object.fromEntries(dashboardMetricOptions.map(metric=>[metric.key,buckets.map(item=>item[metric.key])]))};
+  }
+  function removeZeroDashboardPeriods(series,metrics) {
+    if (!hideInactiveDaysInput.checked) return series;
+    const keep=series.months.map((_,index)=>metrics.some(metric=>Number(series[metric]?.[index]||0)!==0));
+    const result={...series};
+    ['months','tooltips',...volumeMetricKeys].forEach(key=>{
+      const values=series[key] || (key==='tooltips' ? series.months : null);
+      if (values) result[key]=values.filter((_,index)=>keep[index]);
+    });
+    return result;
+  }
+  function dashboardLines(series) {
+    return dashboardMetricOptions.map(metric=>({key:metric.key,name:metric.name,values:series[metric.key],color:metric.color}));
+  }
+  function renderDashboardPeriodBars(series) {
+    const metrics=dashboardMetricOptions.filter(metric=>visibleDashboardMetrics.has(metric.key));
+    const filtered=removeZeroDashboardPeriods(series,metrics.map(metric=>metric.key));
+    const container=root.querySelector('#rd-dashboard-periods');
+    if (!metrics.length || !filtered.months.length) { container.innerHTML='<div class="rd-dashboard-empty">Нет данных за выбранный период</div>'; return; }
+    const maxima=Object.fromEntries(metrics.map(metric=>[metric.key,Math.max(1,...filtered[metric.key])]));
+    const rows=filtered.months.map((label,index)=>({label,index,changedLines:Number(filtered.added[index]||0)+Number(filtered.deleted[index]||0),scores:metrics.map(metric=>Number(filtered[metric.key][index]||0)/maxima[metric.key])}));
+    const maximumScore=Math.max(1,...rows.map(row=>row.scores.reduce((sum,value)=>sum+value,0)));
+    container.innerHTML=rows.map((row,rowIndex)=>`<div class="rd-dashboard-period-row"><span class="rd-dashboard-period-label">${escapeHtml(row.label)}</span><button type="button" class="rd-dashboard-period-track" data-period-index="${rowIndex}" aria-label="Показать значения за ${escapeHtml(row.label)}; изменено ${formatNumber(row.changedLines)} строк">${metrics.map((metric,metricIndex)=>`<span class="rd-dashboard-period-metric" aria-hidden="true" style="width:${row.scores[metricIndex]/maximumScore*100}%;background:${metric.color}"></span>`).join('')}</button><span class="rd-dashboard-period-total" title="Добавлено и удалено строк">${formatNumber(row.changedLines)} стр.</span></div>`).join('')+'<div class="rd-chart-tooltip" role="tooltip" hidden></div>';
+    const tooltip=container.querySelector('.rd-chart-tooltip');
+    let pinnedIndex=null;
+    const showPeriod=index=>{
+      const row=rows[index],target=container.querySelector(`[data-period-index="${index}"]`);
+      tooltip.innerHTML=`<strong>${escapeHtml(row.label)}</strong>${metrics.map(metric=>`<span><b><i style="background:${metric.color}"></i>${escapeHtml(metric.name)}</b><em>${formatNumber(filtered[metric.key][row.index])}</em></span>`).join('')}<span><b>Добавлено + удалено</b><em>${formatNumber(row.changedLines)} строк</em></span>`;
+      tooltip.hidden=false;
+      const targetBox=target.getBoundingClientRect(),containerBox=container.getBoundingClientRect();
+      tooltip.style.left=`${Math.max(18,Math.min(82,(targetBox.left+targetBox.width/2-containerBox.left)/containerBox.width*100))}%`;
+      tooltip.style.bottom=`${Math.max(12,containerBox.bottom-targetBox.top+7)}px`;
+    };
+    const hidePeriod=()=>{if(pinnedIndex===null) tooltip.hidden=true;};
+    container.querySelectorAll('[data-period-index]').forEach(target=>{
+      const index=Number(target.dataset.periodIndex);
+      target.addEventListener('pointerenter',()=>showPeriod(index));
+      target.addEventListener('focus',()=>showPeriod(index));
+      target.addEventListener('pointerleave',hidePeriod);
+      target.addEventListener('blur',hidePeriod);
+      target.addEventListener('click',()=>{pinnedIndex=pinnedIndex===index?null:index;pinnedIndex===null?hidePeriod():showPeriod(index);});
+      target.addEventListener('keydown',event=>{if(event.key==='Escape'){pinnedIndex=null;hidePeriod();}});
+    });
+  }
+  function renderDashboardCard(metric,source,groups) {
+    if (!groups.includes(dashboardGroups.get(metric.key))) dashboardGroups.set(metric.key,groups[0]);
+    const group=dashboardGroups.get(metric.key),series=removeZeroDashboardPeriods(regroupDashboardSeries(source,group),[metric.key]);
+    const total=series[metric.key].reduce((sum,value)=>sum+value,0),grouping=groups.length===1?`<span>${dashboardGroupNames[groups[0]]}</span>`:groups.map(item=>`<button type="button" data-dashboard-metric="${metric.key}" data-dashboard-group="${item}" aria-pressed="${group===item}">${dashboardGroupNames[item]}</button>`).join('');
+    const body=dashboardView==='line'?`<div class="rd-line-chart rd-dashboard-card-chart" id="rd-dashboard-card-${metric.key}"></div>`:`<div class="rd-dashboard-card-bars">${series.months.length?series.months.map((label,index)=>`<div class="rd-dashboard-bar-row"><span class="rd-dashboard-period-label">${escapeHtml(label)}</span><span class="rd-dashboard-period-track"><i style="display:block;width:${series[metric.key][index]/Math.max(1,...series[metric.key])*100}%;height:100%;border-radius:inherit;background:${metric.color}"></i></span><span class="rd-dashboard-bar-value">${formatNumber(series[metric.key][index])}</span></div>`).join(''):'<div class="rd-dashboard-empty">Нет данных</div>'}</div>`;
+    return {html:`<section class="rd-panel"><div class="rd-dashboard-card-head"><div class="rd-dashboard-card-title rd-widget-title"><span>${metric.name}</span><span class="rd-dashboard-card-total">${formatNumber(total)}</span></div><div class="rd-dashboard-grouping">${grouping}</div></div>${body}</section>`,series};
+  }
+  function renderOverviewDashboard() {
+    const source=dashboardSource(),groups=dashboardAvailableGroups(),overall=removeZeroDashboardPeriods(regroupDashboardSeries(source,groups.at(-1)),dashboardMetricOptions.map(metric=>metric.key));
+    const legend=dashboardMetricOptions.map(metric=>`<button type="button" class="rd-metric-toggle" data-dashboard-period-metric="${metric.key}" aria-pressed="${visibleDashboardMetrics.has(metric.key)}"><i style="background:${metric.color}"></i>${metric.name}</button>`).join('');
+    root.querySelector('#rd-dashboard-overall-legend').innerHTML=legend;
+    root.querySelector('#rd-dashboard-period-legend').innerHTML=legend;
+    renderLineChart(root.querySelector('#rd-dashboard-overall-chart'),overall.months,overall.tooltips,dashboardLines(overall),visibleDashboardMetrics);
+    renderDashboardPeriodBars(overall);
+    const cards=dashboardMetricOptions.map(metric=>renderDashboardCard(metric,source,groups));
+    root.querySelector('#rd-dashboard-cards').innerHTML=cards.map(item=>item.html).join('');
+    if (dashboardView==='line') dashboardMetricOptions.forEach((metric,index)=>{const series=cards[index].series;renderLineChart(root.querySelector(`#rd-dashboard-card-${metric.key}`),series.months,series.tooltips,[{key:metric.key,name:metric.name,values:series[metric.key],color:metric.color}],new Set([metric.key]));});
+  }
+  root.addEventListener('click',event=>{
+    const view=event.target.closest('[data-dashboard-view]');
+    if (view) { dashboardView=view.dataset.dashboardView; root.querySelectorAll('[data-dashboard-view]').forEach(button=>button.setAttribute('aria-pressed',String(button===view))); renderOverviewDashboard(); return; }
+    const group=event.target.closest('[data-dashboard-group]');
+    if (group) { dashboardGroups.set(group.dataset.dashboardMetric,group.dataset.dashboardGroup); renderOverviewDashboard(); return; }
+    const metric=event.target.closest('[data-dashboard-period-metric]');
+    if (metric) { if(visibleDashboardMetrics.has(metric.dataset.dashboardPeriodMetric)&&visibleDashboardMetrics.size>1) visibleDashboardMetrics.delete(metric.dataset.dashboardPeriodMetric); else visibleDashboardMetrics.add(metric.dataset.dashboardPeriodMetric); renderOverviewDashboard(); return; }
+    if (event.target.closest('.rd-tab[data-view="overview"]')) requestAnimationFrame(renderOverviewDashboard);
+  });
+  function chartExpandIcon(expanded) {
+    const path=expanded?'M20 4l-6 6m0 0V5m0 5h5M4 20l6-6m0 0v5m0-5H5':'M14 10l6-6m0 0v5m0-5h-5M10 14l-6 6m0 0v-5m0 5h5';
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${path}"/></svg>`;
+  }
+  function renderVolumeConcept() {
+    const metricOptions=[
+      {key:'mrs',name:'Влито MR',color:'#5965d8'}, {key:'added',name:'Добавлено строк',color:'#2f7ae5'},
+      {key:'deleted',name:'Удалено строк',color:'#e58b19'}, {key:'files',name:'Изменено файлов',color:'#2f8f5b'}
+    ];
+    const legend=metricOptions.map(metric=>`<button type="button" class="rd-metric-toggle" data-metric="${metric.key}" aria-pressed="${visibleVolumeMetrics.has(metric.key)}"><i style="background:${metric.color}"></i>${metric.name}</button>`).join('');
+    root.querySelector('#rd-overall-legend').innerHTML = legend;
+    const overallShell=root.querySelector('[data-chart-key="overall"]');
+    overallShell.classList.toggle('rd-chart-expanded',expandedVolumeChart==='overall');
+    const overallExpand=overallShell.querySelector('.rd-chart-expand');
+    overallExpand.innerHTML=chartExpandIcon(expandedVolumeChart==='overall');
+    overallExpand.setAttribute('aria-label',expandedVolumeChart==='overall'?'Свернуть график':'Развернуть график на весь экран');
+    overallExpand.title=overallExpand.getAttribute('aria-label');
+    const selectedPersonEntry = selectedVolumePerson ? volumeTeams.map(team=>({team,person:team.people.find(person=>person.key===selectedVolumePerson.personKey)})).find(item=>item.team.key===selectedVolumePerson.teamKey&&item.person) : null;
+    const selectedTeam = selectedPersonEntry?.team || (teamSelect.value === 'all' ? null : volumeTeams.find(team=>team.key===teamSelect.value) || volumeTeams[teamSelect.selectedIndex-1] || null);
+    const visibleTeams = selectedTeam ? [selectedTeam] : volumeTeams;
+    const sourceFor = team => volumeIsLive && team.series ? team.series : sumSeries(team.people,team.name);
+    const overallData = selectedPersonEntry?.person || (selectedTeam ? sourceFor(selectedTeam) : (volumeIsLive && liveOverall ? liveOverall : sumSeries(volumePeople,'Все команды')));
+    root.querySelector('#rd-overall-title').textContent = selectedPersonEntry?.person.name || selectedTeam?.name || 'Все команды';
+    const overall = filterInactiveDays(volumePeriodSlice(overallData));
+    renderLineChart(root.querySelector('#rd-overall-chart'),overall.months,overall.tooltips||overall.months,[
+      {key:'mrs',name:'Влито MR',values:overall.mrs,color:'#5965d8'},
+      {key:'added',name:'Добавлено строк',values:overall.added,color:'#2f7ae5'},
+      {key:'deleted',name:'Удалено строк',values:overall.deleted,color:'#e58b19'},
+      {key:'files',name:'Изменено файлов',values:overall.files,color:'#2f8f5b'}
+    ]);
+    root.querySelector('#rd-team-analytics').innerHTML = visibleTeams.map(team => {
+      const source = selectedPersonEntry?.team.key === team.key ? selectedPersonEntry.person : sourceFor(team);
+      const chartKey=`team-${team.key}`, expanded=expandedVolumeChart===chartKey;
+      return `<section class="rd-panel rd-team-analytics-card" data-team="${team.key}"><div class="rd-team-card-title">${escapeHtml(team.name)}</div><div class="rd-team-analytics-body"><div class="rd-team-chart rd-chart-shell${expanded?' rd-chart-expanded':''}" data-chart-key="${chartKey}"><div class="rd-panel-title"><span class="rd-widget-title">Динамика команды</span><div class="rd-chart-title-actions"><div class="rd-metric-legend">${legend}</div><button type="button" class="rd-chart-expand" data-chart-key="${chartKey}" aria-label="${expanded?'Свернуть график':'Развернуть график на весь экран'}" title="${expanded?'Свернуть график':'Развернуть график на весь экран'}">${chartExpandIcon(expanded)}</button></div></div><div class="rd-chart-body"><div class="rd-line-chart" id="rd-chart-${team.key}"></div></div></div><div class="rd-team-table"><div class="rd-team-table-head"><div><strong class="rd-widget-title">Сотрудники</strong><small>${team.people.length} сотрудников</small></div></div><div class="rd-team-table-scroll"><table><thead><tr><th data-team="${team.key}" data-sort-key="name">Сотрудник ↕</th><th data-team="${team.key}" data-sort-key="mrs">MR ↕</th><th data-team="${team.key}" data-sort-key="added">Добавлено ↕</th><th data-team="${team.key}" data-sort-key="deleted">Удалено ↕</th><th data-team="${team.key}" data-sort-key="files">Файлов ↕</th></tr></thead><tbody id="rd-table-${team.key}"></tbody></table></div></div></div></section>`;
+    }).join('');
+    visibleTeams.forEach(team => {
+      const source = sourceFor(team);
+      if (!source) return;
+      const series = filterInactiveDays(volumePeriodSlice(source));
+      renderLineChart(root.querySelector(`#rd-chart-${team.key}`),series.months,series.tooltips||series.months,[
+        {key:'mrs',name:'Влито MR',values:series.mrs,color:'#5965d8'}, {key:'added',name:'Добавлено строк',values:series.added,color:'#2f7ae5'},
+        {key:'deleted',name:'Удалено строк',values:series.deleted,color:'#e58b19'}, {key:'files',name:'Изменено файлов',values:series.files,color:'#2f8f5b'}
+      ]);
+      const sort = volumeSort.get(team.key) || {key:'mrs',direction:'desc'};
+      const metrics = team.people.map(item => {
+        const sliced = volumePeriodSlice(item);
+        return {...item,mrs:sliced.mrs.reduce((a,b)=>a+b,0),added:sliced.added.reduce((a,b)=>a+b,0),deleted:sliced.deleted.reduce((a,b)=>a+b,0),files:sliced.files.reduce((a,b)=>a+b,0)};
+      }).sort((a,b) => {
+        const difference = sort.key === 'name' ? a.name.localeCompare(b.name,'ru') : a[sort.key]-b[sort.key];
+        return sort.direction === 'asc' ? difference : -difference;
+      });
+      root.querySelector(`#rd-table-${team.key}`).innerHTML = metrics.map(item => { const active = selectedPersonEntry?.team.key===team.key&&selectedPersonEntry.person.key===item.key; return `<tr${active ? ' class="rd-person-filtered"' : ''}><td><div class="rd-person"><span class="rd-avatar">${item.name.split(' ').map(part=>part[0]).join('').slice(0,2)}</span><button type="button" class="rd-person-filter" data-team="${escapeHtml(team.key)}" data-person="${escapeHtml(item.key)}" aria-pressed="${active}">${escapeHtml(item.name)}</button></div></td><td>${formatNumber(item.mrs)}</td><td>${formatNumber(item.added)}</td><td>${formatNumber(item.deleted)}</td><td>${formatNumber(item.files)}</td></tr>`; }).join('');
+    });
+    root.classList.toggle('rd-chart-lock',Boolean(expandedVolumeChart));
+    document.documentElement.classList.toggle('pulse-review-chart-lock',Boolean(expandedVolumeChart));
+  }
+  root.querySelector('#rd-team-analytics').addEventListener('click', event => {
+    const personButton = event.target.closest('.rd-person-filter');
+    if (personButton) {
+      const same = selectedVolumePerson?.teamKey===personButton.dataset.team&&selectedVolumePerson?.personKey===personButton.dataset.person;
+      selectedVolumePerson = same ? null : {teamKey:personButton.dataset.team,personKey:personButton.dataset.person};
+      renderVolumeConcept();
+      return;
+    }
+    const header = event.target.closest('th[data-sort-key]');
+    if (!header) return;
+    const current = volumeSort.get(header.dataset.team);
+    volumeSort.set(header.dataset.team,{key:header.dataset.sortKey,direction:current.key===header.dataset.sortKey&&current.direction==='desc'?'asc':'desc'});
+    renderVolumeConcept();
+  });
+  root.addEventListener('click',event=>{
+    const metric=event.target.closest('.rd-metric-toggle');
+    if (metric) {
+      visibleVolumeMetrics.has(metric.dataset.metric) ? visibleVolumeMetrics.delete(metric.dataset.metric) : visibleVolumeMetrics.add(metric.dataset.metric);
+      renderVolumeConcept();
+      return;
+    }
+    const expand=event.target.closest('.rd-chart-expand');
+    if (!expand) return;
+    expandedVolumeChart=expandedVolumeChart===expand.dataset.chartKey ? null : expand.dataset.chartKey;
+    renderVolumeConcept();
+  });
+  document.addEventListener('keydown',event=>{
+    if (event.key!=='Escape'||!expandedVolumeChart) return;
+    expandedVolumeChart=null;
+    renderVolumeConcept();
+  });
+  function saveAnalyticsRule() {
+    const threshold = Math.min(100,Math.max(1,Number(signalThresholdInput.value) || 20));
+    const minimum = Math.min(100,Math.max(1,Number(signalMinimumInput.value) || 5));
+    const rule={threshold,minimum,hideInactiveDays:hideInactiveDaysInput.checked};
+    const snapshot=JSON.stringify(rule);
+    if (snapshot===analyticsSavedSnapshot) return false;
+    volumePolicy.signalThresholdPercent = threshold;
+    volumePolicy.minimumMergedMRs = minimum;
+    signalThresholdInput.value = threshold;
+    signalMinimumInput.value = minimum;
+    localStorage.setItem('pulse-review-analytics-rule',snapshot);
+    analyticsSavedSnapshot=snapshot;
+    analyticsStatus.textContent = 'Настройки сохранены на этом компьютере';
+    renderVolumeConcept();
+    renderOverviewDashboard();
+    return true;
+  }
+  [signalThresholdInput,signalMinimumInput].forEach(input=>{
+    input.addEventListener('blur',saveAnalyticsRule);
+    input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();saveAnalyticsRule();input.blur();}});
+  });
+  hideInactiveDaysInput.addEventListener('change',saveAnalyticsRule);
+  [volumeFrom,volumeTo].forEach(input => input.addEventListener('change', renderVolumeConcept));
+  renderVolumeConcept();
+  renderOverviewDashboard();
+
   function fillTeams(routes) {
+    configuredRoutes = routes;
+    if (!volumeIsLive) volumeTeams.forEach((team,index) => { if (routes[index]?.name) team.name = routes[index].name; });
     teamSelect.innerHTML = '<option value="all">Все команды</option>' + routes.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name || 'Без названия')}</option>`).join('');
+    renderVolumeConcept();
+    renderOverviewDashboard();
+  }
+
+  const volumeSeriesFromAPI = points => ({
+    months:(points || []).map(point=>point.label),
+    tooltips:(points || []).map(point=>point.period),
+    mrs:(points || []).map(point=>point.mergedMRs),
+    added:(points || []).map(point=>point.additions),
+    deleted:(points || []).map(point=>point.deletions),
+    files:(points || []).map(point=>point.changedFiles)
+  });
+  function applyWorkVolume(result) {
+    liveOverall = {...volumeSeriesFromAPI(result.overall),name:'Все команды'};
+    liveDailyOverall = result.daily ? {...volumeSeriesFromAPI(result.daily),name:'Все команды'} : null;
+    volumeTeams = (result.teams || []).map(team => ({
+      key:String(team.id), name:team.name, series:{...volumeSeriesFromAPI(team.series),name:team.name}, daily:team.daily?{...volumeSeriesFromAPI(team.daily),name:team.name}:null,
+      people:(team.people || []).map(person=>({team:String(team.id),key:person.username,name:person.name || person.username,...volumeSeriesFromAPI(person.series),daily:person.daily?volumeSeriesFromAPI(person.daily):null}))
+    }));
+    volumePeople = volumeTeams.flatMap(team=>team.people);
+    volumeSort.clear();
+    volumeTeams.forEach(team=>volumeSort.set(team.key,{key:'mrs',direction:'desc'}));
+    volumeIsLive = true;
+    renderVolumeConcept();
+    renderOverviewDashboard();
+  }
+  async function loadWorkVolume() {
+    if (location.protocol === 'file:') return;
+    const from = volumeFrom.value, to = volumeTo.value;
+    const response = await fetch(`/api/work-volume?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Не удалось загрузить динамику');
+    applyWorkVolume(result);
   }
   function updateRouteCount() {
     const count = routesContainer.querySelectorAll('.rd-route').length;
@@ -322,14 +1138,56 @@
     updateRouteCount();
   }
   async function loadConfig() {
-    const response = await fetch('/api/config');
-    const config = await response.json();
+    let config;
+    try {
+      const response = await fetch('/api/config');
+      if (!response.ok) throw new Error(`GitLab API: ${response.status}`);
+      config = await response.json();
+    } catch (error) {
+      if (location.protocol !== 'file:') throw error;
+      config = {
+        preview:true, gitlabConfigured:true, gitlabUrl:'https://gitlab.example.com', gitlabTokenConfigured:true,
+        groups:[], projects:[],
+        routes:[
+          {id:'backend',name:'Backend-команда',members:['anna','ivan','alex'],reviewSignal:'approval',enabled:false},
+          {id:'mobile',name:'Mobile-команда',members:['maria'],reviewSignal:'approval',enabled:false}
+        ]
+      };
+    }
     root.classList.toggle('rd-mattermost-enabled', config.mattermostConfigured === true);
+    root.classList.toggle('rd-personal-signal-enabled', config.personalSignalEnabled === true);
     gitlabConfigured = config.gitlabConfigured === true;
     gitlabURLInput.value = config.gitlabUrl || '';
-    gitlabTokenInput.placeholder = config.gitlabTokenConfigured ? 'Сохранён — оставьте пустым, чтобы не менять' : 'Токен с правом read_api';
+    if (config.gitlabTokenConfigured) showSavedTokenMask();
+    else { gitlabTokenInput.value=''; gitlabTokenInput.dataset.saved='false'; gitlabTokenInput.placeholder='Токен с правом read_api'; }
     fillTeams(config.routes || []);
     renderRoutes(config.routes || []);
+    if (config.preview) {
+      volumeIsPreview=true;
+      const previewPeople = {
+        backend:[
+          {id:1,name:'Анна Смирнова',username:'anna',approvals:8,comments:14,createdMergeRequests:11,receivedComments:9,openedMergeRequests:2,profileUrl:'#',openMergeRequestsUrl:'#'},
+          {id:2,name:'Иван Петров',username:'ivan',approvals:6,comments:12,createdMergeRequests:10,receivedComments:7,openedMergeRequests:1,profileUrl:'#',openMergeRequestsUrl:'#'},
+          {id:3,name:'Алексей Денисов',username:'alex',approvals:5,comments:9,createdMergeRequests:5,receivedComments:6,openedMergeRequests:1,profileUrl:'#',openMergeRequestsUrl:'#'}
+        ],
+        mobile:volumePeople.filter(person=>person.team==='mobile').map((person,index)=>({id:index+4,name:person.name,username:person.key,approvals:Math.max(1,7-index%5),comments:Math.max(2,12-index%7),createdMergeRequests:person.mrs.at(-1),receivedComments:Math.max(1,8-index%4),openedMergeRequests:index%3,profileUrl:'#',openMergeRequestsUrl:'#'}))
+      };
+      const previewTeams = (config.routes || []).map((route,index) => ({id:route.id,name:route.name,reviewSignal:route.reviewSignal,reviewers:index === 0 ? previewPeople.backend : previewPeople.mobile}));
+      lastReport = {project:'Preview',projects:[],from:fromInput.value,to:toInput.value,reviewers:[...previewPeople.backend,...previewPeople.mobile],teams:previewTeams};
+      const previewDaily={name:'Все команды',months:['16.08','17.08','18.08','19.08','20.08','21.08','22.08','23.08','24.08','25.08','26.08','27.08','28.08','29.08'],tooltips:['16.08.26','17.08.26','18.08.26','19.08.26','20.08.26','21.08.26','22.08.26','23.08.26','24.08.26','25.08.26','26.08.26','27.08.26','28.08.26','29.08.26'],mrs:[2,1,3,2,4,3,2,1,2,3,0,4,5,6],added:[2800,3100,3500,3200,3900,4200,3600,3000,3350,3700,0,4050,4400,5000],deleted:[820,900,1030,940,1160,1250,1080,900,1010,1120,0,1230,1340,1550],files:[34,37,43,39,48,51,45,38,42,47,0,52,58,68],daily:true};
+      liveDailyOverall=previewDaily;
+      liveOverall=previewDaily;
+      volumeTeams.forEach((team,index)=>{
+        const share=index===0?.56:.44;
+        const scaled={...previewDaily,name:team.name,...Object.fromEntries(volumeMetricKeys.map(metric=>[metric,previewDaily[metric].map(value=>Math.round(value*share))]))};
+        team.daily=scaled;
+        team.series=scaled;
+      });
+      volumeIsLive=true;
+      renderSelectedTeam();
+      renderVolumeConcept();
+      renderOverviewDashboard();
+    }
     const sourcesBox = root.querySelector('.rd-global-sources');
     sourcesBox.querySelectorAll('.rd-chip').forEach(chip => chip.remove());
     [...(config.groups || []), ...(config.projects || [])].forEach(source => addChip(sourcesBox, source, 'rd-add-source'));
@@ -342,13 +1200,12 @@
   }
   async function saveConnection() {
     connectionStatus.textContent = 'Проверяю подключение…';
-    const response = await fetch('/api/connection', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ gitlabUrl:gitlabURLInput.value.trim(), gitlabToken:gitlabTokenInput.value }) });
+    const response = await fetch('/api/connection', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ gitlabUrl:gitlabURLInput.value.trim(), gitlabToken:gitlabTokenInput.dataset.saved==='true' ? '' : gitlabTokenInput.value }) });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Не удалось сохранить подключение');
     gitlabConfigured = true;
     gitlabURLInput.value = result.gitlabUrl;
-    gitlabTokenInput.value = '';
-    gitlabTokenInput.placeholder = 'Сохранён — оставьте пустым, чтобы не менять';
+    showSavedTokenMask();
     connectionStatus.textContent = `Подключено: ${result.user?.name || result.user?.username || 'GitLab'}`;
     return result;
   }
@@ -454,17 +1311,27 @@
   }
   root.querySelector('#rd-add-route').addEventListener('click', event => { event.stopImmediatePropagation(); routesContainer.appendChild(createRoute({ enabled:false })); updateRouteCount(); });
   root.querySelector('#rd-save-routes').addEventListener('click', event => { event.stopImmediatePropagation(); saveProjects().catch(error => settingsStatus.textContent = error.message); });
+  root.querySelector('.rd-engagement-legend').addEventListener('click', event => {
+    const button=event.target.closest('[data-engagement-metric]');
+    if (!button) return;
+    const metric=button.dataset.engagementMetric;
+    visibleEngagementMetrics.has(metric) ? visibleEngagementMetrics.delete(metric) : visibleEngagementMetrics.add(metric);
+    if (lastReport) renderSelectedTeam();
+    else if (currentEngagementPeople.length) renderEngagement(currentEngagementPeople);
+    else root.querySelectorAll('[data-engagement-metric]').forEach(item=>item.setAttribute('aria-pressed',String(visibleEngagementMetrics.has(item.dataset.engagementMetric))));
+  });
   function renderEngagement(people) {
-    const ranked = people.map(person => ({ ...person, engagement: (person.approvals || 0) + (person.comments || 0) + (person.createdMergeRequests || 0) }))
+    currentEngagementPeople = people;
+    root.querySelectorAll('[data-engagement-metric]').forEach(button=>button.setAttribute('aria-pressed',String(visibleEngagementMetrics.has(button.dataset.engagementMetric))));
+    const metricValue=(person,metric)=>metric==='mrs' ? Number(person.createdMergeRequests||0) : Number(person[metric]||0);
+    const ranked = people.map(person => ({ ...person, engagement: [...visibleEngagementMetrics].reduce((sum,metric)=>sum+metricValue(person,metric),0) }))
       .sort((a, b) => b.engagement - a.engagement || a.name.localeCompare(b.name, 'ru'));
     if (!ranked.length) { engagementBody.innerHTML = '<div class="rd-engagement-empty">Нет данных за выбранный период</div>'; return; }
     const max = Math.max(1, ...ranked.map(person => person.engagement));
     engagementBody.innerHTML = ranked.map(person => {
       const initials = person.name.split(' ').map(part => part[0]).join('').slice(0, 2);
-      const approvalsWidth = (person.approvals || 0) / max * 100;
-      const commentsWidth = (person.comments || 0) / max * 100;
-      const mrsWidth = (person.createdMergeRequests || 0) / max * 100;
-      return `<div class="rd-engagement-row"><div class="rd-engagement-person"><span class="rd-avatar">${escapeHtml(initials)}</span><span title="${escapeHtml(person.name)}">${escapeHtml(person.name)}</span></div><div class="rd-engagement-bar" aria-label="Вовлечённость ${escapeHtml(person.name)}: ${person.engagement}"><span class="rd-engagement-segment rd-engagement-approvals" style="width:${approvalsWidth}%" data-tooltip="Approvals / 👍: ${person.approvals || 0}"></span><span class="rd-engagement-segment rd-engagement-comments" style="width:${commentsWidth}%" data-tooltip="Комментарии: ${person.comments || 0}"></span><span class="rd-engagement-segment rd-engagement-mrs" style="width:${mrsWidth}%" data-tooltip="Создано MR: ${person.createdMergeRequests || 0}"></span></div><div class="rd-engagement-total" title="Суммарная вовлечённость">${person.engagement}</div></div>`;
+      const segment=(metric,className,label)=>visibleEngagementMetrics.has(metric) ? `<span class="rd-engagement-segment ${className}" style="width:${metricValue(person,metric)/max*100}%" data-tooltip="${label}: ${metricValue(person,metric)}"></span>` : '';
+      return `<div class="rd-engagement-row"><div class="rd-engagement-person"><span class="rd-avatar">${escapeHtml(initials)}</span><span title="${escapeHtml(person.name)}">${escapeHtml(person.name)}</span></div><div class="rd-engagement-bar" aria-label="Вовлечённость ${escapeHtml(person.name)}: ${person.engagement}">${segment('approvals','rd-engagement-approvals','Approvals / 👍')}${segment('comments','rd-engagement-comments','Комментарии')}${segment('mrs','rd-engagement-mrs','Создано MR')}</div><div class="rd-engagement-total" title="Суммарная вовлечённость">${person.engagement}</div></div>`;
     }).join('');
   }
   function renderReport(report) {
@@ -483,7 +1350,7 @@
       const sumMrs = section.reviewers.reduce((sum, person) => sum + person.createdMergeRequests, 0);
       const sumReceivedComments = section.reviewers.reduce((sum, person) => sum + (person.receivedComments || 0), 0);
       const sumOpenedMrs = section.reviewers.reduce((sum, person) => sum + (person.openedMergeRequests || 0), 0);
-      return `<section class="rd-panel"><div class="rd-panel-title"><span>${escapeHtml(section.name || 'Без названия')}</span><button class="rd-export-team" data-section="${sectionIndex}" aria-label="Скачать CSV команды ${escapeHtml(section.name || 'Без названия')}" title="Скачать CSV"></button></div><table><thead><tr><th>Сотрудник</th><th>Approvals</th><th>Комментарии</th><th>Создано MR</th><th>Комментариев к MR</th><th>Открыто MR</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Итого</td><td>${sumApprovals}</td><td>${sumComments}</td><td>${sumMrs}</td><td>${sumReceivedComments}</td><td>${sumOpenedMrs}</td></tr></tfoot></table></section>`;
+      return `<section class="rd-panel"><div class="rd-panel-title"><span>${escapeHtml(section.name || 'Без названия')}</span><button class="rd-export-team" data-section="${sectionIndex}" aria-label="Скачать CSV команды ${escapeHtml(section.name || 'Без названия')}" title="Скачать CSV"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3.5v10m-3.5-3.5 3.5 3.5 3.5-3.5M4 17h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><table><thead><tr><th>Сотрудник</th><th>Approvals</th><th>Комментарии</th><th>Создано MR</th><th>Комментариев к MR</th><th>Открыто MR</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>Итого</td><td>${sumApprovals}</td><td>${sumComments}</td><td>${sumMrs}</td><td>${sumReceivedComments}</td><td>${sumOpenedMrs}</td></tr></tfoot></table></section>`;
     }).join('');
     reportContent._visibleSections = sections;
   }
@@ -494,39 +1361,90 @@
     renderReport({ ...lastReport, teams: team ? [team] : [] });
   }
   const toIsoDate = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  const formatShortMonth = date => `${String(date.getMonth()+1).padStart(2,'0')}'${String(date.getFullYear()).slice(-2)}`;
+  const formatQuarter = date => `${Math.floor(date.getMonth()/3)+1}q'${String(date.getFullYear()).slice(-2)}`;
+  const labelToday = new Date(), labelPreviousMonth = new Date(labelToday.getFullYear(),labelToday.getMonth()-1,1), labelPreviousQuarter = new Date(labelToday.getFullYear(),Math.floor(labelToday.getMonth()/3)*3-3,1);
+  periodSelect.querySelector('[value="current_month"]').textContent = `Текущий месяц · ${formatShortMonth(labelToday)}`;
+  periodSelect.querySelector('[value="previous_month"]').textContent = `Прошлый месяц · ${formatShortMonth(labelPreviousMonth)}`;
+  periodSelect.querySelector('[value="current_quarter"]').textContent = `Текущий квартал · ${formatQuarter(labelToday)}`;
+  periodSelect.querySelector('[value="previous_quarter"]').textContent = `Прошлый квартал · ${formatQuarter(labelPreviousQuarter)}`;
   periodSelect.addEventListener('change', () => {
     const today = new Date();
-    const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
-    if (periodSelect.value === 'yesterday') { fromInput.value = toIsoDate(yesterday); toInput.value = toIsoDate(yesterday); captionLive.textContent = 'Статистика за вчера'; }
-    if (periodSelect.value === 'week') { fromInput.value = toIsoDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7)); toInput.value = toIsoDate(today); captionLive.textContent = 'Статистика за последние 7 дней, включая сегодня'; }
-    if (periodSelect.value === 'month') { fromInput.value = toIsoDate(new Date(today.getFullYear(), today.getMonth() - 1, 1)); toInput.value = toIsoDate(new Date(today.getFullYear(), today.getMonth(), 0)); captionLive.textContent = 'Статистика за предыдущий месяц'; }
-    if (periodSelect.value === 'current_quarter') { const startMonth = Math.floor(today.getMonth() / 3) * 3; fromInput.value = toIsoDate(new Date(today.getFullYear(), startMonth, 1)); toInput.value = toIsoDate(today); captionLive.textContent = 'Статистика за текущий квартал'; }
-    if (periodSelect.value === 'previous_quarter') { const startMonth = Math.floor(today.getMonth() / 3) * 3; fromInput.value = toIsoDate(new Date(today.getFullYear(), startMonth - 3, 1)); toInput.value = toIsoDate(new Date(today.getFullYear(), startMonth, 0)); captionLive.textContent = 'Статистика за предыдущий квартал'; }
-    if (periodSelect.value === 'custom') captionLive.textContent = 'Статистика за выбранный период';
+    const startMonth = Math.floor(today.getMonth() / 3) * 3;
+    const ranges = {
+      week:[new Date(today.getFullYear(),today.getMonth(),today.getDate()-6),today,'Статистика за последнюю неделю'],
+      two_weeks:[new Date(today.getFullYear(),today.getMonth(),today.getDate()-13),today,'Статистика за последние 2 недели'],
+      current_month:[new Date(today.getFullYear(),today.getMonth(),1),today,'Статистика за текущий месяц'],
+      previous_month:[new Date(today.getFullYear(),today.getMonth()-1,1),new Date(today.getFullYear(),today.getMonth(),0),'Статистика за прошлый месяц'],
+      current_quarter:[new Date(today.getFullYear(),startMonth,1),today,'Статистика за текущий квартал'],
+      previous_quarter:[new Date(today.getFullYear(),startMonth-3,1),new Date(today.getFullYear(),startMonth,0),'Статистика за прошлый квартал'],
+      half_year:[new Date(today.getFullYear(),today.getMonth()-5,1),today,'Статистика за последние полгода'],
+      year:[new Date(today.getFullYear(),today.getMonth()-11,1),today,'Статистика за последний год']
+    };
+    sharedDates.classList.toggle('visible', periodSelect.value === 'custom');
+    analyticsControls.classList.toggle('rd-custom-period', periodSelect.value === 'custom');
+    const range = ranges[periodSelect.value];
+    if (range) { fromInput.value = toIsoDate(range[0]); toInput.value = toIsoDate(range[1]); }
+    renderVolumeConcept();
+    renderOverviewDashboard();
     status.textContent = 'Период изменён — нажмите обновить';
   });
-  [fromInput, toInput].forEach(input => input.addEventListener('change', () => { periodSelect.value = 'custom'; captionLive.textContent = 'Статистика за выбранный период'; status.textContent = 'Период изменён — нажмите обновить'; }));
-  teamSelect.addEventListener('change', renderSelectedTeam);
+  [fromInput, toInput].forEach(input => input.addEventListener('change', () => { periodSelect.value = 'custom'; sharedDates.classList.add('visible'); analyticsControls.classList.add('rd-custom-period'); renderVolumeConcept(); renderOverviewDashboard(); status.textContent = 'Период изменён — нажмите обновить'; }));
+  teamSelect.addEventListener('change', () => { selectedVolumePerson=null; renderSelectedTeam(); renderVolumeConcept(); renderOverviewDashboard(); });
+  const csvQuote = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
+  function createCsvDownload(rows,filename) {
+    const csv='\uFEFF'+rows.map(row=>row.map(csvQuote).join(';')).join('\r\n');
+    const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+    const link=document.createElement('a');
+    link.href=url; link.download=filename; link.click(); URL.revokeObjectURL(url);
+  }
+  const seriesTotals = series => Object.fromEntries(volumeMetricKeys.map(metric=>[metric,(series[metric]||[]).reduce((sum,value)=>sum+Number(value||0),0)]));
+  function selectedExportTeams() {
+    if (teamSelect.value==='all') return volumeTeams;
+    const team=volumeTeams.find(item=>String(item.key)===teamSelect.value);
+    return team ? [team] : [];
+  }
+  function downloadAllIndicators() {
+    const selectedTeams=selectedExportTeams();
+    const scopeName=selectedTeams.length===1 ? selectedTeams[0].name : 'Все команды';
+    const source=filterInactiveDays(volumePeriodSlice(dashboardSource(),true));
+    const reviewSections=(lastReport?.teams || (lastReport ? [{name:lastReport.project,reviewers:lastReport.reviewers||[]}] : []))
+      .filter(section=>teamSelect.value==='all'||String(section.id)===teamSelect.value||section.name===scopeName);
+    const reviewByUsername=new Map(reviewSections.flatMap(section=>(section.reviewers||[]).map(person=>[String(person.username||'').toLowerCase(),person])));
+    const header=['Тип строки','Команда','Сотрудник','GitLab username','Период','Влито MR','Добавлено строк','Удалено строк','Изменено файлов','Approvals','Комментарии','Создано MR','Комментариев к MR','Открыто MR'];
+    const periodRows=source.months.map((label,index)=>['Период',scopeName,'','',source.tooltips?.[index]||label,source.mrs[index]||0,source.added[index]||0,source.deleted[index]||0,source.files[index]||0,'','','','','']);
+    const peopleRows=selectedTeams.flatMap(team=>team.people.map(person=>{
+      const personSource=volumeIsLive&&person.daily ? person.daily : person;
+      const totals=seriesTotals(filterInactiveDays(volumePeriodSlice(personSource,true)));
+      const review=reviewByUsername.get(String(person.key||'').toLowerCase())||{};
+      return ['Сотрудник',team.name,person.name,person.key,`${fromInput.value} — ${toInput.value}`,totals.mrs,totals.added,totals.deleted,totals.files,review.approvals||0,review.comments||0,review.createdMergeRequests||0,review.receivedComments||0,review.openedMergeRequests||0];
+    }));
+    const safeScope=scopeName.replace(/[^a-zа-яё0-9_-]+/gi,'-');
+    createCsvDownload([header,...periodRows,...peopleRows],`pulse-review-${safeScope}-${fromInput.value}-${toInput.value}.csv`);
+  }
+  root.querySelector('#rd-export-all').addEventListener('click',downloadAllIndicators);
   root.addEventListener('click', event => {
     const button = event.target.closest('.rd-export-team');
     if (!button) return;
     const section = (reportContent._visibleSections || [])[Number(button.dataset.section)];
     if (!section) return;
-    const quote = value => `"${String(value).replace(/"/g, '""')}"`;
     const lines = [['Сотрудник','GitLab username','Approvals','Комментарии','Создано MR','Комментариев к MR','Открыто MR'], ...section.reviewers.map(person => [person.name,person.username,person.approvals,person.comments,person.createdMergeRequests,person.receivedComments || 0,person.openedMergeRequests || 0])];
-    const csv = '\uFEFF' + lines.map(row => row.map(quote).join(';')).join('\r\n');
-    const url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
-    const link = document.createElement('a'); link.href = url; link.download = `${(section.name || 'team').replace(/[^a-zа-яё0-9_-]+/gi,'-')}-${fromInput.value}-${toInput.value}.csv`; link.click(); URL.revokeObjectURL(url);
+    createCsvDownload(lines,`${(section.name || 'team').replace(/[^a-zа-яё0-9_-]+/gi,'-')}-${fromInput.value}-${toInput.value}.csv`);
   });
   async function loadReport() {
     let progressKnown = false;
-    const setLoadingMessage = message => {
-      status.textContent = message;
-      const cell = reportContent.querySelector('.rd-loading-message');
-      if (cell) cell.textContent = message;
+    const setLoadingMessage = (message, processed = null, total = null) => {
+      updateProgressCount.textContent = processed === null ? message : `Обработано ${processed} из ${total} MR`;
+      const percent = processed === null || !total ? 0 : Math.min(100,Math.round(processed/total*100));
+      updateProgressTrack.setAttribute('aria-valuenow',String(percent));
+      updateProgressBar.style.width = `${percent}%`;
     };
     refreshButton.disabled = true;
-    reportContent.innerHTML = '<section class="rd-panel"><div class="rd-panel-title"><span>Загрузка статистики</span></div><table><tbody><tr><td class="rd-zero rd-loading-message">Посылаю запросы в космос…</td></tr></tbody></table></section>';
+    activeReportController?.abort();
+    const reportController = new AbortController();
+    activeReportController = reportController;
+    updateProgress.hidden = false;
+    status.textContent = '';
     setLoadingMessage('Посылаю запросы в космос…');
     const from = root.querySelector('#rd-from').value, to = root.querySelector('#rd-to').value;
     const job = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -541,26 +1459,45 @@
         if (Number.isInteger(progress.total)) {
           progressKnown = true;
           const shown = progress.processed >= progress.total ? progress.total : Math.floor(progress.processed / 10) * 10;
-          setLoadingMessage(`Обработано ${shown} из ${progress.total} MR…`);
+          setLoadingMessage('Обновление данных',shown,progress.total);
         }
       } catch {}
     }, 1000);
     try {
-      const response = await fetch(`/api/report?from=${from}&to=${to}&team=all&job=${encodeURIComponent(job)}`);
+      const response = await fetch(`/api/report?from=${from}&to=${to}&team=all&job=${encodeURIComponent(job)}`,{signal:reportController.signal});
       const report = await response.json();
       if (!response.ok) throw new Error(report.error || 'Ошибка загрузки');
       lastReport = report;
       renderSelectedTeam();
-      status.textContent = 'Данные обновлены';
+      try {
+        await loadWorkVolume();
+        status.textContent = 'Данные обновлены';
+      } catch (volumeError) {
+        status.textContent = `Статистика обновлена. Динамика: ${volumeError.message}`;
+      }
+    } catch (error) {
+      if (error.name === 'AbortError') { status.textContent = 'Обновление отменено'; return; }
+      throw error;
     } finally {
       timers.forEach(clearTimeout);
       clearInterval(progressTimer);
       refreshButton.disabled = false;
+      updateProgress.hidden = true;
+      if (activeReportController === reportController) activeReportController = null;
     }
   }
+  updateCancel.addEventListener('click', () => activeReportController?.abort());
   root.querySelector('#rd-refresh').addEventListener('click', event => { event.stopImmediatePropagation(); loadReport().catch(error => status.textContent = error.message); });
+  if (location.protocol === 'file:') renderEngagement([
+    {name:'Анна Смирнова',approvals:4,comments:11,createdMergeRequests:5},
+    {name:'Иван Петров',approvals:3,comments:9,createdMergeRequests:4},
+    {name:'Мария Ким',approvals:2,comments:8,createdMergeRequests:3},
+    {name:'Алексей Денисов',approvals:2,comments:6,createdMergeRequests:3},
+    {name:'Олег Белов',approvals:1,comments:4,createdMergeRequests:2},
+    {name:'Елена Новикова',approvals:0,comments:0,createdMergeRequests:0}
+  ]);
   periodSelect.dispatchEvent(new Event('change'));
-  loadConfig().then(config => config.gitlabConfigured ? loadReport() : null).catch(error => status.textContent = error.message);
+  loadConfig().then(config => !config.preview && config.gitlabConfigured ? loadReport() : null).catch(error => status.textContent = error.message);
 })();
 </script>
 </body>

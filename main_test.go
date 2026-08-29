@@ -228,6 +228,7 @@ func TestWriteJSONAtomicCanOverwriteExistingSettings(t *testing.T) {
 
 func TestHTTPCompatibilityShapes(t *testing.T) {
 	t.Setenv("MATTERMOST_WEBHOOK_URL", "")
+	t.Setenv("PULSE_REVIEW_PERSONAL_SIGNAL_ENABLED", "")
 	app := newTestApplication(t, fixtureGitLab(t))
 
 	progressRequest := httptest.NewRequest(http.MethodGet, "/api/progress?id=unknown", nil)
@@ -254,8 +255,22 @@ func TestHTTPCompatibilityShapes(t *testing.T) {
 	if config["mattermostConfigured"] != false {
 		t.Fatalf("unexpected config: %#v", config)
 	}
+	if config["personalSignalEnabled"] != false {
+		t.Fatalf("personal signal must be disabled by default: %#v", config)
+	}
 	if projects, ok := config["projects"].([]any); !ok || len(projects) != 0 {
 		t.Fatalf("projects must be an empty array: %#v", config["projects"])
+	}
+
+	t.Setenv("PULSE_REVIEW_PERSONAL_SIGNAL_ENABLED", "true")
+	flagResponse := httptest.NewRecorder()
+	app.handler().ServeHTTP(flagResponse, httptest.NewRequest(http.MethodGet, "/api/config", nil))
+	var flaggedConfig map[string]any
+	if err := json.Unmarshal(flagResponse.Body.Bytes(), &flaggedConfig); err != nil {
+		t.Fatal(err)
+	}
+	if flaggedConfig["personalSignalEnabled"] != true {
+		t.Fatalf("personal signal feature flag was not enabled: %#v", flaggedConfig)
 	}
 
 	staticRequest := httptest.NewRequest(http.MethodGet, "/", nil)

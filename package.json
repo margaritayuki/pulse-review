@@ -1,0 +1,11 @@
+{
+  "name": "pulse-review-ui-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:ui": "node scripts/test-ui.mjs",
+    "test:browser": "node scripts/test-browser.mjs",
+    "test": "npm run test:ui",
+    "test:all": "npm run test:ui && npm run test:browser"
+  }
+}
