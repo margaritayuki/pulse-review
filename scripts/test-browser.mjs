@@ -182,6 +182,10 @@ try {
     assert.ok(lineState.every(card=>card.paths===1&&card.points>0&&card.areas===(card.points>1?1:0)),JSON.stringify({case:testCase.name,view:'График',lineState}));
     await setDashboardView('bar');
     if (testCase.period==='week') assert.ok(await cdp.evaluate(`document.querySelector('#rd-dashboard-cards .rd-dashboard-card-bars').getBoundingClientRect().height<=202`),JSON.stringify({case:testCase.name,view:'Линейчатая'}));
+    if (testCase.period==='two_weeks') {
+      const layout=await cdp.evaluate(`(()=>[...document.querySelectorAll('#rd-dashboard-cards > .rd-panel')].map(card=>{const head=card.querySelector('.rd-dashboard-card-head').getBoundingClientRect(),bars=card.querySelector('.rd-dashboard-card-bars').getBoundingClientRect(),rows=[...card.querySelectorAll('.rd-dashboard-bar-row')].map(row=>row.getBoundingClientRect());return {rows:rows.length,barsHeight:bars.height,firstTop:rows[0]?.top,lastBottom:rows.at(-1)?.bottom,headBottom:head.bottom,barsTop:bars.top,barsBottom:bars.bottom}}))()`);
+      assert.ok(layout.every(card=>card.rows===13&&card.barsHeight>200&&card.firstTop>=card.headBottom&&card.lastBottom<=card.barsBottom),JSON.stringify({case:testCase.name,error:'Строки двух недель выходят за границы карточки',layout}));
+    }
     let cards=await readDashboardBars();
     assert.ok(cards.every(card=>JSON.stringify(card.groups)===JSON.stringify(testCase.groups)),JSON.stringify({case:testCase.name,expected:testCase.groups,cards}));
     const expectedTotals=Object.fromEntries(cards.map(card=>[card.key,card.total]));

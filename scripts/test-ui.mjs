@@ -100,6 +100,7 @@ const contracts = [
   ['dashboard horizontal-bar view', 'data-dashboard-view="bar"'],
   ['period-dependent groupings', 'function dashboardAvailableGroups()'],
   ['two-week preview window', "volumeRange.value==='week'?7:14"],
+  ['dashboard bars grow for long periods', '.rd-dashboard-card-bars { min-height:200px;'],
   ['zero periods are removed', 'function removeZeroDashboardPeriods('],
   ['dashboard uses existing loaded source', 'function dashboardSource()'],
   ['metric total inherits title typography', '.rd-dashboard-card-total { color:inherit; font:inherit; }'],
