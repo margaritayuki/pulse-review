@@ -27,6 +27,7 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`.rd-dashboard-card-bars { min-height:200px;`,
 		`rd-dashboard-card-title rd-widget-title`,
 		`.rd-panel-title { min-height:58px; box-sizing:border-box;`,
+		`.rd-dashboard-top .rd-panel-title { min-height:50px; padding-block:8px; align-items:center; }`,
 		`renderSelectedTeam();`,
 		`.rd-controls[hidden] { display:none !important; }`,
 		`.rd-info-wrap:hover .rd-info-popover`,

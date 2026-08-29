@@ -106,6 +106,7 @@ const contracts = [
   ['metric total inherits title typography', '.rd-dashboard-card-total { color:inherit; font:inherit; }'],
   ['dashboard cards use engagement title style', 'rd-dashboard-card-title rd-widget-title'],
   ['compact widget header box sizing', '.rd-panel-title { min-height:58px; box-sizing:border-box;'],
+  ['centered compact dashboard widget headings', '.rd-dashboard-top .rd-panel-title { min-height:50px; padding-block:8px; align-items:center; }'],
 ];
 
 for (const [name, fragment] of contracts) {
