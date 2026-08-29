@@ -270,10 +270,9 @@
     #review-dashboard-concept .rd-dashboard-periods { position:relative; padding:16px; display:grid; align-content:center; gap:13px; min-height:300px; }
     #review-dashboard-concept .rd-dashboard-period-row { display:grid; grid-template-columns:80px minmax(0,1fr) 92px; align-items:center; gap:12px; }
     #review-dashboard-concept .rd-dashboard-period-label { color:light-dark(#667085,#aab4c4); font-size:11px; white-space:nowrap; }
-    #review-dashboard-concept .rd-dashboard-period-track { width:100%; min-height:34px; padding:2px 0; display:grid; align-content:center; gap:3px; border:0; background:transparent; cursor:pointer; }
+    #review-dashboard-concept .rd-dashboard-period-track { width:100%; height:12px; padding:0; display:flex; overflow:hidden; border:0; border-radius:7px; background:light-dark(#edf0f5,#293342); cursor:pointer; }
     #review-dashboard-concept .rd-dashboard-period-track:focus-visible { outline:2px solid #5965d8; outline-offset:3px; }
-    #review-dashboard-concept .rd-dashboard-period-metric { height:4px; overflow:hidden; border-radius:4px; background:light-dark(#edf0f5,#293342); }
-    #review-dashboard-concept .rd-dashboard-period-metric i { display:block; height:100%; min-width:1px; border-radius:inherit; }
+    #review-dashboard-concept .rd-dashboard-period-metric { display:block; height:100%; min-width:1px; }
     #review-dashboard-concept .rd-dashboard-period-total { color:light-dark(#344054,#d9e0eb); font-size:11px; font-weight:650; text-align:right; white-space:nowrap; }
     #review-dashboard-concept .rd-dashboard-periods .rd-chart-tooltip { top:auto; bottom:18px; }
     #review-dashboard-concept .rd-dashboard-legend { justify-content:flex-end; padding:0; }
@@ -892,8 +891,9 @@
     const container=root.querySelector('#rd-dashboard-periods');
     if (!metrics.length || !filtered.months.length) { container.innerHTML='<div class="rd-dashboard-empty">Нет данных за выбранный период</div>'; return; }
     const maxima=Object.fromEntries(metrics.map(metric=>[metric.key,Math.max(1,...filtered[metric.key])]));
-    const rows=filtered.months.map((label,index)=>({label,index,changedLines:Number(filtered.added[index]||0)+Number(filtered.deleted[index]||0)}));
-    container.innerHTML=rows.map((row,rowIndex)=>`<div class="rd-dashboard-period-row"><span class="rd-dashboard-period-label">${escapeHtml(row.label)}</span><button type="button" class="rd-dashboard-period-track" data-period-index="${rowIndex}" aria-label="Показать значения за ${escapeHtml(row.label)}; изменено ${formatNumber(row.changedLines)} строк">${metrics.map(metric=>`<span class="rd-dashboard-period-metric" aria-hidden="true"><i style="width:${Number(filtered[metric.key][row.index]||0)/maxima[metric.key]*100}%;background:${metric.color}"></i></span>`).join('')}</button><span class="rd-dashboard-period-total" title="Добавлено и удалено строк">${formatNumber(row.changedLines)} стр.</span></div>`).join('')+'<div class="rd-chart-tooltip" role="tooltip" hidden></div>';
+    const rows=filtered.months.map((label,index)=>({label,index,changedLines:Number(filtered.added[index]||0)+Number(filtered.deleted[index]||0),scores:metrics.map(metric=>Number(filtered[metric.key][index]||0)/maxima[metric.key])}));
+    const maximumScore=Math.max(1,...rows.map(row=>row.scores.reduce((sum,value)=>sum+value,0)));
+    container.innerHTML=rows.map((row,rowIndex)=>`<div class="rd-dashboard-period-row"><span class="rd-dashboard-period-label">${escapeHtml(row.label)}</span><button type="button" class="rd-dashboard-period-track" data-period-index="${rowIndex}" aria-label="Показать значения за ${escapeHtml(row.label)}; изменено ${formatNumber(row.changedLines)} строк">${metrics.map((metric,metricIndex)=>`<span class="rd-dashboard-period-metric" aria-hidden="true" style="width:${row.scores[metricIndex]/maximumScore*100}%;background:${metric.color}"></span>`).join('')}</button><span class="rd-dashboard-period-total" title="Добавлено и удалено строк">${formatNumber(row.changedLines)} стр.</span></div>`).join('')+'<div class="rd-chart-tooltip" role="tooltip" hidden></div>';
     const tooltip=container.querySelector('.rd-chart-tooltip');
     let pinnedIndex=null;
     const showPeriod=index=>{

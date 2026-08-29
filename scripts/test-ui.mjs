@@ -87,7 +87,7 @@ const contracts = [
   ['dashboard legends live in panel headers', '<strong class="rd-widget-title">Все показатели</strong><div class="rd-metric-legend rd-dashboard-legend"'],
   ['mixed small-MR scale', 'const fixed=[0,1,3,5,7,10]'],
   ['period totals are visible', 'class="rd-dashboard-period-total"'],
-  ['period metrics use independent tracks', 'class="rd-dashboard-period-metric"'],
+  ['period metrics use engagement-style segments', 'class="rd-dashboard-period-metric"'],
   ['period total means changed lines', 'Добавлено + удалено'],
   ['period bars have interactive details', 'data-period-index="${rowIndex}"'],
   ['saved token is visibly masked', "const savedTokenMask = '••••••••••••'"],
