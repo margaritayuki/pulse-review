@@ -332,6 +332,10 @@ try {
   assert.ok(weeklyCalendar.weekendLabels.every(label=>/^\d{2}\.\d{2}$/.test(label)),JSON.stringify(weeklyCalendar));
   assert.notEqual(weeklyCalendar.weekdayColor,weeklyCalendar.weekendColor,JSON.stringify(weeklyCalendar));
   assert.equal(weeklyCalendar.inside,true,JSON.stringify(weeklyCalendar));
+  await cdp.evaluate(`document.querySelector('#rd-period').value='two_weeks';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
+  const twoWeekPreview=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart'),labels=[...chart.querySelectorAll('.rd-line-axis-date')].map(node=>node.textContent);return {points:chart.querySelectorAll('.rd-line-hit').length,first:labels[0],last:labels.at(-1)}})()`);
+  assert.deepEqual(twoWeekPreview,{points:13,first:'16.08',last:'29.08'},JSON.stringify(twoWeekPreview));
+  await cdp.evaluate(`document.querySelector('#rd-period').value='week';document.querySelector('#rd-period').dispatchEvent(new Event('change',{bubbles:true}))`);
   const chartScale=await cdp.evaluate(`(()=>{const chart=document.querySelector('#rd-overall-chart'),svg=chart.querySelector('svg'),ticks=[...chart.querySelectorAll('.rd-y-axis-tick')].map(node=>node.textContent),paths=[...chart.querySelectorAll('.rd-line-path')].map(node=>node.getAttribute('d'));return {mode:svg.dataset.scaleMode,ticks,axisTitles:chart.querySelectorAll('.rd-line-axis-title').length,distinctPaths:new Set(paths).size,totalPaths:paths.length}})()`);
   assert.equal(chartScale.mode,'nonlinear',JSON.stringify(chartScale));
   assert.ok(chartScale.ticks.length>=5,JSON.stringify(chartScale));

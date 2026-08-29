@@ -22,6 +22,7 @@ func TestFrontendRegressionContracts(t *testing.T) {
 		`id:'backend',name:'Backend-команда'`,
 		`id:'mobile',name:'Mobile-команда'`,
 		`const previewTeams = (config.routes || []).map`,
+		`volumeRange.value==='week'?7:14`,
 		`renderSelectedTeam();`,
 		`.rd-controls[hidden] { display:none !important; }`,
 		`.rd-info-wrap:hover .rd-info-popover`,
