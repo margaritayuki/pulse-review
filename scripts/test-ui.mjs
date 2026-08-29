@@ -104,6 +104,7 @@ const contracts = [
   ['zero periods are removed', 'function removeZeroDashboardPeriods('],
   ['dashboard uses existing loaded source', 'function dashboardSource()'],
   ['metric total inherits title typography', '.rd-dashboard-card-total { color:inherit; font:inherit; }'],
+  ['dashboard cards use engagement title style', 'rd-dashboard-card-title rd-widget-title'],
 ];
 
 for (const [name, fragment] of contracts) {
